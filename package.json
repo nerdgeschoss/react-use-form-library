@@ -1,0 +1,17 @@
+{
+  "name": "react-use-form-library",
+  "version": "1.0.0",
+  "description": "A simple form library using react hooks",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leo Gonzalez",
+  "license": "ISC",
+  "dependencies": {
+    "@types/lodash.isempty": "^4.4.6",
+    "@types/react": "^16.9.34",
+    "lodash.isempty": "^4.4.0",
+    "react": "^16.13.1"
+  }
+}
