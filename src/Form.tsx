@@ -1,9 +1,9 @@
-import React, { useState, useRef } from "react";
-import isEmpty from "lodash.isempty";
-import { useForceUpdate } from "./util";
-import { FormField } from "./FormField";
-import { MappedValidation, CustomValidationMessages } from "./validation";
-import { MappedFields, FormModel } from "./types";
+import React, { useState, useRef } from 'react';
+import isEmpty from 'lodash.isempty';
+import { useForceUpdate } from './util';
+import { FormField } from './FormField';
+import { MappedValidation, CustomValidationMessages } from './validation';
+import { MappedFields, FormModel } from './types';
 
 class Form<T> {
   private model: T;
@@ -50,7 +50,7 @@ class Form<T> {
     this.fields[key] = new FormField({
       name: key,
       value: this.model[key],
-      required: this.validations?.[key]?.includes("required"),
+      required: this.validations?.[key]?.includes('required'),
       onUpdate: this.onUpdate,
     });
   }

@@ -1,0 +1,11 @@
+{
+  "extends": "./node_modules/@nerdgeschoss/config/tsconfig.json",
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "lib": ["ES2018"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true
+  }
+}

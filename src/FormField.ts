@@ -2,7 +2,7 @@ import {
   FieldValidation,
   validateValue,
   CustomValidationMessages,
-} from "./validation";
+} from './validation';
 
 export class FormField<T> {
   public name: string;
@@ -51,10 +51,10 @@ export class FormField<T> {
   }
 
   public hasValue(): boolean {
-    if (typeof this.value === "string" || Array.isArray(this.value)) {
+    if (typeof this.value === 'string' || Array.isArray(this.value)) {
       return !!this.value.length;
     }
-    if (typeof this.value === "number") {
+    if (typeof this.value === 'number') {
       return this.value !== undefined && this.value !== null;
     }
 
@@ -78,7 +78,7 @@ export class FormField<T> {
     let errors: string[] = [];
     if (validation && this.touched) {
       validation.forEach((validate) => {
-        if (typeof validate === "string") {
+        if (typeof validate === 'string') {
           const error = validateValue({
             value: this.hasValue() ? this.value : undefined,
             type: validate,
@@ -88,7 +88,7 @@ export class FormField<T> {
             errors.push(error);
           }
         }
-        if (typeof validate === "function") {
+        if (typeof validate === 'function') {
           const validateErrors = validate(model) || [];
           errors = [...errors, ...validateErrors];
         }
