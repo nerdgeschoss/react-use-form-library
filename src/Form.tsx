@@ -5,7 +5,7 @@ import { FormField } from './FormField';
 import { MappedValidation, CustomValidationMessages } from './validation';
 import { MappedFields, FormModel } from './types';
 
-class Form<T> {
+export class Form<T> {
   private model: T;
   public fields = {} as MappedFields<T>;
   private validations?: Partial<MappedValidation<T>>;
