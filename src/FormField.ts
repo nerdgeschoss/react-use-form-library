@@ -7,9 +7,9 @@ import {
 export class FormField<T> {
   public name: string;
   public value?: T;
+  private originalValue?: T;
   public touched = false;
   public required = false;
-  public dirty = false;
   public errors: string[] = [];
   private onUpdate: () => void;
   public onFocus?: () => void;
@@ -26,15 +26,14 @@ export class FormField<T> {
     onUpdate: () => void;
   }) {
     this.name = name;
+    this.originalValue = value;
     this.value = value;
     this.required = required;
     this.onUpdate = onUpdate;
 
-    if (this.value && this.required && !this.touched) {
+    if (this.value && !this.touched) {
       this.touched = true;
     }
-    // Since validation only happens on update, this is necessary to trigger validation for fields that are created conditionally
-    this.onUpdate();
   }
 
   public onChange(value?: T): void {
@@ -111,5 +110,9 @@ export class FormField<T> {
         return !errors;
       }
     }
+  }
+
+  public get dirty(): boolean {
+    return this.originalValue !== this.value;
   }
 }

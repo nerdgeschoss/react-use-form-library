@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import isEmpty from 'lodash.isempty';
 import { useForceUpdate } from './util';
 import { FormField } from './FormField';
@@ -7,18 +7,28 @@ import { MappedFields, FormModel } from './types';
 
 export class Form<T> {
   private model: T;
-  public fields = {} as MappedFields<T>;
+  private cachedFields = {} as MappedFields<T>;
   private validations?: Partial<MappedValidation<T>>;
-  private onUpdate: () => void;
+  private cachedOnUpdate: () => void;
+  private handleSubmit: (() => void | Promise<void>) | undefined;
+  public submitError: Error | undefined = undefined;
+  public loading = false;
 
-  constructor(
-    model: T,
-    onUpdate: () => void,
-    validations?: Partial<MappedValidation<T>>
-  ) {
+  constructor({
+    model,
+    onUpdate,
+    validations,
+    handleSubmit,
+  }: {
+    model: T;
+    onUpdate: () => void;
+    validations?: Partial<MappedValidation<T>>;
+    handleSubmit?: () => void | Promise<void>;
+  }) {
     this.model = model;
-    this.onUpdate = onUpdate;
+    this.cachedOnUpdate = onUpdate;
     this.validations = validations;
+    this.handleSubmit = handleSubmit;
 
     for (const key in model) {
       this.addField(key);
@@ -29,9 +39,9 @@ export class Form<T> {
   public getChanges(): Partial<T> {
     const changes = {} as Partial<T>;
 
-    for (const key in this.fields) {
-      const field = this.fields[key];
-      if (field.value !== this.model[key]) {
+    for (const key in this.cachedFields) {
+      const field = this.cachedFields[key];
+      if (field.dirty) {
         changes[key] = field.value;
       }
     }
@@ -41,44 +51,60 @@ export class Form<T> {
 
   // A valid form needs all of its fields to be touched and have no errors
   public get valid(): boolean {
-    return Object.keys(this.fields).every((key) => {
-      return this.fields[key].valid;
+    return Object.keys(this.cachedFields).every((key) => {
+      return this.cachedFields[key].valid;
     });
   }
 
   public addField(key: string): void {
-    this.fields[key] = new FormField({
+    this.cachedFields[key] = new FormField({
       name: key,
       value: this.model[key],
       required: this.validations?.[key]?.includes('required'),
-      onUpdate: this.onUpdate,
+      onUpdate: this.onUpdate.bind(this),
     });
   }
 
   public touchFields(): void {
-    for (const key in this.fields) {
-      this.fields[key].touched = true;
+    for (const key in this.cachedFields) {
+      this.cachedFields[key].touched = true;
     }
   }
 
-  public resetForm(): void {
-    for (const key in this.fields) {
-      this.fields[key].value = undefined;
+  public async onSubmit(e?: React.FormEvent<HTMLFormElement>): Promise<void> {
+    if (e) {
+      e.preventDefault();
+    }
+    this.loading = true;
+    this.touchFields();
+    try {
+      if (this.handleSubmit) {
+        await this.handleSubmit();
+      }
+    } catch (error) {
+      this.submitError = error;
+    }
+    this.loading = false;
+  }
+
+  public reset(): void {
+    for (const key in this.cachedFields) {
+      this.cachedFields[key].value = undefined;
     }
   }
 
   public updateFields(model: Partial<T>): void {
     for (const key in model) {
       // Necessary to update fields that don't exist yet, due to conditional rendering
-      if (!this.fields[key]) {
+      if (!this.cachedFields[key]) {
         this.addField(key);
       }
-      this.fields[key].onChange(model[key]);
+      this.cachedFields[key].onChange(model[key]);
     }
     this.onUpdate();
   }
 
-  public getFields(): MappedFields<T> {
+  public get fields(): MappedFields<T> {
     const handler = {
       get: (target: MappedFields<T>, key: string) => {
         if (!target[key]) {
@@ -86,20 +112,23 @@ export class Form<T> {
         }
 
         return {
-          ...this.fields[key],
-          onChange: this.fields[key].onChange?.bind(this.fields[key]),
-          onBlur: this.fields[key].onBlur?.bind(this.fields[key]),
-          valid: this.fields[key].valid,
+          ...this.cachedFields[key],
+          onChange: this.cachedFields[key].onChange?.bind(
+            this.cachedFields[key]
+          ),
+          onBlur: this.cachedFields[key].onBlur?.bind(this.cachedFields[key]),
+          valid: this.cachedFields[key].valid,
+          dirty: this.cachedFields[key].dirty,
         };
       },
     };
 
-    return new Proxy(this.fields, handler);
+    return new Proxy(this.cachedFields, handler);
   }
 
   public validateFields(messages?: CustomValidationMessages): void {
     for (const key in this.validations) {
-      const field = this.fields[key];
+      const field = this.cachedFields[key];
 
       if (field) {
         field.validate({
@@ -113,13 +142,17 @@ export class Form<T> {
       }
     }
   }
+
+  public onUpdate(): void {
+    this.validateFields();
+    this.cachedOnUpdate();
+  }
 }
 
 interface UseFormProps<T> {
   model: T;
-  handleSubmit?: () => Promise<void>;
+  handleSubmit?: () => void | Promise<void>;
   validations?: Partial<MappedValidation<T>>;
-  validationMessages?: CustomValidationMessages;
 }
 
 // The actual hook
@@ -127,50 +160,31 @@ export function useForm<T>({
   model,
   handleSubmit,
   validations,
-  validationMessages,
 }: UseFormProps<T>): FormModel<T> {
-  const forceUpdate = useForceUpdate();
+  const onUpdate = useForceUpdate();
   const formRef = useRef<Form<T> | null>(null);
   if (!formRef.current) {
-    formRef.current = new Form(model, forceUpdate, validations);
+    formRef.current = new Form({
+      model,
+      onUpdate,
+      validations,
+      handleSubmit,
+    });
   }
   const form = formRef.current;
 
-  // Loading state
-  const [submitting, setSubmitting] = useState(false);
-  // Error tracking
-  const [submitError, setSubmitError] = useState<Error | undefined>(undefined);
-
-  async function onSubmit(e?: React.FormEvent<HTMLFormElement>): Promise<void> {
-    if (e) {
-      e.preventDefault();
-    }
-    setSubmitting(true);
-    form.touchFields();
-    try {
-      if (handleSubmit) {
-        await handleSubmit();
-      }
-    } catch (error) {
-      setSubmitError(error);
-    }
-    setSubmitting(false);
-  }
-
   const changes = form.getChanges();
-
-  form.validateFields(validationMessages);
 
   return {
     model: { ...model, ...changes },
-    fields: form.getFields(),
+    fields: form.fields,
     changes,
     dirty: !isEmpty(changes),
     valid: form.valid,
-    submitError,
-    submitting,
-    onSubmit,
-    resetForm: form.resetForm.bind(form),
+    submitError: form.submitError,
+    submitting: form.loading,
+    onSubmit: form.onSubmit,
+    reset: form.reset.bind(form),
     updateFields: form.updateFields.bind(form),
   };
 }
