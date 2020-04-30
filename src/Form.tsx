@@ -2,15 +2,15 @@ import React, { useRef } from 'react';
 import isEmpty from 'lodash.isempty';
 import { useForceUpdate } from './util';
 import { FormField } from './FormField';
-import { MappedValidation, CustomValidationMessages } from './validation';
+import { MappedValidation } from './validation';
 import { MappedFields, FormModel } from './types';
 
 export class Form<T> {
-  private model: T;
+  private originalModel: T;
   private cachedFields = {} as MappedFields<T>;
-  private validations?: Partial<MappedValidation<T>>;
   private cachedOnUpdate: () => void;
   private handleSubmit: (() => void | Promise<void>) | undefined;
+  public validations?: Partial<MappedValidation<T>>;
   public submitError: Error | undefined = undefined;
   public loading = false;
 
@@ -25,7 +25,7 @@ export class Form<T> {
     validations?: Partial<MappedValidation<T>>;
     handleSubmit?: () => void | Promise<void>;
   }) {
-    this.model = model;
+    this.originalModel = model;
     this.cachedOnUpdate = onUpdate;
     this.validations = validations;
     this.handleSubmit = handleSubmit;
@@ -36,7 +36,7 @@ export class Form<T> {
   }
 
   // Changes are tracked comparing the new value agains the original passed from the model
-  public getChanges(): Partial<T> {
+  public get changes(): Partial<T> {
     const changes = {} as Partial<T>;
 
     for (const key in this.cachedFields) {
@@ -48,21 +48,36 @@ export class Form<T> {
 
     return changes;
   }
+  public get model(): T {
+    return {
+      ...this.originalModel,
+      ...this.changes,
+    };
+  }
+  public get dirty(): boolean {
+    return !isEmpty(this.changes);
+  }
 
   // A valid form needs all of its fields to be touched and have no errors
   public get valid(): boolean {
-    return Object.keys(this.cachedFields).every((key) => {
-      return this.cachedFields[key].valid;
+    if (!this.validations) {
+      return true;
+    }
+    return Object.keys(this.validations).every((key) => {
+      return this.fields[key].required ? this.fields[key].valid : true;
     });
   }
 
   public addField(key: string): void {
     this.cachedFields[key] = new FormField({
       name: key,
-      value: this.model[key],
-      required: this.validations?.[key]?.includes('required'),
+      value: this.originalModel[key],
       onUpdate: this.onUpdate.bind(this),
+      validation: this.validations?.[key],
     });
+    if (this.cachedFields[key].required) {
+      this.cachedFields[key].validate(this.model);
+    }
   }
 
   public touchFields(): void {
@@ -109,6 +124,7 @@ export class Form<T> {
       get: (target: MappedFields<T>, key: string) => {
         if (!target[key]) {
           this.addField(key);
+          this.validateFields();
         }
 
         return {
@@ -126,19 +142,12 @@ export class Form<T> {
     return new Proxy(this.cachedFields, handler);
   }
 
-  public validateFields(messages?: CustomValidationMessages): void {
+  private validateFields(): void {
     for (const key in this.validations) {
       const field = this.cachedFields[key];
 
       if (field) {
-        field.validate({
-          model: {
-            ...this.model,
-            ...this.getChanges(),
-          },
-          validation: this.validations?.[key],
-          messages,
-        });
+        field.validate(this.model);
       }
     }
   }
@@ -173,18 +182,15 @@ export function useForm<T>({
   }
   const form = formRef.current;
 
-  const changes = form.getChanges();
-
   return {
-    model: { ...model, ...changes },
+    model: form.model,
     fields: form.fields,
-    changes,
-    dirty: !isEmpty(changes),
+    changes: form.changes,
+    dirty: form.dirty,
     valid: form.valid,
     submitError: form.submitError,
     submitting: form.loading,
-    onSubmit: form.onSubmit,
+    onSubmit: form.onSubmit.bind(form),
     reset: form.reset.bind(form),
-    updateFields: form.updateFields.bind(form),
   };
 }

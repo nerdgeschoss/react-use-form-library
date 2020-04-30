@@ -1,8 +1,4 @@
-import {
-  FieldValidation,
-  validateValue,
-  CustomValidationMessages,
-} from './validation';
+import { FieldValidation, validateValue } from './validation';
 
 export class FormField<T> {
   public name: string;
@@ -13,27 +9,25 @@ export class FormField<T> {
   public errors: string[] = [];
   private onUpdate: () => void;
   public onFocus?: () => void;
+  public validation?: FieldValidation<unknown>;
 
   constructor({
     name,
     value,
-    required,
+    validation,
     onUpdate,
   }: {
     name: string;
     value: T;
-    required: boolean;
+    validation?: FieldValidation<unknown>;
     onUpdate: () => void;
   }) {
     this.name = name;
     this.originalValue = value;
     this.value = value;
-    this.required = required;
+    this.validation = validation;
+    this.required = this.validation?.includes('required') ? true : false;
     this.onUpdate = onUpdate;
-
-    if (this.value && !this.touched) {
-      this.touched = true;
-    }
   }
 
   public onChange(value?: T): void {
@@ -60,28 +54,14 @@ export class FormField<T> {
     return !!this.value;
   }
 
-  /* We need to pass validation here as an argument because of the types. If we want to store validation as a property of the class,
-   then we would need to pass a second type argument to the class itself so FormField<T, M> where T is the actual value type and M
-   is the form model */
-  /* It would be the same case if we wanted to have a validation property defined as validation: (model: Partial<M>) => void (since the errors
-    saved as this.errors = errors) */
-  public validate<M>({
-    model,
-    validation,
-    messages,
-  }: {
-    model: M;
-    validation?: FieldValidation<M>;
-    messages?: CustomValidationMessages;
-  }): void {
+  public validate<M>(model: M): void {
     let errors: string[] = [];
-    if (validation && this.touched) {
-      validation.forEach((validate) => {
+    if (this.validation) {
+      this.validation.forEach((validate) => {
         if (typeof validate === 'string') {
           const error = validateValue({
-            value: this.hasValue() ? this.value : undefined,
+            value: this.value,
             type: validate,
-            messages,
           });
           if (error) {
             errors.push(error);
@@ -97,19 +77,7 @@ export class FormField<T> {
   }
 
   public get valid(): boolean {
-    // First condition is the default behavior for fields that are not required. If there are no errors then the field is valid
-    if (!this.required && !this.errors.length) {
-      return true;
-    } else {
-      // If the field is required tho, and it hasn't been touched, then it is not valid even if there are no errors (yet);
-      if (!this.touched) {
-        return false;
-      } else {
-        // If the field is required and it has been touched, then we can check for errors.
-        const errors = !!this.errors.length;
-        return !errors;
-      }
-    }
+    return !this.errors.length;
   }
 
   public get dirty(): boolean {

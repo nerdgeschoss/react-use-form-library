@@ -43,18 +43,34 @@ describe(Form, () => {
 
   describe('instantiation', () => {
     const form = createForm();
-    // eslint-disable-next-line
     it('creates an empty field name', () => {
       expect(form.fields.name).toBeTruthy();
       expect(form.fields.name.value).toBeFalsy();
       expect(form.fields.name.dirty).toBeFalsy();
-      expect(form.fields.name.touched).toBeFalsy();
     });
     it('creates an pre filled field age', () => {
       expect(form.fields.age).toBeTruthy();
       expect(form.fields.age.value).toBeTruthy();
       expect(form.fields.age.dirty).toBeFalsy();
-      expect(form.fields.age.touched).toBeTruthy();
+    });
+  });
+
+  describe('model tracking', () => {
+    it('returns the updated model', () => {
+      const form = createForm();
+      expect(form.changes).toEqual({});
+      form.fields.name.onChange('test');
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(form.originalModel.name).toBe('');
+      expect(Object.keys(form.changes).includes('name')).toBeTruthy();
+      expect(form.model.name).toBe('test');
+    });
+    it('is dirty only when there are changes', () => {
+      const form = createForm();
+      expect(form.dirty).toBeFalsy();
+      form.fields.name.onChange('test');
+      expect(form.dirty).toBeTruthy();
     });
   });
 
@@ -81,30 +97,29 @@ describe(Form, () => {
 
     it('returns a change object on changed values', () => {
       const form = createForm();
-      expect(form.getChanges()).toEqual({});
+      expect(form.changes).toEqual({});
       form.fields.name.onChange('test');
-      expect(form.getChanges()).toEqual({ name: 'test' });
+      expect(form.changes).toEqual({ name: 'test' });
     });
 
     it('resets', () => {
       const form = createForm();
       form.fields.name.onChange('hello');
-      // TODO: naming doesn't really make sense - it should be reset
       form.reset();
-      expect(form.getChanges()).toEqual({});
+      expect(form.changes).toEqual({});
     });
 
     it('mass assigns', () => {
       const form = createForm();
       form.updateFields({ name: 'George', age: 5 });
-      expect(form.getChanges()).toEqual({ name: 'George', age: 5 });
+      expect(form.changes).toEqual({ name: 'George', age: 5 });
     });
 
     it("doesn't track same value as a change", () => {
       const form = createForm();
       form.fields.age.onChange(18);
       expect(form.fields.name.dirty).toBeFalsy();
-      expect(form.getChanges()).toEqual({});
+      expect(form.changes).toEqual({});
     });
   });
 
@@ -115,25 +130,35 @@ describe(Form, () => {
         validations: { name: ['required'] },
       });
       expect(form.fields.name.required).toBeTruthy();
-      // expect(form.valid).toBeTruthy();
-      // expect(form.fields.name.valid).toBeTruthy();
-      // TODO: a required attribute should *not* accept undefined in onChange
-      // form.fields.name.onChange('');
-      // TODO: validateFields() should not be public - this should happen automaticall
-      // form.validateFields();
-      // expect(form.valid).toBeFalsy();
+      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('');
+      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('Freddy');
+      expect(form.fields.name.valid).toBeTruthy();
+      expect(form.valid).toBeTruthy();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(form.validateFields()).toBeUndefined();
+    });
+
+    it('its valid when non-required fields are invalid', () => {
+      const form = createForm({
+        validations: { name: ['email'] },
+      });
+      form.fields.name.onChange('test');
+      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.valid).toBeTruthy();
     });
 
     it('uses a built in email validation', () => {
       const form = createForm({
-        validations: { name: ['email'] },
+        validations: { name: ['email', 'required'] },
       });
-      // TODO: this field should be invalid, no matter the touch status
       form.fields.name.onBlur();
-      form.validateFields();
       expect(form.valid).toBeFalsy();
       form.fields.name.onChange('test@example.com');
-      form.validateFields();
       expect(form.valid).toBeTruthy();
     });
 
@@ -142,8 +167,7 @@ describe(Form, () => {
         validations: { name: [() => ['custom error']] },
       });
       form.fields.name.onBlur();
-      form.validateFields();
-      expect(form.valid).toBeFalsy();
+      expect(form.fields.name.valid).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
     });
   });

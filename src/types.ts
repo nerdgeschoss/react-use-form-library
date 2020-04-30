@@ -14,9 +14,7 @@ export interface FormModel<T> {
   dirty: boolean;
   valid: boolean;
   submitting: boolean;
-  // validate?: () => Promise<boolean>;
   submitError?: Error;
   onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
   reset: () => void;
-  updateFields: (model: Partial<T>) => void;
 }
