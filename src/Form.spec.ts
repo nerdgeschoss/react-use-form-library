@@ -5,6 +5,7 @@ type VoidFunction = () => void;
 
 class UpdateTracker {
   wasCalled = false;
+  submitted = false;
 
   onUpdate: VoidFunction = () => {
     this.wasCalled = true;
@@ -12,6 +13,10 @@ class UpdateTracker {
 
   reset: VoidFunction = () => {
     this.wasCalled = false;
+  };
+
+  onSubmit: VoidFunction = () => {
+    this.submitted = true;
   };
 }
 
@@ -35,6 +40,7 @@ function createForm({
     model: { ...defaultValue, ...(value || {}) },
     onUpdate: tracker.onUpdate,
     validations,
+    handleSubmit: tracker.onSubmit,
   });
 }
 
@@ -55,7 +61,7 @@ describe(Form, () => {
     });
   });
 
-  describe('model tracking', () => {
+  describe('tracking changes', () => {
     it('returns the updated model', () => {
       const form = createForm();
       expect(form.changes).toEqual({});
@@ -66,15 +72,14 @@ describe(Form, () => {
       expect(Object.keys(form.changes).includes('name')).toBeTruthy();
       expect(form.model.name).toBe('test');
     });
+
     it('is dirty only when there are changes', () => {
       const form = createForm();
       expect(form.dirty).toBeFalsy();
       form.fields.name.onChange('test');
       expect(form.dirty).toBeTruthy();
     });
-  });
 
-  describe('tracking changes', () => {
     it('invokes the callback when a value changes', () => {
       const form = createForm();
       expect(form.fields.name.dirty).toBeFalsy();
@@ -93,13 +98,6 @@ describe(Form, () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       form.fields.description!.onChange('Test description');
       expect(tracker.wasCalled).toBeTruthy();
-    });
-
-    it('returns a change object on changed values', () => {
-      const form = createForm();
-      expect(form.changes).toEqual({});
-      form.fields.name.onChange('test');
-      expect(form.changes).toEqual({ name: 'test' });
     });
 
     it('resets', () => {
@@ -123,11 +121,10 @@ describe(Form, () => {
     });
   });
 
-  describe('validating', () => {
+  describe('validation', () => {
     it('uses built in required validations', () => {
-      // TODO: also accept a single validation as an agument ({name: 'required'})
       const form = createForm({
-        validations: { name: ['required'] },
+        validations: { name: 'required' },
       });
       expect(form.fields.name.required).toBeTruthy();
       expect(form.fields.name.valid).toBeFalsy();
@@ -169,6 +166,17 @@ describe(Form, () => {
       form.fields.name.onBlur();
       expect(form.fields.name.valid).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
+    });
+  });
+
+  describe('submit', () => {
+    it('submits', () => {
+      const form = createForm();
+      form.onSubmit();
+      expect(form.loading).toBeTruthy();
+      expect(form.fields.name.touched).toBeTruthy();
+      expect(form.fields.age.touched).toBeTruthy();
+      expect(tracker.onSubmit).toBeTruthy();
     });
   });
 });

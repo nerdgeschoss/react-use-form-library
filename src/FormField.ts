@@ -56,8 +56,14 @@ export class FormField<T> {
 
   public validate<M>(model: M): void {
     let errors: string[] = [];
-    if (this.validation) {
-      this.validation.forEach((validate) => {
+    const validation = this.validation
+      ? Array.isArray(this.validation)
+        ? this.validation
+        : [this.validation]
+      : undefined;
+
+    if (validation) {
+      validation.forEach((validate) => {
         if (typeof validate === 'string') {
           const error = validateValue({
             value: this.value,

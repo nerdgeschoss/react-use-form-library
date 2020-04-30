@@ -91,6 +91,7 @@ export class Form<T> {
       e.preventDefault();
     }
     this.loading = true;
+    this.cachedOnUpdate();
     this.touchFields();
     try {
       if (this.handleSubmit) {
@@ -100,6 +101,7 @@ export class Form<T> {
       this.submitError = error;
     }
     this.loading = false;
+    this.cachedOnUpdate();
   }
 
   public reset(): void {
