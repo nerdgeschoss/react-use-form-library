@@ -8,10 +8,10 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsc",
-    "format": "prettier --write \"src/**/*.{tsx,ts,css,scss,json,yml}\"",
+    "format": "prettier --write \"src/**/*.{ts,css,scss,json,yml}\"",
     "lint": "yarn lint:types && yarn lint:style",
     "lint:types": "tsc --noEmit",
-    "lint:style": "eslint src/**/*.{tsx,ts} --max-warnings 0",
+    "lint:style": "eslint src/**/*.ts --max-warnings 0",
     "test:ci": "jest --coverage",
     "test": "jest --watchAll",
     "watch": "rimraf dist && tsc -w",
