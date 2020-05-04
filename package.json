@@ -1,6 +1,6 @@
 {
   "name": "react-use-form-library",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A simple form library using react hooks",
   "main": "dist/index",
   "files": [
