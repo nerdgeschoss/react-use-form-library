@@ -88,7 +88,7 @@ export class Form<T> {
   // Reset function will clear the value of every field
   public reset(): void {
     for (const key in this.cachedFields) {
-      this.cachedFields[key].value = undefined;
+      this.cachedFields[key].reset();
     }
   }
 

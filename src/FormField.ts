@@ -2,15 +2,16 @@ import { FieldValidation } from './types';
 import { validateValue } from './validation';
 
 export class FormField<T> {
+  // CLASS PROPERTIES
   public name: string;
   public value?: T;
   private originalValue?: T;
   public touched = false;
   public required = false;
   public errors: string[] = [];
+  public validation?: FieldValidation<unknown>;
   private onUpdate: () => void;
   public onFocus?: () => void;
-  public validation?: FieldValidation<unknown>;
 
   constructor({
     name,
@@ -31,6 +32,7 @@ export class FormField<T> {
     this.onUpdate = onUpdate;
   }
 
+  // CLASS METHODS
   public onChange(value?: T): void {
     this.value = value;
     this.touched = true;
@@ -44,6 +46,7 @@ export class FormField<T> {
     }
   }
 
+  // This method is helpful to correctly display an empty state in the view.
   public hasValue(): boolean {
     if (typeof this.value === 'string' || Array.isArray(this.value)) {
       return !!this.value.length;
@@ -55,8 +58,11 @@ export class FormField<T> {
     return !!this.value;
   }
 
+  // Validate takes the updated model as a parameter to allow cross-field validation
   public validate<M>(model: M): void {
     let errors: string[] = [];
+    // Validation can be a single string "required", an array ["required", "email"] or a custom function
+    // If it is a single string, parsing intro an array is necessary
     const validation = this.validation
       ? Array.isArray(this.validation)
         ? this.validation
@@ -83,6 +89,11 @@ export class FormField<T> {
     this.errors = errors;
   }
 
+  public reset(): void {
+    this.value = this.originalValue;
+  }
+
+  // CLASS GETTERS
   public get valid(): boolean {
     return !this.errors.length;
   }
