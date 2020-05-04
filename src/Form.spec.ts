@@ -1,11 +1,12 @@
 import { Form } from './Form';
-import { MappedValidation } from './types';
+import { FormEvent } from 'react';
+import { MappedValidation } from './validation';
 
 type VoidFunction = () => void;
 
 class UpdateTracker {
   wasCalled = false;
-  submitted = false;
+  submitted: Model | null = null;
 
   onUpdate: VoidFunction = () => {
     this.wasCalled = true;
@@ -13,10 +14,11 @@ class UpdateTracker {
 
   reset: VoidFunction = () => {
     this.wasCalled = false;
+    this.submitted = null;
   };
 
-  onSubmit: VoidFunction = () => {
-    this.submitted = true;
+  onSubmit: (value: Form<Model>) => void = (form) => {
+    this.submitted = form.model;
   };
 }
 
@@ -31,14 +33,17 @@ interface Model {
 function createForm({
   validations,
   value,
+  onSubmit,
 }: {
   value?: Partial<Model>;
   validations?: Partial<MappedValidation<Model>>;
+  onSubmit?: (form: Form<Model>) => Promise<void> | void;
 } = {}): Form<Model> {
   const defaultValue = { name: '', age: 18 };
   return new Form<Model>({
     model: { ...defaultValue, ...(value || {}) },
     onUpdate: tracker.onUpdate,
+    handleSubmit: onSubmit ?? tracker.onSubmit,
     validations,
   });
 }
@@ -65,9 +70,6 @@ describe(Form, () => {
       const form = createForm();
       expect(form.changes).toEqual({});
       form.fields.name.onChange('test');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      expect(form.originalModel.name).toBe('');
       expect(Object.keys(form.changes).includes('name')).toBeTruthy();
       expect(form.model.name).toBe('test');
     });
@@ -92,10 +94,10 @@ describe(Form, () => {
     it('invokes the callback for undefined values', () => {
       const form = createForm();
       expect(form.fields.description).toBeDefined();
-      expect(form.fields.description?.value).toBeUndefined();
+      expect(form.fields.description.value).toBeUndefined();
       expect(tracker.wasCalled).toBeFalsy();
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      form.fields.description!.onChange('Test description');
+      form.fields.description.onChange('Test description');
       expect(tracker.wasCalled).toBeTruthy();
     });
 
@@ -134,25 +136,24 @@ describe(Form, () => {
       form.fields.name.onChange('Freddy');
       expect(form.fields.name.valid).toBeTruthy();
       expect(form.valid).toBeTruthy();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      expect(form.validateFields()).toBeUndefined();
     });
 
-    it('its valid when non-required fields are invalid', () => {
+    it('ignores validations on non required', () => {
       const form = createForm({
+        value: { name: '' },
         validations: { name: ['email'] },
       });
+      expect(form.fields.name.valid).toBeTruthy();
+      expect(form.valid).toBeTruthy();
       form.fields.name.onChange('test');
       expect(form.fields.name.valid).toBeFalsy();
-      expect(form.valid).toBeTruthy();
+      expect(form.valid).toBeFalsy();
     });
 
     it('uses a built in email validation', () => {
       const form = createForm({
         validations: { name: ['email', 'required'] },
       });
-      form.fields.name.onBlur();
       expect(form.valid).toBeFalsy();
       form.fields.name.onChange('test@example.com');
       expect(form.valid).toBeTruthy();
@@ -162,9 +163,56 @@ describe(Form, () => {
       const form = createForm({
         validations: { name: [() => ['custom error']] },
       });
-      form.fields.name.onBlur();
       expect(form.fields.name.valid).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
+    });
+  });
+
+  describe('submitting', () => {
+    it('prevents the event default', () => {
+      const mock = jest.fn();
+      const submitEvent = ({ preventDefault: mock } as unknown) as FormEvent<
+        HTMLFormElement
+      >;
+      const form = createForm();
+      form.onSubmit(submitEvent);
+      expect(mock).toBeCalled();
+    });
+
+    it('invokes the submit handler if all fields are valid', () => {
+      const form = createForm();
+      expect(tracker.submitted).toBeFalsy();
+      form.onSubmit();
+      expect(tracker.submitted).toBeTruthy();
+    });
+
+    it('touches fields', () => {
+      const form = createForm();
+      expect(form.fields.name.touched).toBeFalsy();
+      form.onSubmit();
+      expect(form.fields.name.touched).toBeTruthy();
+    });
+
+    it('handles async functions', async () => {
+      const form = createForm({
+        onSubmit: async (form) => {
+          expect(form.submitting).toBeTruthy();
+        },
+      });
+      await form.onSubmit();
+      expect(form.submitting).toBeFalsy();
+      expect(form.submitError).toBeUndefined();
+    });
+
+    it('handles errors from async functions', async () => {
+      const form = createForm({
+        onSubmit: async () => {
+          throw new Error('failed to submit');
+        },
+      });
+      await form.onSubmit();
+      expect(form.submitting).toBeFalsy();
+      expect(form.submitError).toBeDefined();
     });
   });
 });

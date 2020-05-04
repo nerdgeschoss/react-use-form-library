@@ -1,3 +1,2 @@
-import { useForm } from './Form';
-
-export { useForm };
+export { Form } from './Form';
+export { useForm } from './hooks';

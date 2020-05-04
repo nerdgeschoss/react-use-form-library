@@ -1,5 +1,4 @@
-import { FieldValidation } from './types';
-import { validateValue } from './validation';
+import { validateValue, FieldValidation } from './validation';
 
 export class FormField<T> {
   // CLASS PROPERTIES
@@ -62,7 +61,7 @@ export class FormField<T> {
   public validate<M>(model: M): void {
     let errors: string[] = [];
     // Validation can be a single string "required", an array ["required", "email"] or a custom function
-    // If it is a single string, parsing intro an array is necessary
+    // If it is a single string, parsing into an array is necessary
     const validation = this.validation
       ? Array.isArray(this.validation)
         ? this.validation

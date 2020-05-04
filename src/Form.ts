@@ -1,13 +1,13 @@
-import React, { useRef } from 'react';
 import isEmpty from 'lodash.isempty';
-import { useForceUpdate } from './util';
 import { FormField } from './FormField';
-import {
-  MappedFields,
-  MappedValidation,
-  UseFormProps,
-  FormModel,
-} from './types';
+import { MappedValidation } from './validation';
+
+/* This type is used to take a model, parse it an return a different type
+for each field. In this case, for each field of T, string | number you
+get back a FormField type */
+export type MappedFields<T> = {
+  [P in keyof Required<T>]: FormField<T[P]>;
+};
 
 export class Form<T> {
   // CLASS PROPERTIES
@@ -18,7 +18,7 @@ export class Form<T> {
   // OnUpdate function used to update the view after any changes
   private cachedOnUpdate: () => void;
   // Form submit function
-  public handleSubmit: (() => void | Promise<void>) | undefined;
+  public handleSubmit: ((form: Form<T>) => void | Promise<void>) | undefined;
   // Loading state for submit function
   public submitting = false;
   // Any errors on submit are stored here
@@ -35,18 +35,12 @@ export class Form<T> {
     model: T;
     onUpdate: () => void;
     validations?: Partial<MappedValidation<T>>;
-    handleSubmit?: () => void | Promise<void>;
+    handleSubmit?: (form: Form<T>) => void | Promise<void>;
   }) {
     this.originalModel = model;
     this.cachedOnUpdate = onUpdate;
     this.validations = validations;
     this.handleSubmit = handleSubmit;
-
-    // A new field will be created for every key in the model.
-    // Any field that is not present in the original model will be created on demand within the fields getter
-    for (const key in model) {
-      this.addField(key);
-    }
   }
 
   // CLASS METHODS
@@ -81,7 +75,7 @@ export class Form<T> {
     this.touchFields();
     try {
       if (this.handleSubmit) {
-        await this.handleSubmit();
+        await this.handleSubmit(this);
       }
     } catch (error) {
       this.submitError = error;
@@ -154,12 +148,12 @@ export class Form<T> {
 
   public get valid(): boolean {
     // If there are no validations, forms are valid by default.
-    if (!this.validations) {
+    if (!this.validations || Object.keys(this.validations).length === 0) {
       return true;
     }
-    // A form is valid if all required fields are valid
+    // A form is valid if all fields are valid
     return Object.keys(this.validations).every((key) => {
-      return this.fields[key].required ? this.fields[key].valid : true;
+      return this.fields[key].valid;
     });
   }
 
@@ -186,40 +180,4 @@ export class Form<T> {
 
     return new Proxy(this.cachedFields, handler);
   }
-}
-
-// The actual hook
-export function useForm<T>({
-  model,
-  handleSubmit,
-  validations,
-}: UseFormProps<T>): FormModel<T> {
-  // Using a custom hook to call a rerender on every change
-  const onUpdate = useForceUpdate();
-  // Saving the form in a ref, to have only 1 instance throghout the lifetime of the hook
-  const formRef = useRef<Form<T> | null>(null);
-  if (!formRef.current) {
-    formRef.current = new Form({
-      model,
-      onUpdate,
-      validations,
-      handleSubmit,
-    });
-  }
-
-  const form = formRef.current;
-  // If the submit function depends on the model, it needs to be updated on each re render to take the updated model
-  form.handleSubmit = handleSubmit;
-
-  return {
-    model: form.model,
-    fields: form.fields,
-    changes: form.changes,
-    dirty: form.dirty,
-    valid: form.valid,
-    submitError: form.submitError,
-    submitting: form.submitting,
-    onSubmit: form.onSubmit.bind(form),
-    reset: form.reset.bind(form),
-  };
 }
