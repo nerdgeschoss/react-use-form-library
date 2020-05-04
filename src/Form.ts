@@ -2,7 +2,12 @@ import React, { useRef } from 'react';
 import isEmpty from 'lodash.isempty';
 import { useForceUpdate } from './util';
 import { FormField } from './FormField';
-import { MappedFields, MappedValidation, UseFormProps } from './types';
+import {
+  MappedFields,
+  MappedValidation,
+  UseFormProps,
+  FormModel,
+} from './types';
 
 export class Form<T> {
   // CLASS PROPERTIES
@@ -188,7 +193,7 @@ export function useForm<T>({
   model,
   handleSubmit,
   validations,
-}: UseFormProps<T>): Partial<Form<T>> {
+}: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
   // Saving the form in a ref, to have only 1 instance throghout the lifetime of the hook
@@ -204,7 +209,13 @@ export function useForm<T>({
 
   const form = formRef.current;
   return {
-    ...form,
+    model: form.model,
+    fields: form.fields,
+    changes: form.changes,
+    dirty: form.dirty,
+    valid: form.valid,
+    submitError: form.submitError,
+    submitting: form.submitting,
     onSubmit: form.onSubmit.bind(form),
     reset: form.reset.bind(form),
   };

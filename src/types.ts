@@ -21,3 +21,18 @@ export type FieldValidation<T> =
 export type MappedValidation<T> = {
   [P in keyof T]: FieldValidation<T>;
 };
+
+// This interface is what you get back from the useForm hook
+export interface FormModel<T> {
+  model: T;
+  fields: MappedFields<T>;
+  changes: Partial<T>;
+  dirty: boolean;
+  valid: boolean;
+  submitting: boolean;
+  submitError?: Error;
+  validations?: Partial<MappedValidation<T>>;
+  onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
+  reset: () => void;
+  handleSubmit?: () => void | Promise<void>;
+}
