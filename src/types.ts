@@ -6,15 +6,18 @@ export type MappedFields<T> = {
   [P in keyof T]: FormField<T[P]>;
 };
 
-// This interface is what you get back from the useForm hook
-export interface FormModel<T> {
+export interface UseFormProps<T> {
   model: T;
-  fields: MappedFields<T>;
-  changes: Partial<T>;
-  dirty: boolean;
-  valid: boolean;
-  submitting: boolean;
-  submitError?: Error;
-  onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
-  reset: () => void;
+  handleSubmit?: () => void | Promise<void>;
+  validations?: Partial<MappedValidation<T>>;
 }
+
+export type ValidationFunction<T> = (value?: T) => string[];
+export type ValidationStrings = 'required' | 'json' | 'email';
+export type FieldValidation<T> =
+  | ValidationStrings
+  | Array<ValidationStrings | ValidationFunction<T>>;
+
+export type MappedValidation<T> = {
+  [P in keyof T]: FieldValidation<T>;
+};

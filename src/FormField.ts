@@ -1,4 +1,5 @@
-import { FieldValidation, validateValue } from './validation';
+import { FieldValidation } from './types';
+import { validateValue } from './validation';
 
 export class FormField<T> {
   public name: string;

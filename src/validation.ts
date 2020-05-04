@@ -1,12 +1,4 @@
-export type ValidationFunction<T> = (value?: T) => string[];
-export type ValidationStrings = 'required' | 'json' | 'email';
-export type FieldValidation<T> =
-  | ValidationStrings
-  | Array<ValidationStrings | ValidationFunction<T>>;
-
-export type MappedValidation<T> = {
-  [P in keyof T]: FieldValidation<T>;
-};
+import { ValidationStrings } from './types';
 
 export function validateValue<T>({
   value,

@@ -1,5 +1,5 @@
 import { Form } from './Form';
-import { MappedValidation } from './validation';
+import { MappedValidation } from './types';
 
 type VoidFunction = () => void;
 
@@ -173,7 +173,7 @@ describe(Form, () => {
     it('submits', () => {
       const form = createForm();
       form.onSubmit();
-      expect(form.loading).toBeTruthy();
+      expect(form.submitting).toBeTruthy();
       expect(form.fields.name.touched).toBeTruthy();
       expect(form.fields.age.touched).toBeTruthy();
       expect(tracker.onSubmit).toBeTruthy();
