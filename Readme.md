@@ -23,6 +23,51 @@ const { model, fields, onSubmit } = useForm({
 </form>
 ```
 
+## Advanced example
+
+```
+import { useForm } from 'react-use-form-library';
+
+const { model, changes, fields, dirty, valid, onSubmit, submitting, submitError, reset } = useForm({
+  model: {
+    name: '',
+    age: 25,
+  },
+  handleSubmit: async () => {
+    if (valid) {
+      if (newItem) {
+        // You can use here the updated model, which includes the original model and any changes made
+        await addItem(model)
+      } else {
+        // For updating, you can use only the changes that were made
+        await updateItem(changes)
+      }
+      // If you need to clear the fields, you can call on reset form
+      reset();
+    } else {
+      // Any errors thrown witin this function will be stored in the submitError property
+      throw new Error('invalid form')
+    }
+  },
+});
+
+// On the component
+<div>
+  // Display any error
+  {submitError && <div>{submitError}</div>}
+  <form onSubmit={onSubmit}>
+    <input value={fields.name.value} onChange={v => fields.name.onChange(v.target.value)} />
+    // You can use submitting to display loading state
+    {submitting ? 
+      <div>Loading...</div> 
+      :
+      // Valid state can also be used to disable submit
+      <button disabled={!valid}>Submit</button>
+    }
+  </form>
+</div>
+```
+
 ### Form Model
 
 Property | Details
