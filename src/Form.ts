@@ -18,7 +18,7 @@ export class Form<T> {
   // OnUpdate function used to update the view after any changes
   private cachedOnUpdate: () => void;
   // Form submit function
-  private handleSubmit: (() => void | Promise<void>) | undefined;
+  public handleSubmit: (() => void | Promise<void>) | undefined;
   // Loading state for submit function
   public submitting = false;
   // Any errors on submit are stored here
@@ -208,6 +208,9 @@ export function useForm<T>({
   }
 
   const form = formRef.current;
+  // If the submit function depends on the model, it needs to be updated on each re render to take the updated model
+  form.handleSubmit = handleSubmit;
+
   return {
     model: form.model,
     fields: form.fields,

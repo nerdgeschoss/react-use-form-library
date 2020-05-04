@@ -40,7 +40,6 @@ function createForm({
     model: { ...defaultValue, ...(value || {}) },
     onUpdate: tracker.onUpdate,
     validations,
-    handleSubmit: tracker.onSubmit,
   });
 }
 
@@ -166,17 +165,6 @@ describe(Form, () => {
       form.fields.name.onBlur();
       expect(form.fields.name.valid).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
-    });
-  });
-
-  describe('submit', () => {
-    it('submits', () => {
-      const form = createForm();
-      form.onSubmit();
-      expect(form.submitting).toBeTruthy();
-      expect(form.fields.name.touched).toBeTruthy();
-      expect(form.fields.age.touched).toBeTruthy();
-      expect(tracker.onSubmit).toBeTruthy();
     });
   });
 });
