@@ -1,8 +1,6 @@
 import { validateValue, FieldValidation } from './validation';
 
 export class FormField<T> {
-  // CLASS PROPERTIES
-  public name: string;
   public value?: T;
   private originalValue?: T;
   public touched = false;
@@ -10,20 +8,16 @@ export class FormField<T> {
   public errors: string[] = [];
   public validation?: FieldValidation<unknown>;
   private onUpdate: () => void;
-  public onFocus?: () => void;
 
   constructor({
-    name,
     value,
     validation,
     onUpdate,
   }: {
-    name: string;
     value: T;
     validation?: FieldValidation<unknown>;
     onUpdate: () => void;
   }) {
-    this.name = name;
     this.originalValue = value;
     this.value = value;
     this.validation = validation;
@@ -44,6 +38,9 @@ export class FormField<T> {
       this.onUpdate();
     }
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public onFocus(): void {}
 
   // This method is helpful to correctly display an empty state in the view.
   public hasValue(): boolean {

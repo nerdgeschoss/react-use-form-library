@@ -24,7 +24,7 @@ export class Form<T> {
   // Any errors on submit are stored here
   public submitError: Error | undefined = undefined;
   // Vaidations object
-  public validations?: Partial<MappedValidation<T>>;
+  private validations?: Partial<MappedValidation<T>>;
 
   constructor({
     model,
@@ -43,23 +43,19 @@ export class Form<T> {
     this.handleSubmit = handleSubmit;
   }
 
-  // CLASS METHODS
-  public addField(key: string): void {
+  private addField(key: string): void {
     this.cachedFields[key] = new FormField({
-      name: key,
       value: this.originalModel[key],
       onUpdate: this.onUpdate.bind(this),
       validation: this.validations?.[key],
     });
-    if (this.cachedFields[key].required) {
-      this.cachedFields[key].validate(this.model);
-    }
+    this.cachedFields[key].validate(this.model);
   }
 
   // This method will touch every field, for the purpose of displaying the errors in the view
   public touchFields(): void {
-    for (const key in this.cachedFields) {
-      this.cachedFields[key].touched = true;
+    for (const key in this.fields) {
+      this.fields[key].touched = true;
     }
   }
 
@@ -86,26 +82,22 @@ export class Form<T> {
 
   // Reset function will clear the value of every field
   public reset(): void {
-    for (const key in this.cachedFields) {
-      this.cachedFields[key].reset();
+    for (const key in this.fields) {
+      this.fields[key].reset();
     }
   }
 
   // Mass update method.
   public updateFields(model: Partial<T>): void {
     for (const key in model) {
-      // Necessary to update fields that don't exist yet, due to conditional rendering
-      if (!this.cachedFields[key]) {
-        this.addField(key);
-      }
-      this.cachedFields[key].onChange(model[key]);
+      this.fields[key].onChange(model[key]);
     }
     this.onUpdate();
   }
 
   private validateFields(): void {
     for (const key in this.validations) {
-      const field = this.cachedFields[key];
+      const field = this.fields[key];
 
       if (field) {
         field.validate(this.model);
@@ -123,8 +115,8 @@ export class Form<T> {
   public get changes(): Partial<T> {
     const changes = {} as Partial<T>;
 
-    for (const key in this.cachedFields) {
-      const field = this.cachedFields[key];
+    for (const key in this.fields) {
+      const field = this.fields[key];
       if (field.dirty) {
         changes[key] = field.value;
       }
@@ -163,18 +155,8 @@ export class Form<T> {
       get: (target: MappedFields<T>, key: string) => {
         if (!target[key]) {
           this.addField(key);
-          this.validateFields();
         }
-
-        return {
-          ...this.cachedFields[key],
-          onChange: this.cachedFields[key].onChange?.bind(
-            this.cachedFields[key]
-          ),
-          onBlur: this.cachedFields[key].onBlur?.bind(this.cachedFields[key]),
-          valid: this.cachedFields[key].valid,
-          dirty: this.cachedFields[key].dirty,
-        };
+        return target[key];
       },
     };
 

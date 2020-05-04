@@ -63,6 +63,13 @@ describe(Form, () => {
       expect(form.fields.age.value).toBeTruthy();
       expect(form.fields.age.dirty).toBeFalsy();
     });
+    it('can be destructured', () => {
+      const { valid, onChange, onBlur, onFocus } = form.fields.age;
+      expect(valid).toEqual(true);
+      expect(onChange).toBeDefined();
+      expect(onFocus).toBeDefined();
+      expect(onBlur).toBeDefined();
+    });
   });
 
   describe('tracking changes', () => {
