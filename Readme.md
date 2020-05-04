@@ -4,7 +4,7 @@ A simple form libray for React using hooks
 
 ## Basic example
 
-```
+```javascript
 import { useForm } from 'react-use-form-library';
 
 const { model, fields, onSubmit } = useForm({
@@ -25,7 +25,7 @@ const { model, fields, onSubmit } = useForm({
 
 ## Advanced example
 
-```
+```javascript
 import { useForm } from 'react-use-form-library';
 
 const { model, changes, fields, dirty, valid, onSubmit, submitting, submitError, reset } = useForm({
