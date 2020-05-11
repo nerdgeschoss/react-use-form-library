@@ -13,13 +13,17 @@ export default {
     cleaner({
       targets: ['./dist/'],
     }),
-    resolve({ extensions }),
+    resolve({
+      extensions,
+    }),
     commonjs(),
-    babel({ extensions, include: ['src/**/*'] }),
+    babel({
+      extensions,
+      include: ['src/**/*'],
+      runtimeHelpers: true,
+    }),
   ],
-
-  output: [
-    {
+  output: [{
       file: pkg.main,
       format: 'cjs',
     },
