@@ -26,24 +26,24 @@ export class FormField<T> {
   }
 
   // CLASS METHODS
-  public onChange(value?: T): void {
+  public onChange = (value?: T): void => {
     this.value = value;
     this.touched = true;
     this.onUpdate();
-  }
+  };
 
-  public onBlur(): void {
+  public onBlur = (): void => {
     if (!this.touched) {
       this.touched = true;
       this.onUpdate();
     }
-  }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public onFocus(): void {}
+  public onFocus = (): void => {};
 
   // This method is helpful to correctly display an empty state in the view.
-  public hasValue(): boolean {
+  public hasValue = (): boolean => {
     if (typeof this.value === 'string' || Array.isArray(this.value)) {
       return !!this.value.length;
     }
@@ -52,10 +52,10 @@ export class FormField<T> {
     }
 
     return !!this.value;
-  }
+  };
 
   // Validate takes the updated model as a parameter to allow cross-field validation
-  public validate<M>(model: M): void {
+  public validate = <M>(model: M): void => {
     let errors: string[] = [];
     // Validation can be a single string "required", an array ["required", "email"] or a custom function
     // If it is a single string, parsing into an array is necessary
@@ -83,11 +83,11 @@ export class FormField<T> {
       });
     }
     this.errors = errors;
-  }
+  };
 
-  public reset(): void {
+  public reset = (): void => {
     this.value = this.originalValue;
-  }
+  };
 
   // CLASS GETTERS
   public get valid(): boolean {
