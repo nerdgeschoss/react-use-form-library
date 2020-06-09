@@ -208,18 +208,6 @@ describe(Form, () => {
       });
       await form.onSubmit();
       expect(form.submitting).toBeFalsy();
-      expect(form.submitError).toBeUndefined();
-    });
-
-    it('handles errors from async functions', async () => {
-      const form = createForm({
-        onSubmit: async () => {
-          throw new Error('failed to submit');
-        },
-      });
-      await form.onSubmit();
-      expect(form.submitting).toBeFalsy();
-      expect(form.submitError).toBeDefined();
     });
   });
 });

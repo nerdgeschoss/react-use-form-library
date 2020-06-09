@@ -17,7 +17,6 @@ export interface FormModel<T> {
   dirty: boolean;
   valid: boolean;
   submitting: boolean;
-  submitError?: Error;
   validations?: Partial<MappedValidation<T>>;
   onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
   reset: () => void;
@@ -53,7 +52,6 @@ export function useForm<T>({
     changes: form.changes,
     dirty: form.dirty,
     valid: form.valid,
-    submitError: form.submitError,
     submitting: form.submitting,
     onSubmit: form.onSubmit.bind(form),
     reset: form.reset.bind(form),

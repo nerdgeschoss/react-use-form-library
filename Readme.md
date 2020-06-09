@@ -33,7 +33,7 @@ const { model, fields, onSubmit } = useForm({
 ```ts
 import { useForm } from 'react-use-form-library';
 
-const { fields, dirty, valid, onSubmit, submitting, submitError } = useForm({
+const { fields, dirty, valid, onSubmit, submitting } = useForm({
   model: {
     name: '',
     age: 25,
@@ -50,7 +50,7 @@ const { fields, dirty, valid, onSubmit, submitting, submitError } = useForm({
       // If you need to clear the fields, you can call on reset form
       form.reset();
     } else {
-      // Any errors thrown within this function will be stored in the submitError property
+      // Handle any errors
       throw new Error('invalid form');
     }
   },
@@ -58,8 +58,6 @@ const { fields, dirty, valid, onSubmit, submitting, submitError } = useForm({
 
 // On the component
 <div>
-  // Display any error
-  {submitError && <div>{submitError}</div>}
   <form onSubmit={onSubmit}>
     <input
       value={fields.name.value}
@@ -78,17 +76,16 @@ const { fields, dirty, valid, onSubmit, submitting, submitError } = useForm({
 
 ### Form Model
 
-| Property    | Details                                                               |
-| ----------- | --------------------------------------------------------------------- |
-| changes     | A plain object that contains only the modified fields                 |
-| model       | An updated object that contains the updated model                     |
-| fields      | A mapped collection, which has a FormField for every key in the model |
-| dirty       | a getter checking if there are any changes                            |
-| valid       | a getter checking if all **required** fields are valid                |
-| onSubmit    | a method that triggers the function passed as handleSubmit param.     |
-| submitError | contains any error stored by the onSubmit method                      |
-| submitting  | a loading state for the onSubmit method                               |
-| reset       | this helper method will reset every field to it's original value      |
+| Property   | Details                                                               |
+| ---------- | --------------------------------------------------------------------- |
+| changes    | A plain object that contains only the modified fields                 |
+| model      | An updated object that contains the updated model                     |
+| fields     | A mapped collection, which has a FormField for every key in the model |
+| dirty      | a getter checking if there are any changes                            |
+| valid      | a getter checking if all **required** fields are valid                |
+| onSubmit   | a method that triggers the function passed as handleSubmit param.     |
+| submitting | a loading state for the onSubmit method                               |
+| reset      | this helper method will reset every field to it's original value      |
 
 ### Form Field Model
 

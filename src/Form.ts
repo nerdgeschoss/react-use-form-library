@@ -21,8 +21,6 @@ export class Form<T> {
   public handleSubmit: ((form: Form<T>) => void | Promise<void>) | undefined;
   // Loading state for submit function
   public submitting = false;
-  // Any errors on submit are stored here
-  public submitError: Error | undefined = undefined;
   // Vaidations object
   private validations?: Partial<MappedValidation<T>>;
 
@@ -60,7 +58,7 @@ export class Form<T> {
   }
 
   // onSubmit method is a wrapper around the handleSubmit param passed to the constructor.
-  // It handles the loading state and saves any error to the submitError property.
+  // It handles the loading state and executes the handleSubmit function if it is defined.
   public async onSubmit(e?: React.FormEvent<HTMLFormElement>): Promise<void> {
     if (e) {
       e.preventDefault();
@@ -69,12 +67,8 @@ export class Form<T> {
     this.cachedOnUpdate();
     // Touch fields to display errors
     this.touchFields();
-    try {
-      if (this.handleSubmit) {
-        await this.handleSubmit(this);
-      }
-    } catch (error) {
-      this.submitError = error;
+    if (this.handleSubmit) {
+      await this.handleSubmit(this);
     }
     this.submitting = false;
     this.cachedOnUpdate();
