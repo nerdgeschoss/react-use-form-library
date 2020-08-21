@@ -34,16 +34,19 @@ function createForm({
   validations,
   value,
   onSubmit,
+  onSubmitError,
 }: {
   value?: Partial<Model>;
   validations?: Partial<MappedValidation<Model>>;
   onSubmit?: (form: Form<Model>) => Promise<void> | void;
+  onSubmitError?: (error: Error) => void;
 } = {}): Form<Model> {
   const defaultValue = { name: '', age: 18 };
   return new Form<Model>({
     model: { ...defaultValue, ...(value || {}) },
     onUpdate: tracker.onUpdate,
     handleSubmit: onSubmit ?? tracker.onSubmit,
+    onSubmitError,
     validations,
   });
 }
@@ -203,11 +206,43 @@ describe(Form, () => {
     it('handles async functions', async () => {
       const form = createForm({
         onSubmit: async (form) => {
-          expect(form.submitting).toBeTruthy();
+          expect(form.submissionStatus).toBe('submitting');
+        },
+      });
+      expect(form.submissionStatus).toBe('idle');
+      await form.onSubmit();
+      expect(form.submissionStatus).toBe('submitted');
+    });
+
+    it('handles error', async () => {
+      let error = null;
+      const form = createForm({
+        onSubmit: async (form) => {
+          expect(form.submissionStatus).toBe('submitting');
+          throw new Error('');
+        },
+        onSubmitError: (e: Error) => {
+          error = e;
         },
       });
       await form.onSubmit();
-      expect(form.submitting).toBeFalsy();
+      expect(form.submissionStatus).toBe('error');
+      expect(form.error).toBeTruthy();
+      // Custom error handling
+      expect(error).toBeTruthy();
+    });
+    it('resets error', async () => {
+      const form = createForm({
+        onSubmit: async (form) => {
+          expect(form.submissionStatus).toBe('submitting');
+          throw new Error('');
+        },
+      });
+      await form.onSubmit();
+      // Reset error
+      form.resetError();
+      expect(form.submissionStatus).toBe('idle');
+      expect(form.error).toBeUndefined();
     });
   });
 });

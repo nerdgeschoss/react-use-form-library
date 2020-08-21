@@ -9,6 +9,8 @@ export type MappedFields<T> = {
   [P in keyof Required<T>]: FormField<T[P]>;
 };
 
+export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
+
 export class Form<T> {
   // CLASS PROPERTIES
   // Original model
@@ -20,25 +22,32 @@ export class Form<T> {
   // Form submit function
   public handleSubmit: ((form: Form<T>) => void | Promise<void>) | undefined;
   // Loading state for submit function
-  public submitting = false;
-  // Vaidations object
+  public submissionStatus: SubmissionStatus = 'idle';
+  // Validations object
   private validations?: Partial<MappedValidation<T>>;
+  // Error handling
+  public error: Error | undefined;
+  // Function for custom error handling
+  public onSubmitError: ((error: Error) => void) | undefined;
 
   constructor({
     model,
     onUpdate,
     validations,
     handleSubmit,
+    onSubmitError,
   }: {
     model: T;
     onUpdate: () => void;
     validations?: Partial<MappedValidation<T>>;
     handleSubmit?: (form: Form<T>) => void | Promise<void>;
+    onSubmitError?: (error: Error) => void;
   }) {
     this.originalModel = model;
     this.cachedOnUpdate = onUpdate;
     this.validations = validations;
     this.handleSubmit = handleSubmit;
+    this.onSubmitError = onSubmitError;
   }
 
   private addField(key: string): void {
@@ -63,14 +72,22 @@ export class Form<T> {
     if (e) {
       e.preventDefault();
     }
-    this.submitting = true;
+    this.submissionStatus = 'submitting';
     this.cachedOnUpdate();
     // Touch fields to display errors
     this.touchFields();
     if (this.handleSubmit) {
-      await this.handleSubmit(this);
+      try {
+        await this.handleSubmit(this);
+        this.submissionStatus = 'submitted';
+      } catch (error) {
+        this.submissionStatus = 'error';
+        this.error = error;
+        if (this.onSubmitError) {
+          this.onSubmitError(error);
+        }
+      }
     }
-    this.submitting = false;
     this.cachedOnUpdate();
   }
 
@@ -79,6 +96,13 @@ export class Form<T> {
     for (const key in this.fields) {
       this.fields[key].reset();
     }
+    this.submissionStatus = 'idle';
+  }
+
+  // Reset function to reset error state
+  public resetError(): void {
+    this.submissionStatus = 'idle';
+    this.error = undefined;
   }
 
   // Mass update method.

@@ -1,11 +1,12 @@
 import { useForceUpdate } from './util';
 import { useRef } from 'react';
-import { Form, MappedFields } from './Form';
+import { Form, MappedFields, SubmissionStatus } from './Form';
 import { MappedValidation } from './validation';
 
 export interface UseFormProps<T> {
   model: T;
   handleSubmit?: () => void | Promise<void>;
+  onSubmitError?: (error: Error) => void;
   validations?: Partial<MappedValidation<T>>;
 }
 
@@ -16,10 +17,12 @@ export interface FormModel<T> {
   changes: Partial<T>;
   dirty: boolean;
   valid: boolean;
-  submitting: boolean;
+  submissionStatus: SubmissionStatus;
   validations?: Partial<MappedValidation<T>>;
+  error?: Error;
   onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
   reset: () => void;
+  resetError: () => void;
   handleSubmit?: (form: Form<T>) => void | Promise<void>;
 }
 
@@ -27,6 +30,7 @@ export interface FormModel<T> {
 export function useForm<T>({
   model,
   handleSubmit,
+  onSubmitError,
   validations,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
@@ -39,6 +43,7 @@ export function useForm<T>({
       onUpdate,
       validations,
       handleSubmit,
+      onSubmitError,
     });
   }
 
@@ -52,8 +57,10 @@ export function useForm<T>({
     changes: form.changes,
     dirty: form.dirty,
     valid: form.valid,
-    submitting: form.submitting,
+    error: form.error,
+    submissionStatus: form.submissionStatus,
     onSubmit: form.onSubmit.bind(form),
     reset: form.reset.bind(form),
+    resetError: form.resetError.bind(form),
   };
 }
