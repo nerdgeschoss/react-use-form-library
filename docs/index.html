@@ -71,6 +71,7 @@
 					<li><a href="#basic-example">Basic Example</a></li>
 					<li><a href="#optional-fields">Optional fields</a></li>
 					<li><a href="#validation">Validation</a></li>
+					<li><a href="#error-handling">Error Handling</a></li>
 					<li><a href="#advanced-example">Advanced Example</a></li>
 					<li><a href="#api">API</a></li>
 					<li><a href="#development">Development</a></li>
@@ -158,14 +159,6 @@
 					<h2>Validation</h2>
 				</a>
 				<p><a href="https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011">Codepen</a>.</p>
-				<p>The hook function takes two additional optional fields</p>
-				<ul>
-					<li><code>validations</code>, which is an object that will help you set custom validations for each field.</li>
-					<li><code>onSubmitError</code>, a helpful handler to deal with submit errors.</li>
-				</ul>
-				<a href="#validations" id="validations" style="color: inherit; text-decoration: none;">
-					<h4>Validations</h4>
-				</a>
 				<p>The validations object will have the same keys as your model object. Each key can take one of the following values:</p>
 				<ul>
 					<li>A string that contains prebuild usual validations like <code>required, email, number, json, website, etc.</code></li>
@@ -199,6 +192,26 @@
 <span style="color: #000000">        }</span>
 <span style="color: #000000">      }</span>
 <span style="color: #000000">    ]</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<hr>
+				<a href="#error-handling" id="error-handling" style="color: inherit; text-decoration: none;">
+					<h2>Error Handling</h2>
+				</a>
+				<p><a href="https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010">Codepen</a>.</p>
+				<p>The useForm hook also exposes another method: <code>onSubmitError</code>, this methos is handy if you don&#39;t want to use a try/catch on your <code>handleSubmit</code> function</p>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
+<span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">phone:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #795E26">handleSubmit</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #0000FF">async</span><span style="color: #000000"> () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">throw</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;submit error&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #008000">// All erros thrown in the above function will be catched and able to use in the function below</span>
+<span style="color: #000000">  </span><span style="color: #795E26">onSubmitError</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #795E26">alert</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  },</span>
 <span style="color: #000000">});</span>
 </code></pre>

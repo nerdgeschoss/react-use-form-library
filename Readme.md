@@ -10,9 +10,10 @@ A simple form libray for React using hooks
 2. [Basic Example](#basic-example)
 3. [Optional fields](#optional-fields)
 4. [Validation](#validation)
-5. [Advanced Example](#advanced-example)
-6. [API](#api)
-7. [Development](#development)
+5. [Error Handling](#error-handling)
+6. [Advanced Example](#advanced-example)
+7. [API](#api)
+8. [Development](#development)
 
 ## Installation
 
@@ -105,14 +106,7 @@ const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
 
 ## Validation
 
-[Codepen](https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011).
-
-The hook function takes two additional optional fields
-
-- `validations`, which is an object that will help you set custom validations for each field.
-- `onSubmitError`, a helpful handler to deal with submit errors.
-
-#### Validations
+[Codepen](https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011)
 
 The validations object will have the same keys as your model object. Each key can take one of the following values:
 
@@ -148,6 +142,29 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
         }
       }
     ]
+  },
+});
+```
+
+---
+
+## Error Handling
+
+[Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
+
+The useForm hook also exposes another method: `onSubmitError`, this methods is handy if you don't want to use a try/catch in your `handleSubmit` function
+
+```ts
+const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
+  model: {
+    name: '',
+    phone: '',
+  },
+  handleSubmit: async () => {
+    throw new Error('submit error');
+  },
+  onSubmitError: (error) => {
+    alert('error');
   },
 });
 ```
