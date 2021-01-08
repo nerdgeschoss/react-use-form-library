@@ -23,7 +23,7 @@ Add the library to your project: `yarn add react-use-form-library`
 
 [Codepen](https://codepen.io/falkonpunch/pen/oNzyvQG)
 
-To initialize the hook you will need to suply a valid `model` object and a custom `handleSubmit` function.
+To initialize the hook you will need to supply a valid `model` object and a custom `handleSubmit` function.
 
 The three main fields you get from the hook are `{ model, fields, onSubmit }`.
 
@@ -111,7 +111,7 @@ const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
 The validations object will have the same keys as your model object. Each key can take one of the following values:
 
 - A string that contains prebuild usual validations like `required, email, number, json, website, etc.`
-- A custom validation function with the signature `(value): string[] => {}`. The value parameters is useful to suply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
+- A custom validation function with the signature `(value): string[] => {}`. The value parameters is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
 - An array which can contain the previous both.
 
 ```ts
@@ -146,9 +146,17 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 });
 ```
 
+#### Predefined validation strings
+
+| Property | Details                                       |
+| -------- | --------------------------------------------- |
+| required | checks if the field is not empty.             |
+| email    | checks if the value is a valid email address. |
+| json     | checks if the value is a valid json object.   |
+
 ---
 
-## Error Handling
+## Submit Error Handling
 
 [Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
 
@@ -171,50 +179,195 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 
 ---
 
+## Form state
+
+[Codepen](https://codepen.io/falkonpunch/pen/PoGaayB?editors=0010)
+
+There are several properties exposed from the hook to deal with the state throughout the form lifetime
+
+| Property         | Details                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| dirty            | A boolean value indicating that one or more fields have been changed                                   |
+| valid            | A boolean indicating that the form is valid or not, this one depends on the validation rules provided. |
+| error            | any error thrown within the handleSubmit function is stored here as an error object                    |
+| submissionStatus | Displays the current status of the submission process                                                  |
+
+#### Submission Status
+
+This variable contains the current state of the form submission process.
+
+| Status     | Details                                                                     |
+| ---------- | --------------------------------------------------------------------------- |
+| idle       | The form has not yet been submitted. It also applied when the form is reset |
+| submitting | The form is being submitted. This works like a loading state.               |
+| submitted  | The form has been successfully submitted.                                   |
+| error      | There is an error while submitting.                                         |
+
+#### Reset
+
+Sometimes it is useful to reset the form programatically. For this there are two helpful methods
+
+| Property   | Details                    |
+| ---------- | -------------------------- |
+| reset      | Clears all fields.         |
+| resetError | Removes the current error. |
+
+---
+
+## Fields
+
+[Codepen](https://codepen.io/falkonpunch/pen/JjRZwZq?editors=0010)
+
+Every key supplied to the model property of the hook will be parsed into a field
+
+```ts
+const { fields } = reactUseFormLibrary.useForm({
+  model: {
+    name: '',
+  },
+});
+```
+
+A field will be an object that you can use in a simple setup like:
+
+```ts
+<input
+  // The updated value
+  value={fields.phone.value}
+  // A function to modify the value
+  onChange={(v) => fields.phone.onChange(v.target.value)}
+/>
+```
+
+Or a more complex solution:
+
+```ts
+<div>
+  // The required property is derived from the validations object
+  <label>Name {fields.name.required ? '(required)' : ''}: </label>
+  <input
+    value={fields.name.value}
+    onChange={(v) => fields.name.onChange(v.target.value)}
+  />
+  // The errors property is an array of strings with all errors for the field
+  {fields.name.errors.length && (
+    <div>
+      {fields.errors.forEach((error) => {
+        return <div>{error}</div>;
+      })}
+    </div>
+  )}
+</div>
+```
+
+### Helpful properties
+
+#### Touched
+
+If the field is required, the 'required-field' error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (onBlur event).
+
+In order for this to work properly you need to supply the onBlur event to your input
+
+```ts
+const displayErrors = fields.name.touched && fields.name.errors.length;
+
+// ...
+<div>
+  <input
+    value={fields.name.value}
+    onChange={(v) => fields.name.onChange(v.target.value)}
+    onBlur={fields.name.onBlur}
+  />
+  {
+    displayErrors && (
+      <div>
+        {fields.errors.forEach((error) => {
+          return <div>{error}</div>;
+        })}
+      </div>
+    );
+  }
+</div>
+```
+
+#### Valid
+
+A simple getter that returns true if there aren't any errors. This would simplify the above conditional to:
+
+```ts
+const displayErrors = fields.name.touched && !fields.name.valid;
+```
+
+It is also useful if you want to give your input a conditional class to show the user if the field is valid or not
+
+```ts
+<div className={fields.phone.valid ? 'input--valid' : ''}>
+  <input
+    value={fields.phone.value}
+    onChange={(v) => fields.phone.onChange(v.target.value)}
+  />
+</div>
+```
+
+#### Dirty
+
+When instantiated, a field will store it's original value in a variable. This getter will then compare the original value to the current value and return true if they are different.
+
+#### P
+
+---
+
 ## Advanced example
 
 ```ts
 import { useForm } from 'react-use-form-library';
 
-const { fields, dirty, valid, onSubmit, submitting } = useForm({
-  model: {
-    name: '',
-    age: 25,
-  },
-  handleSubmit: async (form) => {
-    if (form.valid) {
-      if (newItem) {
-        // You can use here the updated model, which includes the original model and any changes made
-        await addItem(form.model);
+export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element => {
+  const { fields, dirty, valid, onSubmit, submissionStatus } = useForm({
+    model: {
+      name: '',
+      age: 25,
+    },
+    handleSubmit: async (form) => {
+      if (form.valid) {
+        if (isNewItem) {
+          // You can use here the updated model, which includes the original model and any changes made
+          await addItem(form.model);
+        } else {
+          // For updating, you can use only the changes that were made
+          await updateItem(form.changes);
+        }
+        // If you need to clear the fields, you can call on reset form
+        form.reset();
       } else {
-        // For updating, you can use only the changes that were made
-        await updateItem(form.changes);
+        // throw custom errors
+        throw new Error('invalid form');
       }
-      // If you need to clear the fields, you can call on reset form
-      form.reset();
-    } else {
-      // Handle any errors
-      throw new Error('invalid form');
-    }
-  },
-});
+    },
+    // Handle any errors
+    onSubmitError: (error) => {
+      alert('error');
+    },
+  });
 
-// On the component
-<div>
-  <form onSubmit={onSubmit}>
-    <input
-      value={fields.name.value}
-      onChange={(v) => fields.name.onChange(v.target.value)}
-    />
-    // You can use submitting to display loading state
-    {submitting ? (
-      <div>Loading...</div>
-    ) : (
-      // Valid state can also be used to disable submit
-      <button disabled={!valid || !dirty}>Submit</button>
-    )}
-  </form>
-</div>;
+  return (
+    <div>
+      <form onSubmit={onSubmit}>
+        <input
+          value={fields.name.value}
+          onChange={(v) => fields.name.onChange(v.target.value)}
+        />
+        // You can use submitting to display loading state
+        {submissionStatus === 'submitting' ? (
+          <div>Loading...</div>
+        ) : (
+          // Valid state can also be used to disable submit
+          <button disabled={!valid || !dirty}>Submit</button>
+        )}
+      </form>
+    </div>
+  );
+}
 ```
 
 ---

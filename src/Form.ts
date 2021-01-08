@@ -72,23 +72,21 @@ export class Form<T> {
     if (e) {
       e.preventDefault();
     }
-    this.submissionStatus = 'submitting';
-    this.cachedOnUpdate();
     // Touch fields to display errors
     this.touchFields();
+    this.updateSubmissionStatus('submitting');
     if (this.handleSubmit) {
       try {
         await this.handleSubmit(this);
-        this.submissionStatus = 'submitted';
+        this.updateSubmissionStatus('submitted');
       } catch (error) {
-        this.submissionStatus = 'error';
         this.error = error;
         if (this.onSubmitError) {
           this.onSubmitError(error);
         }
+        this.updateSubmissionStatus('error');
       }
     }
-    this.cachedOnUpdate();
   }
 
   // Reset function will clear the value of every field
@@ -96,13 +94,15 @@ export class Form<T> {
     for (const key in this.fields) {
       this.fields[key].reset();
     }
-    this.submissionStatus = 'idle';
+    this.updateSubmissionStatus('idle');
   }
 
   // Reset function to reset error state
   public resetError(): void {
-    this.submissionStatus = 'idle';
-    this.error = undefined;
+    if (this.error) {
+      this.error = undefined;
+      this.updateSubmissionStatus('idle');
+    }
   }
 
   // Mass update method.
@@ -125,6 +125,11 @@ export class Form<T> {
 
   public onUpdate(): void {
     this.validateFields();
+    this.cachedOnUpdate();
+  }
+
+  private updateSubmissionStatus(status: SubmissionStatus): void {
+    this.submissionStatus = status;
     this.cachedOnUpdate();
   }
 
