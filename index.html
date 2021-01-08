@@ -158,7 +158,7 @@
 				<a href="#validation" id="validation" style="color: inherit; text-decoration: none;">
 					<h2>Validation</h2>
 				</a>
-				<p><a href="https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011">Codepen</a>.</p>
+				<p><a href="https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011">Codepen</a></p>
 				<p>The validations object will have the same keys as your model object. Each key can take one of the following values:</p>
 				<ul>
 					<li>A string that contains prebuild usual validations like <code>required, email, number, json, website, etc.</code></li>
@@ -195,12 +195,35 @@
 <span style="color: #000000">  },</span>
 <span style="color: #000000">});</span>
 </code></pre>
-				<hr>
-				<a href="#error-handling" id="error-handling" style="color: inherit; text-decoration: none;">
-					<h2>Error Handling</h2>
+				<a href="#predefined-validation-strings" id="predefined-validation-strings" style="color: inherit; text-decoration: none;">
+					<h4>Predefined validation strings</h4>
 				</a>
-				<p><a href="https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010">Codepen</a>.</p>
-				<p>The useForm hook also exposes another method: <code>onSubmitError</code>, this methos is handy if you don&#39;t want to use a try/catch on your <code>handleSubmit</code> function</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>required</td>
+							<td>checks if the field is not empty.</td>
+						</tr>
+						<tr>
+							<td>email</td>
+							<td>checks if the value is a valid email address.</td>
+						</tr>
+						<tr>
+							<td>json</td>
+							<td>checks if the value is a valid json object.</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#submit-error-handling" id="submit-error-handling" style="color: inherit; text-decoration: none;">
+					<h2>Submit Error Handling</h2>
+				</a>
+				<p><a href="https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010">Codepen</a></p>
+				<p>The useForm hook also exposes another method: <code>onSubmitError</code>, this methods is handy if you don&#39;t want to use a try/catch in your <code>handleSubmit</code> function</p>
 				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
 <span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
@@ -209,57 +232,218 @@
 <span style="color: #000000">  </span><span style="color: #795E26">handleSubmit</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #0000FF">async</span><span style="color: #000000"> () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #AF00DB">throw</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;submit error&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  },</span>
-<span style="color: #000000">  </span><span style="color: #008000">// All erros thrown in the above function will be catched and able to use in the function below</span>
 <span style="color: #000000">  </span><span style="color: #795E26">onSubmitError</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #795E26">alert</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  },</span>
 <span style="color: #000000">});</span>
 </code></pre>
 				<hr>
+				<a href="#form-state" id="form-state" style="color: inherit; text-decoration: none;">
+					<h2>Form state</h2>
+				</a>
+				<p><a href="https://codepen.io/falkonpunch/pen/PoGaayB?editors=0010">Codepen</a></p>
+				<p>There are several properties exposed from the hook to deal with the state throughout the form lifetime</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>dirty</td>
+							<td>A boolean value indicating that one or more fields have been changed</td>
+						</tr>
+						<tr>
+							<td>valid</td>
+							<td>A boolean indicating that the form is valid or not, this one depends on the validation rules provided.</td>
+						</tr>
+						<tr>
+							<td>error</td>
+							<td>any error thrown within the handleSubmit function is stored here as an error object</td>
+						</tr>
+						<tr>
+							<td>submissionStatus</td>
+							<td>Displays the current status of the submission process</td>
+						</tr>
+				</tbody></table>
+				<a href="#submission-status" id="submission-status" style="color: inherit; text-decoration: none;">
+					<h4>Submission Status</h4>
+				</a>
+				<p>This variable contains the current state of the form submission process.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Status</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>idle</td>
+							<td>The form has not yet been submitted. It also applied when the form is reset</td>
+						</tr>
+						<tr>
+							<td>submitting</td>
+							<td>The form is being submitted. This works like a loading state.</td>
+						</tr>
+						<tr>
+							<td>submitted</td>
+							<td>The form has been successfully submitted.</td>
+						</tr>
+						<tr>
+							<td>error</td>
+							<td>There is an error while submitting.</td>
+						</tr>
+				</tbody></table>
+				<a href="#reset" id="reset" style="color: inherit; text-decoration: none;">
+					<h4>Reset</h4>
+				</a>
+				<p>Sometimes it is useful to reset the form programatically. For this there are two helpful methods</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>reset</td>
+							<td>Clears all fields.</td>
+						</tr>
+						<tr>
+							<td>resetError</td>
+							<td>Removes the current error.</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#fields" id="fields" style="color: inherit; text-decoration: none;">
+					<h2>Fields</h2>
+				</a>
+				<p><a href="https://codepen.io/falkonpunch/pen/JjRZwZq?editors=0010">Codepen</a></p>
+				<p>Every key supplied to the model property of the hook will be parsed into a field</p>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">fields</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
+<span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<p>A field will be an object that you can use in a simple setup like:</p>
+				<pre><code class="language-ts"><span style="color: #000000">&lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">  </span><span style="color: #008000">// The updated value</span>
+<span style="color: #000000">  </span><span style="color: #001080">value</span><span style="color: #000000">={fields.phone.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">  </span><span style="color: #008000">// A function to modify the value</span>
+<span style="color: #000000">  </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.phone.onChange(v.target.value)}</span>
+<span style="color: #000000">/&gt;</span>
+</code></pre>
+				<p>Or a more complex solution:</p>
+				<pre><code class="language-ts"><span style="color: #000000">&lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  </span><span style="color: #008000">// The required property is derived from the validations object</span>
+<span style="color: #000000">  &lt;</span><span style="color: #267F99">label</span><span style="color: #000000">&gt;</span><span style="color: #001080">Name</span><span style="color: #000000"> {</span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">required</span><span style="color: #000000"> ? </span><span style="color: #A31515">&#039;(required)&#039;</span><span style="color: #000000"> : </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">}: &lt;/</span><span style="color: #267F99">label</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  &lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">    </span><span style="color: #001080">value</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">    </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.name.onChange(v.target.value)}</span>
+<span style="color: #000000">  /&gt;</span>
+<span style="color: #000000">  </span><span style="color: #008000">// The errors property is an array of strings with all errors for the field</span>
+<span style="color: #000000">  {</span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">errors</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000"> &amp;&amp; (</span>
+<span style="color: #000000">    &lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">      {fields.errors.forEach((error) =&gt; {</span>
+<span style="color: #000000">        return &lt;div&gt;{</span><span style="color: #001080">error</span><span style="color: #000000">}&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;;</span>
+<span style="color: #000000">      })}</span>
+<span style="color: #000000">    &lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  )}</span>
+<span style="color: #000000">&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+</code></pre>
+				<a href="#helpful-properties" id="helpful-properties" style="color: inherit; text-decoration: none;">
+					<h3>Helpful properties</h3>
+				</a>
+				<a href="#touched" id="touched" style="color: inherit; text-decoration: none;">
+					<h4>Touched</h4>
+				</a>
+				<p>If the field is required, the &#39;required-field&#39; error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (onBlur event)</p>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">errors</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000">;</span>
+
+<span style="color: #008000">// ...</span>
+
+<span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #001080">displayErrors</span><span style="color: #000000"> &amp;&amp; (</span>
+<span style="color: #000000">    &lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">      {fields.errors.forEach((error) =&gt; {</span>
+<span style="color: #000000">        return &lt;div&gt;{</span><span style="color: #001080">error</span><span style="color: #000000">}&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;;</span>
+<span style="color: #000000">      })}</span>
+<span style="color: #000000">    &lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  );</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<a href="#valid" id="valid" style="color: inherit; text-decoration: none;">
+					<h4>Valid</h4>
+				</a>
+				<p>A simple getter that returns true if there aren&#39;t any errors. This would simplify the above conditional to:</p>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; !</span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">valid</span><span style="color: #000000">;</span>
+</code></pre>
+				<p>It is also useful if you want to give your input a conditional class to show the user if the field is valid or not</p>
+				<pre><code class="language-ts"><span style="color: #000000">&lt;</span><span style="color: #001080">div</span><span style="color: #000000"> </span><span style="color: #001080">className</span><span style="color: #000000">={fields.phone.valid ? </span><span style="color: #A31515">&#039;input--valid&#039;</span><span style="color: #001080"> :</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">}&gt;</span>
+<span style="color: #000000">  &lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">    </span><span style="color: #001080">value</span><span style="color: #000000">={fields.phone.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">    </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.phone.onChange(v.target.value)}</span>
+<span style="color: #000000">  /&gt;</span>
+<span style="color: #000000">&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+</code></pre>
+				<a href="#dirty" id="dirty" style="color: inherit; text-decoration: none;">
+					<h4>Dirty</h4>
+				</a>
+				<p>When instantiated, a field will store it&#39;s original value in a variable. This getter will then compare the original value to the current value and return true if they are different.</p>
+				<hr>
 				<a href="#advanced-example" id="advanced-example" style="color: inherit; text-decoration: none;">
 					<h2>Advanced example</h2>
 				</a>
 				<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">dirty</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">submitting</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">25</span><span style="color: #000000">,</span>
-<span style="color: #000000">  },</span>
-<span style="color: #000000">  </span><span style="color: #795E26">handleSubmit</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #0000FF">async</span><span style="color: #000000"> (</span><span style="color: #001080">form</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #001080">valid</span><span style="color: #000000">) {</span>
-<span style="color: #000000">      </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">newItem</span><span style="color: #000000">) {</span>
-<span style="color: #000000">        </span><span style="color: #008000">// You can use here the updated model, which includes the original model and any changes made</span>
-<span style="color: #000000">        </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">addItem</span><span style="color: #000000">(</span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #001080">model</span><span style="color: #000000">);</span>
-<span style="color: #000000">      } </span><span style="color: #AF00DB">else</span><span style="color: #000000"> {</span>
-<span style="color: #000000">        </span><span style="color: #008000">// For updating, you can use only the changes that were made</span>
-<span style="color: #000000">        </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">updateItem</span><span style="color: #000000">(</span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #001080">changes</span><span style="color: #000000">);</span>
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">MyForm</span><span style="color: #000000">({ </span><span style="color: #001080">isNewItem</span><span style="color: #000000">, </span><span style="color: #001080">addItem</span><span style="color: #000000">, </span><span style="color: #001080">updateItem</span><span style="color: #000000"> }: </span><span style="color: #267F99">Props</span><span style="color: #000000">): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #267F99">const</span><span style="color: #000000"> { </span><span style="color: #001080">fields</span><span style="color: #000000">, </span><span style="color: #001080">dirty</span><span style="color: #000000">, </span><span style="color: #001080">valid</span><span style="color: #000000">, </span><span style="color: #001080">onSubmit</span><span style="color: #000000">, </span><span style="color: #001080">submissionStatus</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
+<span style="color: #000000">    </span><span style="color: #001080">model</span><span style="color: #000000">: {</span>
+<span style="color: #000000">      </span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #001080">age</span><span style="color: #000000">: </span><span style="color: #098658">25</span><span style="color: #000000">,</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #001080">handleSubmit</span><span style="color: #000000">: </span><span style="color: #001080">async</span><span style="color: #000000"> (</span><span style="color: #001080">form</span><span style="color: #000000">) =&gt; {</span>
+<span style="color: #000000">      </span><span style="color: #795E26">if</span><span style="color: #000000"> (form.valid) {</span>
+<span style="color: #000000">        </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">isNewItem</span><span style="color: #000000">) {</span>
+<span style="color: #000000">          </span><span style="color: #008000">// You can use here the updated model, which includes the original model and any changes made</span>
+<span style="color: #000000">          </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">addItem</span><span style="color: #000000">(</span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #001080">model</span><span style="color: #000000">);</span>
+<span style="color: #000000">        } </span><span style="color: #AF00DB">else</span><span style="color: #000000"> {</span>
+<span style="color: #000000">          </span><span style="color: #008000">// For updating, you can use only the changes that were made</span>
+<span style="color: #000000">          </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">updateItem</span><span style="color: #000000">(</span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #001080">changes</span><span style="color: #000000">);</span>
+<span style="color: #000000">        }</span>
+<span style="color: #000000">        </span><span style="color: #008000">// If you need to clear the fields, you can call on reset form</span>
+<span style="color: #000000">        </span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #795E26">reset</span><span style="color: #000000">();</span>
+<span style="color: #000000">      } else {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// throw custom errors</span>
+<span style="color: #000000">        throw new </span><span style="color: #795E26">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;invalid form&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">      }</span>
-<span style="color: #000000">      </span><span style="color: #008000">// If you need to clear the fields, you can call on reset form</span>
-<span style="color: #000000">      </span><span style="color: #001080">form</span><span style="color: #000000">.</span><span style="color: #795E26">reset</span><span style="color: #000000">();</span>
-<span style="color: #000000">    } </span><span style="color: #AF00DB">else</span><span style="color: #000000"> {</span>
-<span style="color: #000000">      </span><span style="color: #008000">// Handle any errors</span>
-<span style="color: #000000">      </span><span style="color: #AF00DB">throw</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;invalid form&#039;</span><span style="color: #000000">);</span>
-<span style="color: #000000">    }</span>
-<span style="color: #000000">  },</span>
-<span style="color: #000000">});</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #008000">// Handle any errors</span>
+<span style="color: #000000">    </span><span style="color: #795E26">onSubmitError</span><span style="color: #000000">: (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">      </span><span style="color: #795E26">alert</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">  });</span>
 
-<span style="color: #008000">// On the component</span>
-<span style="color: #000000">&lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">  &lt;</span><span style="color: #001080">form</span><span style="color: #000000"> </span><span style="color: #001080">onSubmit</span><span style="color: #000000">={</span><span style="color: #001080">onSubmit</span><span style="color: #000000">}&gt;</span>
-<span style="color: #000000">    &lt;</span><span style="color: #001080">input</span>
-<span style="color: #000000">      </span><span style="color: #001080">value</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
-<span style="color: #000000">      </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.name.onChange(v.target.value)}</span>
-<span style="color: #000000">    /&gt;</span>
-<span style="color: #000000">    </span><span style="color: #008000">// You can use submitting to display loading state</span>
-<span style="color: #000000">    {</span><span style="color: #001080">submitting</span><span style="color: #000000"> ? (</span>
-<span style="color: #000000">      &lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span><span style="color: #001080">Loading</span><span style="color: #000000">...&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">    ) : (</span>
-<span style="color: #000000">      </span><span style="color: #008000">// Valid state can also be used to disable submit</span>
-<span style="color: #000000">      &lt;</span><span style="color: #001080">button</span><span style="color: #000000"> </span><span style="color: #001080">disabled</span><span style="color: #000000">={!valid || !</span><span style="color: #001080">dirty</span><span style="color: #000000">}&gt;</span><span style="color: #001080">Submit</span><span style="color: #000000">&lt;/</span><span style="color: #001080">button</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">    )}</span>
-<span style="color: #000000">  &lt;/</span><span style="color: #001080">form</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;;</span>
+<span style="color: #000000">  </span><span style="color: #795E26">return</span><span style="color: #000000"> (</span>
+<span style="color: #000000">    &lt;</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">      &lt;</span><span style="color: #001080">form</span><span style="color: #000000"> </span><span style="color: #001080">onSubmit</span><span style="color: #000000">={</span><span style="color: #001080">onSubmit</span><span style="color: #000000">}&gt;</span>
+<span style="color: #000000">        &lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">          </span><span style="color: #001080">value</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">          </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.name.onChange(v.target.value)}</span>
+<span style="color: #000000">        /&gt;</span>
+<span style="color: #000000">        </span><span style="color: #008000">// You can use submitting to display loading state</span>
+<span style="color: #000000">        {</span><span style="color: #001080">submissionStatus</span><span style="color: #000000"> === &#039;</span><span style="color: #001080">submitting</span><span style="color: #000000">&#039; ? (</span>
+<span style="color: #000000">          &lt;</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span><span style="color: #001080">Loading</span><span style="color: #000000">...&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">        ) : (</span>
+<span style="color: #000000">          </span><span style="color: #008000">// Valid state can also be used to disable submit</span>
+<span style="color: #000000">          &lt;</span><span style="color: #001080">button</span><span style="color: #000000"> </span><span style="color: #001080">disabled</span><span style="color: #000000">={!valid || !</span><span style="color: #001080">dirty</span><span style="color: #000000">}&gt;</span><span style="color: #001080">Submit</span><span style="color: #000000">&lt;/</span><span style="color: #001080">button</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">        )}</span>
+<span style="color: #000000">      &lt;/</span><span style="color: #001080">form</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">    &lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  );</span>
+<span style="color: #000000">}</span>
 </code></pre>
 				<hr>
 				<a href="#api" id="api" style="color: inherit; text-decoration: none;">
