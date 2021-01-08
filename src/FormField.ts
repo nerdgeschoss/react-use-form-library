@@ -1,4 +1,8 @@
-import { validateValue, FieldValidation } from './validation';
+import {
+  validateValue,
+  FieldValidation,
+  ValidationStrings,
+} from './validation';
 
 export class FormField<T> {
   public value?: T;
@@ -21,7 +25,9 @@ export class FormField<T> {
     this.originalValue = value;
     this.value = value;
     this.validation = validation;
-    this.required = this.validation?.includes('required') ? true : false;
+    if (typeof this.validation === 'string') {
+      this.required = this.validation?.includes('required') ? true : false;
+    }
     this.onUpdate = onUpdate;
   }
 
@@ -66,14 +72,23 @@ export class FormField<T> {
       : undefined;
 
     if (validation) {
-      validation.forEach((validate) => {
+      validation.forEach((validate: unknown) => {
         if (typeof validate === 'string') {
           const error = validateValue({
             value: this.value,
-            type: validate,
+            type: validate as ValidationStrings,
           });
           if (error) {
             errors.push(error);
+          }
+        }
+        if (validate instanceof RegExp) {
+          if (
+            typeof this.value === 'string' &&
+            !!this.value &&
+            !validate.test(this.value)
+          ) {
+            errors.push('invalid-format');
           }
         }
         if (typeof validate === 'function') {
