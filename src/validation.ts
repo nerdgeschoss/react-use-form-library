@@ -1,4 +1,4 @@
-export type ValidationFunction<T> = (value?: T) => string[];
+export type ValidationFunction<T> = (value?: T) => string[] | void;
 export type ValidationStrings =
   | 'required'
   | 'json'
