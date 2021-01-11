@@ -2,11 +2,11 @@
 
 ![Tests](https://github.com/nerdgeschoss/react-use-form-library/workflows/Tests/badge.svg)
 
-A simple form libray for React using hooks
+A simple form libray for React using hooks.
 
 ## Table of Contents
 
-1. [Instalation](#installation)
+1. [Installation](#installation)
 2. [Basic Example](#basic-example)
 3. [Optional fields](#optional-fields)
 4. [Validation](#validation)

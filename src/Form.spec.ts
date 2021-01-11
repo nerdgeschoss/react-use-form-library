@@ -160,21 +160,71 @@ describe(Form, () => {
       expect(form.valid).toBeFalsy();
     });
 
-    it('uses a built in email validation', () => {
-      const form = createForm({
-        validations: { name: ['email', 'required'] },
-      });
-      expect(form.valid).toBeFalsy();
-      form.fields.name.onChange('test@example.com');
-      expect(form.valid).toBeTruthy();
-    });
-
     it('uses a custom validation function', () => {
       const form = createForm({
         validations: { name: [() => ['custom error']] },
       });
       expect(form.fields.name.valid).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
+    });
+
+    it('uses a custom regex for validation', () => {
+      const form = createForm({
+        validations: { name: /[a-g]/ },
+      });
+      form.fields.name.onChange('xyz');
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('ade');
+      expect(form.valid).toBeTruthy();
+    });
+  });
+
+  describe('pre-defined validation', () => {
+    it('validates a required field', () => {
+      const form = createForm({
+        validations: { name: 'required' },
+      });
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('test');
+      expect(form.valid).toBeTruthy();
+    });
+    it('validates an email field', () => {
+      const form = createForm({
+        validations: { name: 'email' },
+      });
+      form.fields.name.onChange('test');
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('test@example.com');
+      expect(form.valid).toBeTruthy();
+    });
+    it('validates a json field', () => {
+      const form = createForm({
+        validations: { name: 'json' },
+      });
+      form.fields.name.onChange('test');
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('{ "foo": "baz"}');
+      expect(form.valid).toBeTruthy();
+    });
+    it('validates a website field', () => {
+      const form = createForm({
+        validations: { name: 'website' },
+      });
+      form.fields.name.onChange('test');
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('https://google.com');
+      expect(form.valid).toBeTruthy();
+    });
+    it('validates a number field', () => {
+      const form = createForm({
+        validations: { age: 'number' },
+      });
+      // eslint-disable-next-line
+      // @ts-ignore
+      form.fields.age.onChange('test');
+      expect(form.valid).toBeFalsy();
+      form.fields.age.onChange(12);
+      expect(form.valid).toBeTruthy();
     });
   });
 
