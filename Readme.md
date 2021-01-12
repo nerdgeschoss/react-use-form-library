@@ -110,9 +110,9 @@ const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
 
 The validations object will have the same keys as your model object. Each key can take one of the following values:
 
-- A string that contains prebuild usual validations like `required, email, number, json, website, etc.`
+- A string that contains prebuild usual validations, currently we support `required, email, number, json, website`
 - A custom validation function with the signature `(value): string[] => {}`. The value parameters is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
-- An array which can contain the previous both.
+- An array which supports a mix of both.
 
 ```ts
 const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
@@ -153,6 +153,8 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 | required | checks if the field is not empty.             |
 | email    | checks if the value is a valid email address. |
 | json     | checks if the value is a valid json object.   |
+| website  | checks if the value is a valid url.           |
+| number   | checks if the value is a valid number.        |
 
 ---
 
@@ -160,7 +162,7 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 
 [Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
 
-The useForm hook also exposes another method: `onSubmitError`, this methods is handy if you don't want to use a try/catch in your `handleSubmit` function
+The useForm hook also exposes another method: `onSubmitError`, this method is handy if you don't want to use a try/catch in your `handleSubmit` function
 
 ```ts
 const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
@@ -192,18 +194,18 @@ There are several properties exposed from the hook to deal with the state throug
 | error            | any error thrown within the handleSubmit function is stored here as an error object                    |
 | submissionStatus | Displays the current status of the submission process                                                  |
 
-#### Submission Status
+### Submission Status
 
 This variable contains the current state of the form submission process.
 
 | Status     | Details                                                                     |
 | ---------- | --------------------------------------------------------------------------- |
-| idle       | The form has not yet been submitted. It also applied when the form is reset |
+| pristine   | The form has not yet been submitted. It also applied when the form is reset |
 | submitting | The form is being submitted. This works like a loading state.               |
 | submitted  | The form has been successfully submitted.                                   |
 | error      | There is an error while submitting.                                         |
 
-#### Reset
+### Reset
 
 Sometimes it is useful to reset the form programatically. For this there are two helpful methods
 
