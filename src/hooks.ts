@@ -17,6 +17,7 @@ export interface FormModel<T> {
   changes: Partial<T>;
   dirty: boolean;
   valid: boolean;
+  canSubmit: boolean;
   submissionStatus: SubmissionStatus;
   validations?: Partial<MappedValidation<T>>;
   error?: Error;
@@ -57,6 +58,7 @@ export function useForm<T>({
     changes: form.changes,
     dirty: form.dirty,
     valid: form.valid,
+    canSubmit: form.canSubmit,
     error: form.error,
     submissionStatus: form.submissionStatus,
     onSubmit: form.onSubmit.bind(form),

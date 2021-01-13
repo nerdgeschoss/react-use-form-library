@@ -11,6 +11,7 @@ export class FormField<T> {
   public required = false;
   public errors: string[] = [];
   public validation?: FieldValidation<unknown>;
+  public focused = false;
   private onUpdate: () => void;
 
   constructor({
@@ -34,19 +35,21 @@ export class FormField<T> {
   // CLASS METHODS
   public onChange = (value?: T): void => {
     this.value = value;
-    this.touched = true;
     this.onUpdate();
   };
 
   public onBlur = (): void => {
     if (!this.touched) {
       this.touched = true;
-      this.onUpdate();
     }
+    this.focused = false;
+    this.onUpdate();
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public onFocus = (): void => {};
+  public onFocus = (): void => {
+    this.focused = true;
+    this.onUpdate();
+  };
 
   // This method is helpful to correctly display an empty state in the view.
   public hasValue = (): boolean => {

@@ -97,7 +97,6 @@ describe(Form, () => {
       expect(form.fields.name.touched).toBeFalsy();
       form.fields.name.onChange('Freddy');
       expect(form.fields.name.dirty).toBeTruthy();
-      expect(form.fields.name.touched).toBeTruthy();
       expect(tracker.wasCalled).toBeTruthy();
     });
 
@@ -309,6 +308,25 @@ describe(Form, () => {
       form.reset();
       expect(form.valid).toEqual(false);
       expect(form.dirty).toEqual(false);
+    });
+    it('resets to idle if there are new changes after submitted', async () => {
+      const form = createForm();
+      expect(form.submissionStatus).toEqual('idle');
+      await form.onSubmit();
+      expect(form.submissionStatus).toEqual('submitted');
+      form.fields.name.onChange('test');
+      expect(form.submissionStatus).toEqual('idle');
+    });
+    it('resets to idle if there are new changes after submit error', async () => {
+      const form = createForm({
+        onSubmit: async () => {
+          throw new Error('');
+        },
+      });
+      await form.onSubmit();
+      expect(form.submissionStatus).toBe('error');
+      form.fields.name.onChange('test');
+      expect(form.submissionStatus).toEqual('idle');
     });
   });
 });

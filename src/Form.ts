@@ -126,7 +126,15 @@ export class Form<T> {
 
   public onUpdate(): void {
     this.validateFields();
-    this.cachedOnUpdate();
+    // Reset submission status if there are new changes
+    if (
+      this.submissionStatus === 'error' ||
+      this.submissionStatus === 'submitted'
+    ) {
+      this.updateSubmissionStatus('idle');
+    } else {
+      this.cachedOnUpdate();
+    }
   }
 
   private updateSubmissionStatus(status: SubmissionStatus): void {
@@ -171,6 +179,11 @@ export class Form<T> {
     return Object.keys(this.validations).every((key) => {
       return this.fields[key].valid;
     });
+  }
+
+  // can submit
+  public get canSubmit(): boolean {
+    return this.valid && this.dirty;
   }
 
   // Fields getter uses a proxy object to generate fields on demand. It also binds the instance methods.
