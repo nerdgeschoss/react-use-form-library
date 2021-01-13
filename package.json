@@ -12,6 +12,7 @@
     "build": "yarn build:js && yarn build:types",
     "build:js": "NODE_ENV=production rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
+    "build:docs": "rm -rf docs && typedoc --out docs --mode library --theme minimal src/index.ts",
     "format": "prettier --write \"src/**/*.{ts,css,scss,json,yml}\"",
     "lint": "yarn lint:types && yarn lint:style",
     "lint:types": "tsc --noEmit",
@@ -19,7 +20,6 @@
     "test:ci": "jest --coverage",
     "test": "jest --watchAll",
     "watch": "rimraf dist && tsc -w",
-    "document": "npx typedoc",
     "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive"
   },
   "author": "Leo Gonzalez",
