@@ -93,6 +93,7 @@ export class Form<T> {
   public reset(): void {
     for (const key in this.fields) {
       this.fields[key].reset();
+      this.fields[key].validate(this.model);
     }
     this.updateSubmissionStatus('idle');
   }

@@ -4,6 +4,15 @@
 
 A simple form libray for React using hooks.
 
+## Motivation
+
+The motivation for working on this solution for form handling comes from the fact that we wanted something that is as agnostic to the implementation as possible.
+This is a simple react hook that gives you all the tools to implement your forms as you see fit.
+
+- Easy to use: you supply a model and a submit function to the hook and you get back helpers to use in your inputs.
+- Small: the codebase is quite simple and small. Only 6.1kb gzipped. [size](https://bundlephobia.com/result?p=react-use-form-library@0.0.21)
+- Declarative: we use the same handlers as the native inputs { value, onChange, onBlur }.
+
 ## Table of Contents
 
 1. [Installation](#installation)
@@ -115,10 +124,11 @@ The validations object will have the same keys as your model object. Each key ca
 - An array which can contain the previous both.
 
 ```ts
-const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
+const { model, fields, onSubmit, valid } = useForm({
   model: {
     name: '',
     phone: '',
+    customRegex: '',
     email: '',
     emailConfirmation: '' ,
   },
@@ -131,6 +141,8 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
         return ['not a number'];
       }
     },
+    // A Regex
+    customRegex: /[a-g]/,
     // A combination
     email: ['required', 'email']
     emailComfirmation: [
@@ -148,11 +160,13 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 
 #### Predefined validation strings
 
-| Property | Details                                       |
-| -------- | --------------------------------------------- |
-| required | checks if the field is not empty.             |
-| email    | checks if the value is a valid email address. |
-| json     | checks if the value is a valid json object.   |
+| Property | Details                                                |
+| -------- | ------------------------------------------------------ |
+| required | checks if the field is not empty.                      |
+| email    | checks if the value is a valid email address.          |
+| json     | checks if the value is a valid json object.            |
+| website  | checks if the value is a valid website (http / https). |
+| number   | checks if the value is a number.                       |
 
 ---
 
@@ -160,10 +174,10 @@ const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
 
 [Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
 
-The useForm hook also exposes another method: `onSubmitError`, this methods is handy if you don't want to use a try/catch in your `handleSubmit` function
+The useForm hook also exposes another method: `onSubmitError`, which is handy if you don't want to use a try/catch in your `handleSubmit` function
 
 ```ts
-const { model, fields, onSubmit, valid } = reactUseFormLibrary.useForm({
+const { model, fields, onSubmit, valid } = useForm({
   model: {
     name: '',
     phone: '',
@@ -194,7 +208,7 @@ There are several properties exposed from the hook to deal with the state throug
 
 #### Submission Status
 
-This variable contains the current state of the form submission process.
+This variable contains the current state of the form submission process. At any time the form will be in one of the following states:
 
 | Status     | Details                                                                     |
 | ---------- | --------------------------------------------------------------------------- |
@@ -205,7 +219,7 @@ This variable contains the current state of the form submission process.
 
 #### Reset
 
-Sometimes it is useful to reset the form programatically. For this there are two helpful methods
+Sometimes it is useful to reset the form programatically. For this there are two helpful methods:
 
 | Property   | Details                    |
 | ---------- | -------------------------- |
@@ -218,7 +232,7 @@ Sometimes it is useful to reset the form programatically. For this there are two
 
 [Codepen](https://codepen.io/falkonpunch/pen/JjRZwZq?editors=0010)
 
-Every key supplied to the model property of the hook will be parsed into a field
+Every key supplied to the model property of the hook will be parsed into a [field](#form-field)
 
 ```ts
 const { fields } = reactUseFormLibrary.useForm({
@@ -243,7 +257,7 @@ Or a more complex solution:
 
 ```ts
 <div>
-  // The required property is derived from the validations object
+  // The required property is derived from the validation of the field
   <label>Name {fields.name.required ? '(required)' : ''}: </label>
   <input
     value={fields.name.value}
@@ -264,9 +278,9 @@ Or a more complex solution:
 
 #### Touched
 
-If the field is required, the 'required-field' error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (onBlur event).
+If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (`onBlur` event).
 
-In order for this to work properly you need to supply the onBlur event to your input
+If you want to inmediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
 
 ```ts
 const displayErrors = fields.name.touched && fields.name.errors.length;

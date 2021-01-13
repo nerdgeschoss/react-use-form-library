@@ -62,12 +62,22 @@
 					<h1>React Use Form Library</h1>
 				</a>
 				<p><img src="https://github.com/nerdgeschoss/react-use-form-library/workflows/Tests/badge.svg" alt="Tests"></p>
-				<p>A simple form libray for React using hooks</p>
+				<p>A simple form libray for React using hooks.</p>
+				<a href="#motivation" id="motivation" style="color: inherit; text-decoration: none;">
+					<h2>Motivation</h2>
+				</a>
+				<p>The motivation for working on this solution for form handling comes from the fact that we wanted something that is as agnostic to the implementation as possible.
+				This is a simple react hook that gives you all the tools to implement your forms as you see fit.</p>
+				<ul>
+					<li>Easy to use: you supply a model and a submit function to the hook and you get back helpers to use in your inputs.</li>
+					<li>Small: the codebase is quite simple and small. Only 6.1kb gzipped. <a href="https://bundlephobia.com/result?p=react-use-form-library@0.0.21">size</a></li>
+					<li>Declarative: we use the same handlers as the native inputs { value, onChange, onBlur }.</li>
+				</ul>
 				<a href="#table-of-contents" id="table-of-contents" style="color: inherit; text-decoration: none;">
 					<h2>Table of Contents</h2>
 				</a>
 				<ol>
-					<li><a href="#installation">Instalation</a></li>
+					<li><a href="#installation">Installation</a></li>
 					<li><a href="#basic-example">Basic Example</a></li>
 					<li><a href="#optional-fields">Optional fields</a></li>
 					<li><a href="#validation">Validation</a></li>
@@ -84,7 +94,7 @@
 					<h2>Basic example</h2>
 				</a>
 				<p><a href="https://codepen.io/falkonpunch/pen/oNzyvQG">Codepen</a></p>
-				<p>To initialize the hook you will need to suply a valid <code>model</code> object and a custom <code>handleSubmit</code> function.</p>
+				<p>To initialize the hook you will need to supply a valid <code>model</code> object and a custom <code>handleSubmit</code> function.</p>
 				<p>The three main fields you get from the hook are <code>{ model, fields, onSubmit }</code>.</p>
 				<ul>
 					<li><code>model</code> is the updated object which will contain the modified fields.</li>
@@ -162,13 +172,14 @@
 				<p>The validations object will have the same keys as your model object. Each key can take one of the following values:</p>
 				<ul>
 					<li>A string that contains prebuild usual validations like <code>required, email, number, json, website, etc.</code></li>
-					<li>A custom validation function with the signature <code>(value): string[] =&gt; {}</code>. The value parameters is useful to suply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.</li>
+					<li>A custom validation function with the signature <code>(value): string[] =&gt; {}</code>. The value parameters is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.</li>
 					<li>An array which can contain the previous both.</li>
 				</ul>
-				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
 <span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">phone:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">customRegex:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">email:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">emailConfirmation:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000"> ,</span>
 <span style="color: #000000">  },</span>
@@ -181,6 +192,8 @@
 <span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> [</span><span style="color: #A31515">&#039;not a number&#039;</span><span style="color: #000000">];</span>
 <span style="color: #000000">      }</span>
 <span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #008000">// A Regex</span>
+<span style="color: #000000">    </span><span style="color: #001080">customRegex:</span><span style="color: #811F3F"> /</span><span style="color: #D16969">[</span><span style="color: #811F3F">a-g</span><span style="color: #D16969">]</span><span style="color: #811F3F">/</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #008000">// A combination</span>
 <span style="color: #000000">    </span><span style="color: #001080">email:</span><span style="color: #000000"> [</span><span style="color: #A31515">&#039;required&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;email&#039;</span><span style="color: #000000">]</span>
 <span style="color: #000000">    </span><span style="color: #001080">emailComfirmation</span><span style="color: #000000">: [</span>
@@ -217,14 +230,22 @@
 							<td>json</td>
 							<td>checks if the value is a valid json object.</td>
 						</tr>
+						<tr>
+							<td>website</td>
+							<td>checks if the value is a valid website (http / https).</td>
+						</tr>
+						<tr>
+							<td>number</td>
+							<td>checks if the value is a number.</td>
+						</tr>
 				</tbody></table>
 				<hr>
 				<a href="#submit-error-handling" id="submit-error-handling" style="color: inherit; text-decoration: none;">
 					<h2>Submit Error Handling</h2>
 				</a>
 				<p><a href="https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010">Codepen</a></p>
-				<p>The useForm hook also exposes another method: <code>onSubmitError</code>, this methods is handy if you don&#39;t want to use a try/catch in your <code>handleSubmit</code> function</p>
-				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
+				<p>The useForm hook also exposes another method: <code>onSubmitError</code>, which is handy if you don&#39;t want to use a try/catch in your <code>handleSubmit</code> function</p>
+				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000">, </span><span style="color: #0070C1">valid</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
 <span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">phone:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
@@ -270,7 +291,7 @@
 				<a href="#submission-status" id="submission-status" style="color: inherit; text-decoration: none;">
 					<h4>Submission Status</h4>
 				</a>
-				<p>This variable contains the current state of the form submission process.</p>
+				<p>This variable contains the current state of the form submission process. At any time the form will be in one of the following states:</p>
 				<table>
 					<thead>
 						<tr>
@@ -298,7 +319,7 @@
 				<a href="#reset" id="reset" style="color: inherit; text-decoration: none;">
 					<h4>Reset</h4>
 				</a>
-				<p>Sometimes it is useful to reset the form programatically. For this there are two helpful methods</p>
+				<p>Sometimes it is useful to reset the form programatically. For this there are two helpful methods:</p>
 				<table>
 					<thead>
 						<tr>
@@ -320,7 +341,7 @@
 					<h2>Fields</h2>
 				</a>
 				<p><a href="https://codepen.io/falkonpunch/pen/JjRZwZq?editors=0010">Codepen</a></p>
-				<p>Every key supplied to the model property of the hook will be parsed into a field</p>
+				<p>Every key supplied to the model property of the hook will be parsed into a <a href="#form-field">field</a></p>
 				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">fields</span><span style="color: #000000"> } = </span><span style="color: #001080">reactUseFormLibrary</span><span style="color: #000000">.</span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
 <span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
@@ -359,20 +380,27 @@
 				<a href="#touched" id="touched" style="color: inherit; text-decoration: none;">
 					<h4>Touched</h4>
 				</a>
-				<p>If the field is required, the &#39;required-field&#39; error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (onBlur event)</p>
+				<p>If the field is required, the &#39;required-field&#39; error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (onBlur event).</p>
+				<p>In order for this to work properly you need to supply the onBlur event to your input</p>
 				<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">errors</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000">;</span>
 
 <span style="color: #008000">// ...</span>
-
-<span style="color: #000000">{</span>
-<span style="color: #000000">  </span><span style="color: #001080">displayErrors</span><span style="color: #000000"> &amp;&amp; (</span>
-<span style="color: #000000">    &lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">      {fields.errors.forEach((error) =&gt; {</span>
-<span style="color: #000000">        return &lt;div&gt;{</span><span style="color: #001080">error</span><span style="color: #000000">}&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;;</span>
-<span style="color: #000000">      })}</span>
-<span style="color: #000000">    &lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
-<span style="color: #000000">  );</span>
-<span style="color: #000000">}</span>
+<span style="color: #000000">&lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">  &lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">    </span><span style="color: #001080">value</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">    </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.name.onChange(v.target.value)}</span>
+<span style="color: #000000">    </span><span style="color: #001080">onBlur</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">onBlur</span><span style="color: #000000">}</span>
+<span style="color: #000000">  /&gt;</span>
+<span style="color: #000000">  {</span>
+<span style="color: #000000">    </span><span style="color: #001080">displayErrors</span><span style="color: #000000"> &amp;&amp; (</span>
+<span style="color: #000000">      &lt;</span><span style="color: #267F99">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">        {fields.errors.forEach((error) =&gt; {</span>
+<span style="color: #000000">          return &lt;div&gt;{</span><span style="color: #001080">error</span><span style="color: #000000">}&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;;</span>
+<span style="color: #000000">        })}</span>
+<span style="color: #000000">      &lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
+<span style="color: #000000">    );</span>
+<span style="color: #000000">  }</span>
+<span style="color: #000000">&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
 </code></pre>
 				<a href="#valid" id="valid" style="color: inherit; text-decoration: none;">
 					<h4>Valid</h4>
@@ -392,6 +420,9 @@
 					<h4>Dirty</h4>
 				</a>
 				<p>When instantiated, a field will store it&#39;s original value in a variable. This getter will then compare the original value to the current value and return true if they are different.</p>
+				<a href="#p" id="p" style="color: inherit; text-decoration: none;">
+					<h4>P</h4>
+				</a>
 				<hr>
 				<a href="#advanced-example" id="advanced-example" style="color: inherit; text-decoration: none;">
 					<h2>Advanced example</h2>

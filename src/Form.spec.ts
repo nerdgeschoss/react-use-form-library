@@ -111,13 +111,6 @@ describe(Form, () => {
       expect(tracker.wasCalled).toBeTruthy();
     });
 
-    it('resets', () => {
-      const form = createForm();
-      form.fields.name.onChange('hello');
-      form.reset();
-      expect(form.changes).toEqual({});
-    });
-
     it('mass assigns', () => {
       const form = createForm();
       form.updateFields({ name: 'George', age: 5 });
@@ -281,6 +274,16 @@ describe(Form, () => {
       // Custom error handling
       expect(error).toBeTruthy();
     });
+  });
+
+  describe('reseting', () => {
+    it('resets fields', () => {
+      const form = createForm();
+      form.fields.name.onChange('hello');
+      form.reset();
+      expect(form.changes).toEqual({});
+    });
+
     it('resets error', async () => {
       const form = createForm({
         onSubmit: async (form) => {
@@ -293,6 +296,19 @@ describe(Form, () => {
       form.resetError();
       expect(form.submissionStatus).toBe('idle');
       expect(form.error).toBeUndefined();
+    });
+
+    it('resets valid and dirty fields', () => {
+      const form = createForm({
+        validations: { name: 'required' },
+      });
+      expect(form.valid).toBeFalsy();
+      form.fields.name.onChange('test');
+      expect(form.valid).toBeTruthy();
+
+      form.reset();
+      expect(form.valid).toEqual(false);
+      expect(form.dirty).toEqual(false);
     });
   });
 });
