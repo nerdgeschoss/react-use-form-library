@@ -131,6 +131,9 @@ export class FormField<T> {
 
   // CLASS GETTERS
   public get valid(): boolean {
+    if (this.isNestedObject) {
+      return this.checkNestedValid();
+    }
     return !this.errors.length;
   }
 
@@ -202,12 +205,14 @@ export class FormField<T> {
   }
 
   private checkNestedDirty(): boolean {
-    let dirty = false;
+    return Object.keys(this.fields).some((key) => {
+      return this.fields[key].dirty;
+    });
+  }
 
-    for (const key in this.fields) {
-      dirty = dirty || this.fields[key].dirty;
-    }
-
-    return dirty;
+  private checkNestedValid(): boolean {
+    return Object.keys(this.fields).every((key) => {
+      return this.fields[key].valid;
+    });
   }
 }
