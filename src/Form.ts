@@ -62,7 +62,7 @@ export class Form<T> {
   // This method will touch every field, for the purpose of displaying the errors in the view
   public touchFields(): void {
     for (const key in this.fields) {
-      this.fields[key].touched = true;
+      this.fields[key].touch();
     }
   }
 

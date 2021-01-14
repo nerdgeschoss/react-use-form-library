@@ -1,3 +1,4 @@
+import { MappedFields } from './Form';
 import {
   validateValue,
   FieldValidation,
@@ -13,6 +14,8 @@ export class FormField<T> {
   public validation?: FieldValidation<unknown>;
   public focused = false;
   private onUpdate: () => void;
+  // Nested Objects
+  private cachedFields = {} as MappedFields<T>;
 
   constructor({
     value,
@@ -40,7 +43,7 @@ export class FormField<T> {
 
   public onBlur = (): void => {
     if (!this.touched) {
-      this.touched = true;
+      this.touch();
     }
     this.focused = false;
     this.onUpdate();
@@ -103,6 +106,15 @@ export class FormField<T> {
     this.errors = errors;
   };
 
+  // Helpers
+  public touch = (): void => {
+    this.touched = true;
+
+    for (const key in this.fields) {
+      this.fields[key].touch();
+    }
+  };
+
   public reset = (): void => {
     this.value = this.originalValue;
   };
@@ -114,5 +126,45 @@ export class FormField<T> {
 
   public get dirty(): boolean {
     return this.originalValue !== this.value;
+  }
+
+  // Nested Objects
+  private addField(key: string): void {
+    this.cachedFields[key] = new FormField({
+      value: this.originalValue?.[key],
+      onUpdate: this.nestUpdate.bind(this),
+      validation: this.validation?.[key],
+    });
+    this.cachedFields[key].validate(this.value);
+  }
+
+  public get fields(): MappedFields<T> {
+    const handler = {
+      get: (target: MappedFields<T>, key: string) => {
+        if (!target[key]) {
+          this.addField(key);
+        }
+        return target[key];
+      },
+    };
+
+    return new Proxy(this.cachedFields, handler);
+  }
+
+  private nestUpdate(): void {
+    const changes = {} as Partial<T>;
+
+    for (const key in this.fields) {
+      const field = this.fields[key];
+      changes[key] = field.value;
+      field.validate(this.value);
+    }
+
+    this.value = {
+      ...this.value,
+      ...changes,
+    } as T;
+
+    this.onUpdate();
   }
 }
