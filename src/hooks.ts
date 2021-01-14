@@ -21,6 +21,7 @@ export interface FormModel<T> {
   submissionStatus: SubmissionStatus;
   validations?: Partial<MappedValidation<T>>;
   error?: Error;
+  updateFields: (model: Partial<T>) => void;
   onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
   reset: () => void;
   resetError: () => void;
@@ -61,6 +62,7 @@ export function useForm<T>({
     canSubmit: form.canSubmit,
     error: form.error,
     submissionStatus: form.submissionStatus,
+    updateFields: form.updateFields.bind(form),
     onSubmit: form.onSubmit.bind(form),
     reset: form.reset.bind(form),
     resetError: form.resetError.bind(form),

@@ -37,13 +37,16 @@ export class FormField<T> {
 
   // CLASS METHODS
   public onChange = (value?: T): void => {
+    if (this.isNestedObject) {
+      return this.updateFields(value);
+    }
     this.value = value;
     this.onUpdate();
   };
 
   public onBlur = (): void => {
     if (!this.touched) {
-      this.touch();
+      this.setTouched(true);
     }
     this.focused = false;
     this.onUpdate();
@@ -68,6 +71,11 @@ export class FormField<T> {
 
   // Validate takes the updated model as a parameter to allow cross-field validation
   public validate = <M>(model: M): void => {
+    // If is a nested object run nestValidate
+    if (this.isNestedObject) {
+      return this.nestValidate();
+    }
+
     let errors: string[] = [];
     // Validation can be a single string "required", an array ["required", "email"] or a custom function
     // If it is a single string, parsing into an array is necessary
@@ -107,16 +115,18 @@ export class FormField<T> {
   };
 
   // Helpers
-  public touch = (): void => {
-    this.touched = true;
+  public setTouched = (value: boolean): void => {
+    this.touched = value;
 
     for (const key in this.fields) {
-      this.fields[key].touch();
+      this.fields[key].setTouched(value);
     }
   };
 
   public reset = (): void => {
+    this.setTouched(false);
     this.value = this.originalValue;
+    this.nestReset();
   };
 
   // CLASS GETTERS
@@ -125,9 +135,15 @@ export class FormField<T> {
   }
 
   public get dirty(): boolean {
+    if (this.isNestedObject) {
+      return this.checkNestedDirty();
+    }
     return this.originalValue !== this.value;
   }
 
+  public get isNestedObject(): boolean {
+    return !!Object.keys(this.fields).length;
+  }
   // Nested Objects
   private addField(key: string): void {
     this.cachedFields[key] = new FormField({
@@ -155,16 +171,43 @@ export class FormField<T> {
     const changes = {} as Partial<T>;
 
     for (const key in this.fields) {
-      const field = this.fields[key];
-      changes[key] = field.value;
-      field.validate(this.value);
+      changes[key] = this.fields[key].value;
     }
 
     this.value = {
       ...this.value,
       ...changes,
     } as T;
-
+    this.nestValidate();
     this.onUpdate();
+  }
+
+  private nestValidate(): void {
+    for (const key in this.fields) {
+      this.fields[key].validate(this.value);
+    }
+  }
+
+  private nestReset(): void {
+    for (const key in this.fields) {
+      this.fields[key].reset();
+    }
+  }
+
+  public updateFields(model?: Partial<T>): void {
+    for (const key in model) {
+      this.fields[key].onChange(model[key]);
+    }
+    this.onUpdate();
+  }
+
+  private checkNestedDirty(): boolean {
+    let dirty = false;
+
+    for (const key in this.fields) {
+      dirty = dirty || this.fields[key].dirty;
+    }
+
+    return dirty;
   }
 }
