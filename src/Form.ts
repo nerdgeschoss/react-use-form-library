@@ -8,6 +8,9 @@ get back a FormField type */
 export type MappedFields<T> = {
   [P in keyof Required<T>]: FormField<T[P]>;
 };
+export type MappedArrayFields<T> = {
+  [P in keyof Required<T>]: Array<FormField<T[P]>>;
+};
 
 export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
 
@@ -17,6 +20,8 @@ export class Form<T> {
   private originalModel: T;
   // Cached fields created with addField().
   private cachedFields = {} as MappedFields<T>;
+  // Cached array fields created with addField().
+  private cachedArrayFields = {} as MappedArrayFields<T>;
   // OnUpdate function used to update the view after any changes
   private cachedOnUpdate: () => void;
   // Form submit function
@@ -48,15 +53,6 @@ export class Form<T> {
     this.validations = validations;
     this.handleSubmit = handleSubmit;
     this.onSubmitError = onSubmitError;
-  }
-
-  private addField(key: string): void {
-    this.cachedFields[key] = new FormField({
-      value: this.originalModel[key],
-      onUpdate: this.onUpdate.bind(this),
-      validation: this.validations?.[key],
-    });
-    this.cachedFields[key].validate(this.model);
   }
 
   // This method will touch every field, for the purpose of displaying the errors in the view
@@ -186,6 +182,29 @@ export class Form<T> {
     return this.valid && this.dirty;
   }
 
+  private addField(key: string): void {
+    this.cachedFields[key] = new FormField({
+      value: this.originalModel[key],
+      onUpdate: this.onUpdate.bind(this),
+      validation: this.validations?.[key],
+    });
+    this.cachedFields[key].validate(this.model);
+  }
+
+  private addArrayField(key: string): void {
+    const newArray: any[] = [];
+    this.originalModel[key].forEach((item: string) => {
+      newArray.push(
+        new FormField({
+          value: this.originalModel[key][item],
+          onUpdate: this.onUpdate.bind(this),
+          validation: this.validations?.[key][item],
+        })
+      );
+    });
+    this.cachedArrayFields[key] = newArray;
+  }
+
   // Fields getter uses a proxy object to generate fields on demand. It also binds the instance methods.
   public get fields(): MappedFields<T> {
     const handler = {
@@ -198,5 +217,18 @@ export class Form<T> {
     };
 
     return new Proxy(this.cachedFields, handler);
+  }
+
+  public get arrayFields(): MappedArrayFields<T> {
+    const handler = {
+      get: (target: MappedArrayFields<T>, key: string) => {
+        if (!target[key]) {
+          this.addArrayField(key);
+        }
+        return target[key];
+      },
+    };
+
+    return new Proxy(this.cachedArrayFields, handler);
   }
 }

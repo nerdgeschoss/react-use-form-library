@@ -5,6 +5,8 @@ import {
   ValidationStrings,
 } from './validation';
 
+type ArrayValue<T> = T extends (infer U)[] ? U : never;
+
 export class FormField<T> {
   public value?: T;
   private originalValue?: T;
@@ -144,10 +146,11 @@ export class FormField<T> {
     return this.originalValue !== this.value;
   }
 
+  // Nested Objects
   public get isNestedObject(): boolean {
     return !!Object.keys(this.fields).length;
   }
-  // Nested Objects
+
   private addField(key: string): void {
     this.cachedFields[key] = new FormField({
       value: this.originalValue?.[key],

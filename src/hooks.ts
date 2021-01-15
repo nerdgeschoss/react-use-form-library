@@ -1,6 +1,11 @@
 import { useForceUpdate } from './util';
 import { useRef } from 'react';
-import { Form, MappedFields, SubmissionStatus } from './Form';
+import {
+  Form,
+  MappedArrayFields,
+  MappedFields,
+  SubmissionStatus,
+} from './Form';
 import { MappedValidation } from './validation';
 
 export interface UseFormProps<T> {
@@ -14,6 +19,7 @@ export interface UseFormProps<T> {
 export interface FormModel<T> {
   model: T;
   fields: MappedFields<T>;
+  arrayFields: MappedArrayFields<T>;
   changes: Partial<T>;
   dirty: boolean;
   valid: boolean;
@@ -56,6 +62,7 @@ export function useForm<T>({
   return {
     model: form.model,
     fields: form.fields,
+    arrayFields: form.arrayFields,
     changes: form.changes,
     dirty: form.dirty,
     valid: form.valid,
