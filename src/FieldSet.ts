@@ -3,7 +3,9 @@ import { FieldValidation } from './validation';
 import compact from 'lodash.compact';
 
 // Extract the type of a given array
-type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
+export type ArrayElement<
+  ArrayType extends readonly unknown[]
+> = ArrayType[number];
 
 export class FieldSet<T extends Array<ArrayElement<T>>> extends Array<
   FormField<ArrayElement<T>>
