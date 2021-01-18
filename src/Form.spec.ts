@@ -30,6 +30,10 @@ interface Model {
   age: number;
   description?: string;
   emails?: string[];
+  address?: {
+    streetName: string;
+    streetNumber: number;
+  };
 }
 
 function createForm({
@@ -399,6 +403,21 @@ describe(Form, () => {
       expect(form.fields.emails[0].dirty).toBeTruthy();
       expect(form.fields.emails[1].dirty).toBeFalsy();
       expect(form.fields.emails.dirty).toBeTruthy();
+    });
+  });
+
+  describe('object field', () => {
+    it('creates FormField for each element of the object', () => {
+      const form = createForm({
+        value: {
+          address: {
+            streetName: 'First Street',
+            streetNumber: 23,
+          },
+        },
+      });
+      expect(form.fields.address.fields?.streetName instanceof FormField);
+      expect(form.fields.address.fields?.streetNumber instanceof FormField);
     });
   });
 });

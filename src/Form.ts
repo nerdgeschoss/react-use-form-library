@@ -9,11 +9,11 @@ for each field. In this case, for each field of T, string | number you
 get back a FormField type */
 export type MappedFields<T> = {
   // Here we are only checking if T[P] is actually an array
-  // eslint-disable-next-line
-  [P in keyof Required<T>]: T[P] extends object
-    ? FieldObject<T[P]>
-    : T[P] extends Array<any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [P in keyof Required<T>]: T[P] extends Array<any>
     ? FieldSet<T[P]>
+    : T[P] extends object
+    ? FieldObject<T[P]>
     : FormField<T[P]>;
 };
 
