@@ -9,7 +9,11 @@ export type ValidationStrings =
 export type ValidationType<T> =
   | RegExp
   | ValidationStrings
-  | ValidationFunction<T>;
+  | ValidationFunction<T>
+  // This will allow to handle validations within Fieldsets
+  | Array<RegExp>
+  | Array<ValidationStrings>
+  | Array<ValidationFunction<T>>;
 
 export type FieldValidation<T> = ValidationType<T> | ValidationType<T>[];
 
