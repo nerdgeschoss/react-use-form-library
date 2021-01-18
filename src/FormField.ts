@@ -1,11 +1,10 @@
+import { FieldSet } from './FieldSet';
 import { MappedFields } from './Form';
 import {
   validateValue,
   FieldValidation,
   ValidationStrings,
 } from './validation';
-
-type ArrayValue<T> = T extends (infer U)[] ? U : never;
 
 export class FormField<T> {
   public value?: T;
@@ -152,11 +151,16 @@ export class FormField<T> {
   }
 
   private addField(key: string): void {
-    this.cachedFields[key] = new FormField({
+    const options = {
       value: this.originalValue?.[key],
       onUpdate: this.nestUpdate.bind(this),
       validation: this.validation?.[key],
-    });
+    };
+    if (Array.isArray(this.originalValue?.[key])) {
+      this.cachedFields[key] = new FieldSet(options);
+    } else {
+      this.cachedFields[key] = new FormField(options);
+    }
     this.cachedFields[key].validate(this.value);
   }
 
