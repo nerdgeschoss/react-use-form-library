@@ -2,9 +2,16 @@ import { FormField } from './FormField';
 import { FieldValidation } from './validation';
 import compact from 'lodash.compact';
 
+interface AddItem<T extends Array<T[number]>> {
+  value: T[number];
+  validation?: FieldValidation<T[number]>;
+}
 export class FieldSet<T extends Array<T[number]>> extends Array<
   FormField<T[number]>
 > {
+  private onUpdate: () => void;
+  public validation?: Array<FieldValidation<T[number]>>;
+
   constructor({
     value,
     onUpdate,
@@ -27,6 +34,8 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
           ]
         : [])
     );
+    this.onUpdate = onUpdate;
+    this.validation = validation;
   }
 
   public onChange = (value?: T): void => {
@@ -45,6 +54,25 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
 
   public validate<M>(model: M): void {
     this.forEach((field) => field.validate(model));
+  }
+
+  public add(...items: Array<AddItem<T> | T[number]>): void {
+    items.forEach((item) => {
+      this.push(
+        new FormField({
+          value: typeof item === 'object' ? (item as AddItem<T>).value : item,
+          onUpdate: this.onUpdate,
+          validation:
+            typeof item === 'object'
+              ? (item as AddItem<T>).validation
+              : undefined,
+        })
+      );
+    });
+  }
+
+  public remove(index: number): void {
+    this.splice(index, 1);
   }
 
   // CLASS GETTERS
