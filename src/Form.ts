@@ -2,7 +2,6 @@ import isEmpty from 'lodash.isempty';
 import { FormField } from './FormField';
 import { MappedValidation } from './validation';
 import { FieldSet } from './FieldSet';
-import { FieldObject } from './FieldObject';
 
 /* This type is used to take a model, parse it an return a different type
 for each field. In this case, for each field of T, string | number you
@@ -12,8 +11,6 @@ export type MappedFields<T> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [P in keyof Required<T>]: T[P] extends any[]
     ? FieldSet<T[P]>
-    : T[P] extends object
-    ? FieldObject<T[P]>
     : FormField<T[P]>;
 };
 
@@ -193,8 +190,6 @@ export class Form<T> {
     };
     if (Array.isArray(this.originalModel[key])) {
       this.cachedFields[key] = new FieldSet(options);
-    } else if (typeof this.originalModel[key] === 'object') {
-      this.cachedFields[key] = new FieldObject(options);
     } else {
       this.cachedFields[key] = new FormField(options);
     }
