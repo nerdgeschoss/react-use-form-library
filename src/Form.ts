@@ -10,7 +10,7 @@ get back a FormField type */
 export type MappedFields<T> = {
   // Here we are only checking if T[P] is actually an array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [P in keyof Required<T>]: T[P] extends Array<any>
+  [P in keyof Required<T>]: T[P] extends any[]
     ? FieldSet<T[P]>
     : T[P] extends object
     ? FieldObject<T[P]>

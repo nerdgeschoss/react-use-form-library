@@ -2,13 +2,8 @@ import { FormField } from './FormField';
 import { FieldValidation } from './validation';
 import compact from 'lodash.compact';
 
-// Extract the type of a given array
-export type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType[number];
-
-export class FieldSet<T extends Array<ArrayElement<T>>> extends Array<
-  FormField<ArrayElement<T>>
+export class FieldSet<T extends Array<T[number]>> extends Array<
+  FormField<T[number]>
 > {
   constructor({
     value,
@@ -16,7 +11,7 @@ export class FieldSet<T extends Array<ArrayElement<T>>> extends Array<
     validation,
   }: {
     value?: T;
-    validation?: Array<FieldValidation<ArrayElement<T>>>;
+    validation?: Array<FieldValidation<T[number]>>;
     onUpdate: () => void;
   }) {
     super(
