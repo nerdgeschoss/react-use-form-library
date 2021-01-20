@@ -23,7 +23,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     super();
     this.onUpdate = onUpdate;
     if (value && value.length) {
-      this.add(
+      this.addFields(
         ...value.map((item, index) => {
           return {
             value: item,
@@ -36,7 +36,11 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
 
   public onChange = (value?: T): void => {
     value?.forEach((val, index) => {
-      this[index].onChange(val);
+      if (this[index] === undefined) {
+        this.addFields(val);
+      } else {
+        this[index].onChange(val);
+      }
     });
   };
 
@@ -52,7 +56,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     this.forEach((field) => field.validate(model));
   }
 
-  public add(...items: Array<AddItem<T> | T[number]>): void {
+  public addFields(...items: Array<AddItem<T> | T[number]>): void {
     items.forEach((item) => {
       this.push(
         new FormField({
@@ -67,7 +71,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     });
   }
 
-  public remove(index: number): void {
+  public removeField(index: number): void {
     this.splice(index, 1);
   }
 

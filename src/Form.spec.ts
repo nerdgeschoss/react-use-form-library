@@ -356,6 +356,14 @@ describe(Form, () => {
       expect(form.fields.emails[0].value).toEqual('linkedin.com');
       expect(form.fields.emails[1].value).toEqual('twitter.com');
     });
+    it('creates new fields when mass updating', () => {
+      const form = createForm({
+        value: { emails: [] },
+      });
+      form.fields.emails.onChange(['linkedin.com', 'twitter.com']);
+      expect(form.fields.emails[0].value).toEqual('linkedin.com');
+      expect(form.fields.emails[1].value).toEqual('twitter.com');
+    });
     it('touches every field', () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
@@ -412,8 +420,19 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
       expect(emails.length).toEqual(0);
-      emails.add('test');
+      emails.addFields('test');
       expect(emails.length).toEqual(1);
+      expect(form.fields.emails[0].value).toEqual('test');
+    });
+    it('adds multiple fields', () => {
+      const form = createForm({
+        value: { emails: [] },
+      });
+      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      expect(emails.length).toEqual(0);
+      const newFields = ['test', 'test', 'test'];
+      emails.addFields(...newFields);
+      expect(emails.length).toEqual(3);
       expect(form.fields.emails[0].value).toEqual('test');
     });
     it('removes a field', () => {
@@ -422,9 +441,9 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
       expect(emails.length).toEqual(0);
-      emails.add('test');
+      emails.addFields('test');
       expect(emails.length).toEqual(1);
-      emails.remove(0);
+      emails.removeField(0);
       expect(emails.length).toEqual(0);
     });
   });
@@ -541,6 +560,15 @@ describe(Form, () => {
       expect(form.fields.address.fields?.streetName.dirty).toBeTruthy();
       expect(form.fields.address.fields?.streetNumber.dirty).toBeFalsy();
       expect(form.fields.address.dirty).toBeTruthy();
+    });
+    it('has value when all fields have value', () => {
+      const form = createForm({});
+      expect(form.fields.address.hasValue()).toBeFalsy();
+      form.fields.address.fields?.streetName.onChange('');
+      form.fields.address.fields?.streetNumber.onChange(23);
+      expect(form.fields.address.hasValue()).toBeFalsy();
+      form.fields.address.fields?.streetName.onChange('Test Address');
+      expect(form.fields.address.hasValue()).toBeTruthy();
     });
   });
 });

@@ -61,6 +61,10 @@ export class FormField<T> {
 
   // This method is helpful to correctly display an empty state in the view.
   public hasValue = (): boolean => {
+    if (this.isNestedObject) {
+      return this.checkNestedValue();
+    }
+
     if (typeof this.value === 'string' || Array.isArray(this.value)) {
       return !!this.value.length;
     }
@@ -120,7 +124,7 @@ export class FormField<T> {
   public setTouched = (value: boolean): void => {
     this.fieldTouched = value;
 
-    for (const key in this.fields) {
+    for (const key of this.nestedKeys) {
       this.fields[key].setTouched(value);
     }
   };
@@ -128,7 +132,10 @@ export class FormField<T> {
   public reset = (): void => {
     this.setTouched(false);
     this.value = this.originalValue;
-    this.nestReset();
+
+    if (this.isNestedObject) {
+      this.nestReset();
+    }
   };
 
   // CLASS GETTERS
@@ -240,14 +247,14 @@ export class FormField<T> {
   }
 
   private checkNestedValid(): boolean {
-    return this.nestedKeys.every((key) => {
-      return this.fields[key].valid;
-    });
+    return this.nestedKeys.every((key) => this.fields[key].valid);
   }
 
   private checkNestedTouched(): boolean {
-    return this.nestedKeys.every((key) => {
-      return this.fields[key].touched;
-    });
+    return this.nestedKeys.every((key) => this.fields[key].touched);
+  }
+
+  private checkNestedValue(): boolean {
+    return this.nestedKeys.every((key) => this.fields[key].hasValue());
   }
 }
