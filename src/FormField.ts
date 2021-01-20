@@ -5,16 +5,17 @@ import {
   FieldValidation,
   ValidationStrings,
 } from './validation';
+import uniq from 'lodash.uniq';
 
 export class FormField<T> {
   public value?: T;
   private originalValue?: T;
-  public touched = false;
   public required = false;
   public errors: string[] = [];
   public validation?: FieldValidation<unknown>;
   public focused = false;
   private onUpdate: () => void;
+  private fieldTouched = false;
   // Nested Objects
   private cachedFields = {} as MappedFields<T>;
 
@@ -38,7 +39,7 @@ export class FormField<T> {
 
   // CLASS METHODS
   public onChange = (value?: T): void => {
-    if (this.isNestedObject) {
+    if (typeof value === 'object' || this.isNestedObject) {
       return this.updateFields(value);
     }
     this.value = value;
@@ -117,7 +118,7 @@ export class FormField<T> {
 
   // Helpers
   public setTouched = (value: boolean): void => {
-    this.touched = value;
+    this.fieldTouched = value;
 
     for (const key in this.fields) {
       this.fields[key].setTouched(value);
@@ -131,6 +132,13 @@ export class FormField<T> {
   };
 
   // CLASS GETTERS
+  public get touched(): boolean {
+    if (this.isNestedObject) {
+      return this.checkNestedTouched();
+    }
+    return this.fieldTouched;
+  }
+
   public get valid(): boolean {
     if (this.isNestedObject) {
       return this.checkNestedValid();
@@ -145,10 +153,23 @@ export class FormField<T> {
     return this.originalValue !== this.value;
   }
 
-  public get isNestedObject(): boolean {
-    return !!Object.keys(this.fields).length;
+  // NESTED OBJECTS
+  /* We need to check both in the original value and the generated fields because the field could be 
+  initialized with an empty value and fields created on demand */
+  private get nestedKeys(): string[] {
+    let keys: string[] = [];
+    if (typeof this.value === 'object') {
+      keys = [...Object.keys(this.value)];
+    }
+    keys = [...keys, ...Object.keys(this.fields)];
+
+    return uniq(keys);
   }
-  // Nested Objects
+
+  private get isNestedObject(): boolean {
+    return !!this.nestedKeys.length;
+  }
+
   private addField(key: string): void {
     const options = {
       value: this.originalValue?.[key],
@@ -181,7 +202,7 @@ export class FormField<T> {
   private nestUpdate(): void {
     const changes = {} as Partial<T>;
 
-    for (const key in this.fields) {
+    for (const key of this.nestedKeys) {
       changes[key] = this.fields[key].value;
     }
 
@@ -194,18 +215,18 @@ export class FormField<T> {
   }
 
   private nestValidate(): void {
-    for (const key in this.fields) {
+    for (const key of this.nestedKeys) {
       this.fields[key].validate(this.value);
     }
   }
 
   private nestReset(): void {
-    for (const key in this.fields) {
+    for (const key of this.nestedKeys) {
       this.fields[key].reset();
     }
   }
 
-  public updateFields(model?: Partial<T>): void {
+  private updateFields(model?: Partial<T>): void {
     for (const key in model) {
       this.fields[key].onChange(model[key]);
     }
@@ -213,14 +234,20 @@ export class FormField<T> {
   }
 
   private checkNestedDirty(): boolean {
-    return Object.keys(this.fields).some((key) => {
+    return this.nestedKeys.some((key) => {
       return this.fields[key].dirty;
     });
   }
 
   private checkNestedValid(): boolean {
-    return Object.keys(this.fields).every((key) => {
+    return this.nestedKeys.every((key) => {
       return this.fields[key].valid;
+    });
+  }
+
+  private checkNestedTouched(): boolean {
+    return this.nestedKeys.every((key) => {
+      return this.fields[key].touched;
     });
   }
 }

@@ -2,6 +2,7 @@ import { Form } from './Form';
 import { FormEvent } from 'react';
 import { MappedValidation } from './validation';
 import { FormField } from './FormField';
+import { FieldSet } from './FieldSet';
 
 type VoidFunction = () => void;
 
@@ -341,6 +342,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
+      expect(form.fields.emails instanceof FieldSet);
       expect(form.fields.emails[0] instanceof FormField);
       expect(form.fields.emails[1] instanceof FormField);
       expect(form.fields.emails[0].value).toEqual('google.com');
@@ -404,20 +406,141 @@ describe(Form, () => {
       expect(form.fields.emails[1].dirty).toBeFalsy();
       expect(form.fields.emails.dirty).toBeTruthy();
     });
+    it('adds a new field', () => {
+      const form = createForm({
+        value: { emails: [] },
+      });
+      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      expect(emails.length).toEqual(0);
+      emails.add('test');
+      expect(emails.length).toEqual(1);
+      expect(form.fields.emails[0].value).toEqual('test');
+    });
+    it('removes a field', () => {
+      const form = createForm({
+        value: { emails: [] },
+      });
+      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      expect(emails.length).toEqual(0);
+      emails.add('test');
+      expect(emails.length).toEqual(1);
+      emails.remove(0);
+      expect(emails.length).toEqual(0);
+    });
   });
 
-  describe('object field', () => {
-    it('creates FormField for each element of the object', () => {
+  describe('nested objects', () => {
+    it('creates FormField for a 1 level nested field', () => {
+      const form = createForm();
+      expect(form.fields.address instanceof FormField);
+      expect(form.fields.address.fields?.streetNumber instanceof FormField);
+    });
+    it('updates the value after changing nested fields', () => {
+      const form = createForm();
+      expect(form.fields.address.value).toBeFalsy();
+      form.fields.address.fields?.streetName.onChange('Test Address 123');
+      expect(form.fields.address.value?.streetName).toEqual('Test Address 123');
+    });
+    it('mass updates fields', () => {
+      const form = createForm();
+      form.fields.address.onChange({
+        streetName: 'Test Address',
+        streetNumber: 23,
+      });
+      expect(form.fields.address.fields?.streetName.value).toEqual(
+        'Test Address'
+      );
+      expect(form.fields.address.fields?.streetNumber.value).toEqual(23);
+    });
+    it('validates every field', () => {
       const form = createForm({
         value: {
           address: {
-            streetName: 'First Street',
+            streetName: 'Test Address',
             streetNumber: 23,
           },
         },
+        validations: {
+          address: {
+            streetName: 'required',
+            streetNumber: 'number',
+          },
+        },
       });
-      expect(form.fields.address.fields?.streetName instanceof FormField);
-      expect(form.fields.address.fields?.streetNumber instanceof FormField);
+
+      form.fields.address.validate(form.model);
+      expect(form.fields.address.fields?.streetName.valid).toBeTruthy();
+      form.fields.address.fields?.streetName.onChange('');
+      expect(form.fields.address.fields?.streetName.valid).toBeFalsy();
+    });
+    it('touches every field', () => {
+      const form = createForm({});
+
+      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+      form.fields.address.setTouched(true);
+      expect(form.fields.address.fields?.streetName.touched).toBeTruthy();
+      expect(form.fields.address.fields?.streetNumber.touched).toBeTruthy();
+    });
+    it('resets every field', () => {
+      const form = createForm({});
+
+      expect(form.fields.address.fields?.streetName.value).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.value).toBeFalsy();
+      form.fields.address.onChange({
+        streetName: 'Test Address',
+        streetNumber: 23,
+      });
+      expect(form.fields.address.fields?.streetName.value).toBeTruthy();
+      expect(form.fields.address.fields?.streetNumber.value).toBeTruthy();
+      form.fields.address.reset();
+      expect(form.fields.address.fields?.streetName.value).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.value).toBeFalsy();
+      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+    });
+    it('is valid when all fields are valid', () => {
+      const form = createForm({
+        value: {
+          address: {
+            streetName: '',
+            streetNumber: 23,
+          },
+        },
+        validations: {
+          address: {
+            streetName: 'required',
+            streetNumber: 'number',
+          },
+        },
+      });
+      expect(form.valid).toBeFalsy();
+      expect(form.fields.address.valid).toBeFalsy();
+      form.fields.address.fields?.streetName.onChange('Test Address');
+      expect(form.fields.address.valid).toBeTruthy();
+      expect(form.valid).toBeTruthy();
+    });
+    it('is touched when all fields are touched', () => {
+      const form = createForm({});
+
+      expect(form.fields.address.touched).toBeFalsy();
+      // Instanciate the fields
+      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+      form.fields.address.fields?.streetName.setTouched(true);
+      expect(form.fields.address.touched).toBeFalsy();
+      form.fields.address.fields?.streetNumber.setTouched(true);
+      expect(form.fields.address.touched).toBeTruthy();
+    });
+    it('is dirty when some fields are dirty', () => {
+      const form = createForm({});
+      expect(form.dirty).toBeFalsy();
+      expect(form.fields.address.dirty).toBeFalsy();
+      // Instantiate street Number
+      form.fields.address.fields?.streetName.onChange('Test Address');
+      expect(form.fields.address.fields?.streetName.dirty).toBeTruthy();
+      expect(form.fields.address.fields?.streetNumber.dirty).toBeFalsy();
+      expect(form.fields.address.dirty).toBeTruthy();
     });
   });
 });

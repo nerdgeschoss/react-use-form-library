@@ -10,7 +10,6 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   FormField<T[number]>
 > {
   private onUpdate: () => void;
-  public validation?: Array<FieldValidation<T[number]>>;
 
   constructor({
     value,
@@ -21,21 +20,18 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     validation?: Array<FieldValidation<T[number]>>;
     onUpdate: () => void;
   }) {
-    super(
-      ...(value
-        ? [
-            ...value.map((item, index) => {
-              return new FormField({
-                value: item,
-                onUpdate,
-                validation: validation?.[index],
-              });
-            }),
-          ]
-        : [])
-    );
+    super();
     this.onUpdate = onUpdate;
-    this.validation = validation;
+    if (value && value.length) {
+      this.add(
+        ...value.map((item, index) => {
+          return {
+            value: item,
+            validation: validation?.[index],
+          };
+        })
+      );
+    }
   }
 
   public onChange = (value?: T): void => {
