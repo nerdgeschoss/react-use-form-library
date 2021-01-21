@@ -1,6 +1,6 @@
 import { FormField } from './FormField';
+import { compact } from './util';
 import { FieldValidation } from './validation';
-import compact from 'lodash.compact';
 
 interface AddItem<T extends Array<T[number]>> {
   value: T[number];
