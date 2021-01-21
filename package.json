@@ -1,6 +1,6 @@
 {
   "name": "react-use-form-library",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "description": "A simple form library using react hooks",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -20,26 +20,18 @@
     "test:ci": "jest --coverage",
     "test": "jest --watchAll",
     "watch": "rimraf dist && tsc -w",
-    "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive",
-    "dev": "parcel sandbox-app/index.html"
+    "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive"
   },
   "author": "Leo Gonzalez",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
-    "lodash.compact": "^3.0.1",
-    "lodash.isempty": "^4.4.0",
-    "lodash.uniq": "^4.5.0"
+    "@babel/runtime": "^7.9.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-typescript": "^7.12.7",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^25.2.1",
-    "@types/lodash.compact": "^3.0.6",
-    "@types/lodash.isempty": "^4.4.6",
-    "@types/lodash.uniq": "^4.5.6",
     "@types/react": "^16.9.34",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
@@ -50,10 +42,8 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
     "jest": "^25.4.0",
-    "parcel-bundler": "^1.12.4",
     "prettier": "^2.0.5",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react": "^16.13.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.7.6",
     "rollup-plugin-babel": "^4.4.0",

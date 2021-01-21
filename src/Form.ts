@@ -1,7 +1,7 @@
-import isEmpty from 'lodash.isempty';
 import { FormField } from './FormField';
 import { MappedValidation } from './validation';
 import { FieldSet } from './FieldSet';
+import { isEmpty } from './util';
 
 /* This type is used to take a model, parse it an return a different type
 for each field. In this case, for each field of T, string | number you

@@ -1,11 +1,11 @@
 import { FieldSet } from './FieldSet';
 import { MappedFields } from './Form';
+import { uniq } from './util';
 import {
   validateValue,
   FieldValidation,
   ValidationStrings,
 } from './validation';
-import uniq from 'lodash.uniq';
 
 export class FormField<T> {
   public value?: T;
