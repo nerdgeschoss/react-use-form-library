@@ -111,7 +111,7 @@ export class Form<T> {
   }
 
   private validateFields(): void {
-    for (const key in this.validations) {
+    for (const key in this.fields) {
       const field = this.fields[key];
 
       if (field) {

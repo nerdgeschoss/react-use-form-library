@@ -641,3 +641,29 @@ Install dependencies with `yarn install`. You can run interactive tests with `ya
 If you work with VSCode, it automatically switches to the correct TS version and formats on save via prettier. There is also an included launch config, so you can run and debug tests.
 
 The [VSCode Jest Extension](https://github.com/jest-community/vscode-jest) is highly recommended as it gives you inline test results, code coverage and debugging right within VSCode (VSCode will automatically prompt you to install this extension).
+
+### Sandbox App
+
+There is a also a sandbox basic application to play around with the library. Use `yarn dev` to start up the parcel server, and you can find the files inside the `/sandbox-app` folder.
+
+#### Troubleshoot
+
+Sometimes you may get the following bug/error from parcel:
+
+```
+Conflicting babel versions found in .babelrc.
+```
+
+To solve this, after you started the dev server, go to the `.babelrc` file and comment these two lines:
+
+```json
+{
+  "presets": ["@babel/preset-env", "@babel/preset-typescript"],
+  "plugins": [
+    // "@babel/plugin-transform-runtime",
+    // "babel-plugin-transform-class-properties"
+  ]
+}
+```
+
+After the server starts correctly you should uncomment those lines. If you still have some issues, try restarting the dev server.

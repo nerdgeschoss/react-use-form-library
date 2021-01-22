@@ -69,21 +69,23 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
         })
       );
     });
+    this.onUpdate();
   }
 
   public removeField(index: number): void {
     this.splice(index, 1);
+    this.onUpdate();
   }
 
   // CLASS GETTERS
   public get value(): T {
-    return compact(
-      this.map((field) => {
-        if (field instanceof FormField) {
-          return field.value;
-        }
-      })
-    ) as T;
+    const values: unknown[] = [];
+
+    this.forEach((field) => {
+      values.push(field.value);
+    });
+
+    return compact(values) as T;
   }
 
   public get dirty(): boolean {
