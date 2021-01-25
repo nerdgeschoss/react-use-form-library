@@ -446,6 +446,30 @@ describe(Form, () => {
       emails.removeField(0);
       expect(emails.length).toEqual(0);
     });
+    it('adds the same validation to all fields', () => {
+      const form = createForm({
+        value: { emails: ['', '', ''] },
+        validations: {
+          emails: 'required',
+        },
+      });
+      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      expect(emails[0].validation).toBe('required');
+      expect(emails[1].validation).toBe('required');
+      expect(emails[2].validation).toBe('required');
+    });
+    it("is valid when it has at least one field if it's required", () => {
+      const form = createForm({
+        value: { emails: [] },
+        validations: {
+          emails: 'required',
+        },
+      });
+      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      expect(emails.valid).toBeFalsy();
+      emails.addFields('test');
+      expect(emails.valid).toBeTruthy();
+    });
   });
 
   describe('nested objects', () => {
