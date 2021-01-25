@@ -6,9 +6,9 @@ A simple form libray for React using hooks.
 
 ## Motivation
 
-The motivation for working on this solution for form handling comes from the fact that we wanted something very simple and straighforward to use, and also as agnostic to the implementation as possible, so it is easy to integrate in every kind of project.
+The motivation for working on this solution for form handling comes from the fact that we wanted something very simple and straighforward to use, while also being as agnostic to the implementation as possible, to make it easy to integrate in every kind of project.
 
-Contrary to other solutions that provide you with react components and/or wrappers, we went for a simple react hook that gives you all the tools to implement your forms as you see fit.
+Contrary to other solutions that provide you with react components and/or wrappers, we went for a simple react hook that gives you all the tools needed to implement your forms as you see fit.
 
 - Easy to use: you supply a model and a submit function to the hook and you get back helpers to use in your inputs.
 - Small: the codebase is quite simple and small. Currently only under [7kb gzipped](https://bundlephobia.com/result?p=react-use-form-library).
@@ -29,7 +29,7 @@ Contrary to other solutions that provide you with react components and/or wrappe
 
 ## Installation
 
-Add the library to your project: `yarn add react-use-form-library`
+Add the library to your project: `yarn add react-use-form-library` or `npm install react-use-form-library`
 
 ## Basic example
 
@@ -37,7 +37,7 @@ Add the library to your project: `yarn add react-use-form-library`
 
 To initialize the hook you will need to supply a valid `model` object and a custom `handleSubmit` function.
 
-The three main fields you get from the hook are `{ model, fields, onSubmit }`.
+The three main fields you get from the hook are `model`, `fields` and `onSubmit`.
 
 - `model` is the updated object which will contain the modified fields.
 - `fields` is an object in which each key will be generated from properties of the original model you supplied to the hook.
@@ -68,11 +68,15 @@ function App(): JSX.Element {
 }
 ```
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Optional Fields
 
-You don't need to explicitly enumerate all properties in your model, the library will generate all necesary fields on the fly using [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy).
+You don't need to explicitly enumerate all properties in your model, the library will generate all necesary fields on demand by using [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy).
 
 ```ts
 import { useForm } from 'react-use-form-library';
@@ -105,6 +109,7 @@ function App(): JSX.Element {
 If you use Typescript you will have to supply the interface for your model
 
 ```ts
+// ...
 const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
   model: {},
   handleSubmit: async () => {
@@ -114,16 +119,20 @@ const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
 // ...
 ```
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Validation
 
 [Codepen](https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011)
 
-The validations object will have the same keys as your model object. Each key can take one of the following values:
+The validations object needs to correspond your model object. Each key can take one of the following values:
 
-- A string that contains prebuild usual validations like `required, email, number, json, website, etc.`
-- A custom validation function with the signature `(value): string[] => {}`. The value parameters is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
+- A string that contains prebuild common validations like `required`, `email`, `number` and [more](#predefined-validation-strings).
+- A custom validation function with the signature `(value: model): string[] => {}`. The value parameter is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
 - An array which can contain the previous both.
 
 ```ts
@@ -161,6 +170,8 @@ const { model, fields, onSubmit, valid } = useForm({
 });
 ```
 
+<p>&nbsp</p>
+
 #### Predefined validation strings
 
 | Property | Details                                                |
@@ -171,13 +182,17 @@ const { model, fields, onSubmit, valid } = useForm({
 | website  | checks if the value is a valid website (http / https). |
 | number   | checks if the value is a number.                       |
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Submit Error Handling
 
 [Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
 
-The useForm hook also exposes another method: `onSubmitError`, which is handy if you don't want to use a try/catch in your `handleSubmit` function
+The hook also exposes another method: `onSubmitError`, which is handy if you don't want to use a try/catch in your `handleSubmit` function.
 
 ```ts
 const { model, fields, onSubmit, valid } = useForm({
@@ -194,7 +209,11 @@ const { model, fields, onSubmit, valid } = useForm({
 });
 ```
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Form state
 
@@ -209,6 +228,8 @@ There are several properties exposed from the hook to deal with the state throug
 | error            | any error thrown within the handleSubmit function is stored here as an error object                    |
 | submissionStatus | Displays the current status of the submission process                                                  |
 
+<p>&nbsp</p>
+
 #### Submission Status
 
 This variable contains the current state of the form submission process. At any time the form will be in one of the following states:
@@ -220,6 +241,8 @@ This variable contains the current state of the form submission process. At any 
 | submitted  | The form has been successfully submitted.                                   |
 | error      | There is an error while submitting.                                         |
 
+<p>&nbsp</p>
+
 #### Reset
 
 Sometimes it is useful to reset the form programatically. For this there are two helpful methods:
@@ -229,7 +252,11 @@ Sometimes it is useful to reset the form programatically. For this there are two
 | reset      | Clears all fields.         |
 | resetError | Removes the current error. |
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Fields
 
@@ -238,27 +265,32 @@ Sometimes it is useful to reset the form programatically. For this there are two
 Every key supplied to the model property of the hook will be parsed into a [field](#form-field)
 
 ```ts
+// ...
 const { fields } = reactUseFormLibrary.useForm({
   model: {
     name: '',
   },
 });
+// ...
 ```
 
 A field will be an object that you can use in a simple setup like:
 
 ```ts
+// ...
 <input
   // The updated value
   value={fields.phone.value}
   // A function to modify the value
   onChange={(v) => fields.phone.onChange(v.target.value)}
 />
+// ...
 ```
 
 Or a more complex solution:
 
 ```ts
+// ...
 <div>
   // The required property is derived from the validation of the field
   <label>Name {fields.name.required ? '(required)' : ''}: </label>
@@ -275,7 +307,10 @@ Or a more complex solution:
     </div>
   )}
 </div>
+// ...
 ```
+
+<p>&nbsp</p>
 
 ### Helpful properties
 
@@ -283,12 +318,14 @@ Or a more complex solution:
 
 If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (`onBlur` event).
 
-If you want to inmediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
+**!important**
+
+If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
 
 ```ts
+// ...
 const displayErrors = fields.name.touched && fields.name.errors.length;
 
-// ...
 <div>
   <input
     value={fields.name.value}
@@ -305,7 +342,10 @@ const displayErrors = fields.name.touched && fields.name.errors.length;
     );
   }
 </div>
+// ...
 ```
+
+<p>&nbsp</p>
 
 #### Valid
 
@@ -326,13 +366,17 @@ It is also useful if you want to give your input a conditional class to show the
 </div>
 ```
 
+<p>&nbsp</p>
+
 #### Dirty
 
 When instantiated, a field will store it's original value in a variable. This getter will then compare the original value to the current value and return true if they are different.
 
-#### P
+<p>&nbsp</p>
 
 ---
+
+<p>&nbsp</p>
 
 ## Advanced example
 
@@ -340,22 +384,22 @@ When instantiated, a field will store it's original value in a variable. This ge
 import { useForm } from 'react-use-form-library';
 
 export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element => {
-  const { fields, dirty, valid, onSubmit, submissionStatus } = useForm({
+  const { model, changes, reset, fields, dirty, valid, onSubmit, submissionStatus } = useForm({
     model: {
       name: '',
       age: 25,
     },
-    handleSubmit: async (form) => {
-      if (form.valid) {
+    handleSubmit: async () => {
+      if (valid) {
         if (isNewItem) {
           // You can use here the updated model, which includes the original model and any changes made
-          await addItem(form.model);
+          await addItem(model);
         } else {
           // For updating, you can use only the changes that were made
-          await updateItem(form.changes);
+          await updateItem(changes);
         }
         // If you need to clear the fields, you can call on reset form
-        form.reset();
+        reset();
       } else {
         // throw custom errors
         throw new Error('invalid form');
@@ -387,11 +431,15 @@ export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element =
 }
 ```
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Nested Objects
 
-Each FormField object is also able to contain fields. It behaves similar as with the Form object but with slight differences on it's methods (See [API](#nested-fields)).
+Each FormField object is also able to contain fields. This behavior is the same as with the Form object but with slight differences on it's methods (See [API](#nested-fields)).
 
 ```ts
 import { useForm } from 'react-use-form-library';
@@ -477,15 +525,19 @@ function App(): JSX.Element {
 }
 ```
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## FieldSet
 
 A FieldSet is basically an array of FormFields. Contrary to nested objects, a FieldSet will only be instantiated if it is **explicitely** declared in the model.
 
-This is because at the moment of field instantiation, the addField method within a Form (or a FormField if it is a nested object) will as if the model value is actually an Array. It is not possible of implicitely determine if the field is an array based only on the type.
+This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to implicitely determine if the field is an array based only on the type.
 
-The FieldSet class extends Array, so you can access all methods an array has, plus custom methods that work similarly as those in FormField (more in the [API](#fieldset-1))
+The `FieldSet` class extends `Array`, so you can access all methods an array has, plus custom methods that work similarly as those in `FormField` (more in the [API](#fieldset-1))
 
 ```ts
 function App(): JSX.Element {
@@ -522,6 +574,8 @@ function App(): JSX.Element {
 }
 ```
 
+<p>&nbsp</p>
+
 ### Adding Items
 
 The `addFields` methods takes an array of items that can be either a simple value or an object with value and validation. Being an array extension, it is also possible to add items to FieldSet using array methods like `push`;
@@ -538,7 +592,7 @@ The `addFields` methods takes an array of items that can be either a simple valu
 <button onClick={() => fields.emails.addFields('example@email.com', '', 'another-example@emal.com')}>Add Field</button>
 ```
 
-**Important**
+**!important**
 
 `addFields` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it
 
@@ -546,6 +600,8 @@ The `addFields` methods takes an array of items that can be either a simple valu
 const newValues = ['example@email.com', '', 'another-example@emal.com'];
 <button onClick={() => fields.emails.addFields(...newValues)}
 ```
+
+<p>&nbsp</p>
 
 ### Removing Items
 
@@ -555,7 +611,77 @@ There is a `removeField` helper function that takes in an index number as parame
 <button onClick={() => fields.emails.remove(index)}>remove</button>
 ```
 
+<p>&nbsp</p>
+
+### Validating a FieldSet
+
+There are a couple ways to validate a FieldSet. The first one is to simply assing a validation string or function (or an array of both) to each index of the property we want to validate:
+
+```ts
+const { model, fields, onSubmit, valid } = useForm({
+  model: {
+    // Initialize the field with one empty subfield
+    names: [''],
+    emails: ['', ''],
+  },
+  validations: {
+    // Will make only the first item to be required.
+    names: ['required'],
+    // Will make only the first item to be required and to be an email, the second item is optional but it needs to be an email
+    emails: [['required', 'email'], 'email'],
+  },
+});
+```
+
+<p>&nbsp</p>
+
+#### Group validation
+
+If instead of defining an array type for the key you use a simple validation (string, function or array of both), this rule will be applied to all _defined_ items of the array in the model.
+
+```ts
+const { model, fields, onSubmit, valid } = useForm({
+  model: {
+    emails: ['', ''],
+  },
+  validations: {
+    emails: 'email',
+  },
+});
+```
+
+If the group validation is of the type `required`, it will also make the field invalid unless it has at least one element.
+
+```ts
+const { model, fields, onSubmit, valid } = useForm({
+  model: {
+    // emails.valid will be false because we're initializing it with no elements.
+    emails: [],
+  },
+  validations: {
+    emails: 'required',
+  },
+});
+```
+
+<p>&nbsp</p>
+
+#### Validation of new items
+
+Defined validations as parameters of the hook will not apply to new items added to the array. For this you need to use an object instead of a simple value when you call `addFields`
+
+```ts
+<button onClick={() => fields.emails.addFields({
+  value: '',
+  validation: 'email',
+})};
+```
+
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## API
 
@@ -570,6 +696,8 @@ There is a `removeField` helper function that takes in an index number as parame
 | onSubmitError | A useful handler to deal with errors.                                                                            |
 | validations   | A validations object.                                                                                            |
 
+<p>&nbsp</p>
+
 ### Form
 
 | Property   | Details                                                               |
@@ -582,6 +710,8 @@ There is a `removeField` helper function that takes in an index number as parame
 | onSubmit   | a method that triggers the function passed as handleSubmit param.     |
 | submitting | a loading state for the onSubmit method                               |
 | reset      | this helper method will reset every field to it's original value      |
+
+<p>&nbsp</p>
 
 ### Form Field
 
@@ -603,6 +733,8 @@ There is a `removeField` helper function that takes in an index number as parame
 | dirty      | a getter that compares the current value to the original value passed on instantiation                       |
 | touched    | a touched state, initially false and changed to true when calling onChange/onBlur                            |
 
+<p>&nbsp</p>
+
 ### Nested Fields
 
 These following methods will behave differently if the FormField has nested fields
@@ -619,6 +751,8 @@ These following methods will behave differently if the FormField has nested fiel
 | dirty      | Will be valid when at least one field is dirty                                     |
 | fields     | A mapped collection, which has a FormField for every key in the value              |
 
+<p>&nbsp</p>
+
 ### FieldSet
 
 | Property    | Details                                                                                                                                                                                            |
@@ -633,7 +767,11 @@ These following methods will behave differently if the FormField has nested fiel
 | dirty       | Will be true if any item is dirty                                                                                                                                                                  |
 | touched     | Will be true if every item is touched                                                                                                                                                              |
 
+<p>&nbsp</p>
+
 ---
+
+<p>&nbsp</p>
 
 ## Development
 
@@ -642,6 +780,8 @@ Install dependencies with `yarn install`. You can run interactive tests with `ya
 If you work with VSCode, it automatically switches to the correct TS version and formats on save via prettier. There is also an included launch config, so you can run and debug tests.
 
 The [VSCode Jest Extension](https://github.com/jest-community/vscode-jest) is highly recommended as it gives you inline test results, code coverage and debugging right within VSCode (VSCode will automatically prompt you to install this extension).
+
+<p>&nbsp</p>
 
 ### Sandbox App
 
