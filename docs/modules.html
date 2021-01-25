@@ -2698,11 +2698,11 @@ img {
 			<a href="#motivation" id="motivation" style="color: inherit; text-decoration: none;">
 				<h2>Motivation</h2>
 			</a>
-			<p>The motivation for working on this solution for form handling comes from the fact that we wanted something that is as agnostic to the implementation as possible.
-			This is a simple react hook that gives you all the tools to implement your forms as you see fit.</p>
+			<p>The motivation for working on this solution for form handling comes from the fact that we wanted something very simple and straighforward to use, and also as agnostic to the implementation as possible, so it is easy to integrate in every kind of project.</p>
+			<p>Contrary to other solutions that provide you with react components and/or wrappers, we went for a simple react hook that gives you all the tools to implement your forms as you see fit.</p>
 			<ul>
 				<li>Easy to use: you supply a model and a submit function to the hook and you get back helpers to use in your inputs.</li>
-				<li>Small: the codebase is quite simple and small. Only 6.1kb gzipped. <a href="https://bundlephobia.com/result?p=react-use-form-library@0.0.21">size</a></li>
+				<li>Small: the codebase is quite simple and small. Currently only under 7kb gzipped. <a href="https://bundlephobia.com/result?p=react-use-form-library">size</a></li>
 				<li>Declarative: we use the same handlers as the native inputs { value, onChange, onBlur }.</li>
 			</ul>
 			<a href="#table-of-contents" id="table-of-contents" style="color: inherit; text-decoration: none;">
@@ -3506,6 +3506,26 @@ img {
 			<p>Install dependencies with <code>yarn install</code>. You can run interactive tests with <code>yarn test</code> and lint your project with <code>yarn lint</code>.</p>
 			<p>If you work with VSCode, it automatically switches to the correct TS version and formats on save via prettier. There is also an included launch config, so you can run and debug tests.</p>
 			<p>The <a href="https://github.com/jest-community/vscode-jest">VSCode Jest Extension</a> is highly recommended as it gives you inline test results, code coverage and debugging right within VSCode (VSCode will automatically prompt you to install this extension).</p>
+			<a href="#sandbox-app" id="sandbox-app" style="color: inherit; text-decoration: none;">
+				<h3>Sandbox App</h3>
+			</a>
+			<p>There is a also a sandbox basic application to play around with the library. Use <code>yarn dev</code> to start up the parcel server, and you can find the files inside the <code>/sandbox-app</code> folder.</p>
+			<a href="#troubleshoot" id="troubleshoot" style="color: inherit; text-decoration: none;">
+				<h4>Troubleshoot</h4>
+			</a>
+			<p>Sometimes you may get the following bug/error from parcel:</p>
+			<pre><code><span style="color: #001080">Conflicting</span><span style="color: #000000"> </span><span style="color: #001080">babel</span><span style="color: #000000"> </span><span style="color: #001080">versions</span><span style="color: #000000"> </span><span style="color: #001080">found</span><span style="color: #000000"> </span><span style="color: #0000FF">in</span><span style="color: #000000"> .</span><span style="color: #001080">babelrc</span><span style="color: #000000">.</span>
+</code></pre>
+			<p>To solve this, after you started the dev server, go to the <code>.babelrc</code> file and comment these two lines:</p>
+			<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;presets&quot;</span><span style="color: #000000">: [</span><span style="color: #A31515">&quot;@babel/preset-env&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;@babel/preset-typescript&quot;</span><span style="color: #000000">],</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;plugins&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">    </span><span style="color: #008000">// &quot;@babel/plugin-transform-runtime&quot;,</span>
+<span style="color: #000000">    </span><span style="color: #008000">// &quot;babel-plugin-transform-class-properties&quot;</span>
+<span style="color: #000000">  ]</span>
+<span style="color: #000000">}</span>
+</code></pre>
+			<p>After the server starts correctly you should uncomment those lines. If you still have some issues, try restarting the dev server.</p>
 		</div>
 		<section class="tsd-panel-group tsd-index-group">
 			<h2>Index</h2>
@@ -3539,7 +3559,7 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/nerdgeschoss/react-use-form-library/blob/2a25321/src/hooks.ts#L32">hooks.ts:32</a></li>
+								<li>Defined in <a href="https://github.com/nerdgeschoss/react-use-form-library/blob/7940fa8/src/hooks.ts#L32">hooks.ts:32</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>

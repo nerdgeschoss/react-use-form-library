@@ -6,11 +6,12 @@ A simple form libray for React using hooks.
 
 ## Motivation
 
-The motivation for working on this solution for form handling comes from the fact that we wanted something that is as agnostic to the implementation as possible.
-This is a simple react hook that gives you all the tools to implement your forms as you see fit.
+The motivation for working on this solution for form handling comes from the fact that we wanted something very simple and straighforward to use, and also as agnostic to the implementation as possible, so it is easy to integrate in every kind of project.
+
+Contrary to other solutions that provide you with react components and/or wrappers, we went for a simple react hook that gives you all the tools to implement your forms as you see fit.
 
 - Easy to use: you supply a model and a submit function to the hook and you get back helpers to use in your inputs.
-- Small: the codebase is quite simple and small. Only 6.1kb gzipped. [size](https://bundlephobia.com/result?p=react-use-form-library@0.0.21)
+- Small: the codebase is quite simple and small. Currently only under [7kb gzipped](https://bundlephobia.com/result?p=react-use-form-library).
 - Declarative: we use the same handlers as the native inputs { value, onChange, onBlur }.
 
 ## Table of Contents

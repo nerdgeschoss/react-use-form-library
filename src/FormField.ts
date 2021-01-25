@@ -82,8 +82,6 @@ export class FormField<T> {
       return this.nestValidate();
     }
 
-    console.log('validate');
-
     let errors: string[] = [];
     // Validation can be a single string "required", an array ["required", "email"] or a custom function
     // If it is a single string, parsing into an array is necessary
