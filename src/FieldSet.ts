@@ -10,6 +10,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   FormField<T[number]>
 > {
   private onUpdate: () => void;
+  public required = false;
 
   constructor({
     value,
@@ -17,17 +18,24 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     validation,
   }: {
     value?: T;
-    validation?: Array<FieldValidation<T[number]>>;
+    validation?: Array<FieldValidation<T[number]>> | FieldValidation<T[number]>;
     onUpdate: () => void;
   }) {
     super();
     this.onUpdate = onUpdate;
-    if (value && value.length) {
+
+    if (typeof validation === 'string') {
+      this.required = validation?.includes('required') ? true : false;
+    }
+
+    if (value?.length) {
       this.addFields(
         ...value.map((item, index) => {
           return {
             value: item,
-            validation: validation?.[index],
+            validation: Array.isArray(validation)
+              ? validation[index]
+              : validation,
           };
         })
       );
@@ -97,6 +105,9 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   }
 
   public get valid(): boolean {
+    if (this.required && !this.length) {
+      return false;
+    }
     return this.every((field) => field.valid);
   }
 }
