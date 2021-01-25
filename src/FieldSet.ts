@@ -95,4 +95,8 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   public get touched(): boolean {
     return this.every((field) => field.touched);
   }
+
+  public get valid(): boolean {
+    return this.every((field) => field.valid);
+  }
 }
