@@ -2,15 +2,11 @@ import { FormField } from './FormField';
 import { compact } from './util';
 import { FieldValidation } from './validation';
 
-interface AddItem<T extends Array<T[number]>> {
-  value: T[number];
-  validation?: FieldValidation<T[number]>;
-}
-export class FieldSet<T extends Array<T[number]>> extends Array<
-  FormField<T[number]>
-> {
+export class FieldSet<T extends Array<T[number]>> {
   private onUpdate: () => void;
   public required = false;
+  public fields: Array<FormField<T[number]>> = [];
+  private validation?: FieldValidation<T[number]>;
 
   constructor({
     value,
@@ -18,62 +14,50 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
     validation,
   }: {
     value?: T;
-    validation?: Array<FieldValidation<T[number]>> | FieldValidation<T[number]>;
+    validation?: FieldValidation<T[number]>;
     onUpdate: () => void;
   }) {
-    super();
     this.onUpdate = onUpdate;
+    this.validation = validation;
 
     if (typeof validation === 'string') {
       this.required = validation?.includes('required') ? true : false;
     }
 
     if (value?.length) {
-      this.addFields(
-        ...value.map((item, index) => {
-          return {
-            value: item,
-            validation: Array.isArray(validation)
-              ? validation[index]
-              : validation,
-          };
-        })
-      );
+      this.addFields(...value);
     }
   }
 
   public onChange = (value?: T): void => {
     value?.forEach((val, index) => {
-      if (this[index] === undefined) {
+      if (this.fields[index] === undefined) {
         this.addFields(val);
       } else {
-        this[index].onChange(val);
+        this.fields[index].onChange(val);
       }
     });
   };
 
   public setTouched(value: boolean): void {
-    this.forEach((field) => field.setTouched(value));
+    this.fields.forEach((field) => field.setTouched(value));
   }
 
   public reset(): void {
-    this.forEach((field) => field.reset());
+    this.fields.forEach((field) => field.reset());
   }
 
   public validate<M>(model: M): void {
-    this.forEach((field) => field.validate(model));
+    this.fields.forEach((field) => field.validate(model));
   }
 
-  public addFields(...items: Array<AddItem<T> | T[number]>): void {
+  public addFields(...items: Array<T[number]>): void {
     items.forEach((item) => {
-      this.push(
+      this.fields.push(
         new FormField({
-          value: typeof item === 'object' ? (item as AddItem<T>).value : item,
+          value: item,
           onUpdate: this.onUpdate,
-          validation:
-            typeof item === 'object'
-              ? (item as AddItem<T>).validation
-              : undefined,
+          validation: this.validation,
         })
       );
     });
@@ -81,7 +65,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   }
 
   public removeField(index: number): void {
-    this.splice(index, 1);
+    this.fields.splice(index, 1);
     this.onUpdate();
   }
 
@@ -89,7 +73,7 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   public get value(): T {
     const values: unknown[] = [];
 
-    this.forEach((field) => {
+    this.fields.forEach((field) => {
       values.push(field.value);
     });
 
@@ -97,17 +81,17 @@ export class FieldSet<T extends Array<T[number]>> extends Array<
   }
 
   public get dirty(): boolean {
-    return this.some((field) => field.dirty);
+    return this.fields.some((field) => field.dirty);
   }
 
   public get touched(): boolean {
-    return this.every((field) => field.touched);
+    return this.fields.every((field) => field.touched);
   }
 
   public get valid(): boolean {
-    if (this.required && !this.length) {
+    if (this.required && !this.fields.length) {
       return false;
     }
-    return this.every((field) => field.valid);
+    return this.fields.every((field) => field.valid);
   }
 }

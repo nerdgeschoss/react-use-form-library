@@ -410,11 +410,9 @@ function App(): JSX.Element {
   return (
     <form onSubmit={onSubmit}>
       <input
-        /* Since the FormField could be either a value or an object, the fields property is optional 
-        and you will need to check for existance */
-        value={fields.address.fields?.streetName.value}
+        value={fields.address.fields.streetName.value}
         onChange={(v) =>
-          fields.address.fields?.streetName.onChange(v.target.value)
+          fields.address.fields.streetName.onChange(v.target.value)
         }
       />
       <button>Submit</button>
@@ -453,7 +451,15 @@ explicitely declaring them
 
 ```ts
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  /* If you use Typescript you have to define the model interface, otherwise you'll get an error
+  while trying to access the nested properties */
+  const { model, fields, onSubmit } = useForm<{
+    bankDetails: {
+      address: {
+        screetName: string;
+      };
+    };
+  }>({
     model: {},
     handleSubmit: async () => {
       console.log(model);
