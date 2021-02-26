@@ -21,7 +21,7 @@
     "test": "jest --watchAll",
     "watch": "rimraf dist && tsc -w",
     "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive",
-    "dev": "parcel sandbox-app/index.html",
+    "start": "parcel sandbox-app/index.html",
     "document": "yarn build:docs"
   },
   "author": "Leo Gonzalez",
