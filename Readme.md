@@ -439,7 +439,7 @@ export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element =
 
 ## Nested Objects
 
-Each FormField object is also able to contain fields. This behavior is the same as with the Form object but with slight differences on it's methods (See [API](#nested-fields)).
+Each FormField object is also able to contain fields. It behaves similarly to the Form object but with slight differences in its methods (See [API](#nested-fields)).
 
 ```ts
 import { useForm } from 'react-use-form-library';
@@ -533,9 +533,9 @@ function App(): JSX.Element {
 
 ## FieldSet
 
-A FieldSet is basically an array of FormFields. Contrary to nested objects, a FieldSet will only be instantiated if it is **explicitely** declared in the model.
+A FieldSet is basically an array of FormFields. Contrary to nested objects, a FieldSet will only be instantiated if it is **explicitly** declared in the model.
 
-This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to implicitely determine if the field is an array based only on the type.
+This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will as if the model value is actually an Array. It is not possible to implicitly determine if the field is array-based only on the type.
 
 The `FieldSet` class extends `Array`, so you can access all methods an array has, plus custom methods that work similarly as those in `FormField` (more in the [API](#fieldset-1))
 
