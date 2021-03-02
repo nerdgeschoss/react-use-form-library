@@ -437,7 +437,7 @@ describe(Form, () => {
       expect(emails.fields.length).toEqual(0);
       emails.addFields('test');
       expect(emails.fields.length).toEqual(1);
-      emails.fields[0].remove();
+      emails.removeField(0);
       expect(emails.fields.length).toEqual(0);
     });
     // Validation
