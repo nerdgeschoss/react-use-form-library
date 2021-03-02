@@ -10,10 +10,16 @@ function App(): JSX.Element {
       streetName?: string;
       streetNumber?: number;
     };
+    images: Array<{
+      id: string | number;
+      tags?: string[];
+      url?: string;
+    }>;
   }>({
     model: {
       name: '',
       emails: [],
+      images: [],
     },
     handleSubmit: async () => {
       // eslint-disable-next-line
@@ -50,7 +56,7 @@ function App(): JSX.Element {
         </fieldset>
         <fieldset>
           <legend>Array fields</legend>
-          {fields.emails.map((field, index) => {
+          {fields.emails.fields.map((field, index) => {
             return (
               <div key={index}>
                 <div>
@@ -76,16 +82,48 @@ function App(): JSX.Element {
           })}
 
           <footer>
+            <button type="button" onClick={() => fields.emails.addFields('')}>
+              Add email
+            </button>
+          </footer>
+        </fieldset>
+        <fieldset>
+          <legend>Images</legend>
+          {fields.images.fields.map((field, index) => {
+            return (
+              <div key={index}>
+                <div>
+                  <label>Image URL: </label>
+                  <input
+                    onBlur={field.onBlur}
+                    value={field.fields.url.value}
+                    onChange={(v) => field.fields.url.onChange(v.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fields.images.removeField(index)}
+                  >
+                    x
+                  </button>
+                </div>
+                {field.touched &&
+                  field.errors.map((error) => (
+                    <small key={error}>* {error}</small>
+                  ))}
+              </div>
+            );
+          })}
+
+          <footer>
             <button
               type="button"
               onClick={() =>
-                fields.emails.addFields({
-                  value: '',
-                  validation: 'email',
+                fields.images.addFields({
+                  id: fields.images.fields.length,
                 })
               }
             >
-              Add email
+              Add image
             </button>
           </footer>
         </fieldset>
