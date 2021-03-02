@@ -58,6 +58,9 @@ export class FieldSet<T extends Array<T[number]>> {
           value: item,
           onUpdate: this.onUpdate,
           validation: this.validation,
+          remove: () => {
+            this.fields.splice(Math.max(this.fields.length - 1, 0), 1);
+          },
         })
       );
     });
