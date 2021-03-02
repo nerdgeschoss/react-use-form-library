@@ -266,7 +266,7 @@ Every key supplied to the model property of the hook will be parsed into a [fiel
 
 ```ts
 // ...
-const { fields } = reactUseFormLibrary.useForm({
+const { fields } = useForm({
   model: {
     name: '',
   },
@@ -318,7 +318,7 @@ Or a more complex solution:
 
 If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (`onBlur` event).
 
-**!important**
+**Important !!**
 
 If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
 
@@ -541,9 +541,35 @@ function App(): JSX.Element {
 
 A FieldSet is basically an array of FormFields. Contrary to nested objects, a FieldSet will only be instantiated if it is **explicitly** declared in the model.
 
-This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will as if the model value is actually an Array. It is not possible to implicitly determine if the field is array-based only on the type.
+**Important !!**
 
-The `FieldSet` class extends `Array`, so you can access all methods an array has, plus custom methods that work similarly as those in `FormField` (more in the [API](#fieldset-1))
+If you don't initialize the property in the model and try to access it in your code you will get an error.
+
+This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to **implicitly** determine if the field is array-based only from the type.
+
+```ts
+const { fields } = useForm<{ emails: string[] }>({
+  model: {
+    images: [],
+  },
+});
+
+return (
+  <form onSubmit={onSubmit}>
+    /* This will result in an error because emails has been instantiated as a
+    FormField not as a FieldSet */
+    {fields.emails.fields.map((field, index) => {
+      // ...
+    })}
+    /* This will work as intented */
+    {fields.images.fields.map((field, index) => {
+      // ...
+    })}
+  </form>
+);
+```
+
+The `FieldSet` object has a `fields` property, which is an array of `FormField` (more in the [API](#fieldset-1))
 
 ```ts
 function App(): JSX.Element {
@@ -558,9 +584,9 @@ function App(): JSX.Element {
 
   return (
     <form onSubmit={onSubmit}>
-      // a FieldSet is iterable
-      {fields.emails.map((field, index) => {
-        // Every FieldSet item is a FormField
+      // a FieldSet fields property is iterable
+      {fields.emails.fields.map((field, index) => {
+        // Every FieldSet field is a FormField
         return (
           <div className="input">
             <input
@@ -568,7 +594,9 @@ function App(): JSX.Element {
               onChange={(v) => field.onChange(v.target.value)}
             />
             // FieldSet has a helpful removeField method
-            <button onClick={() => fields.emails.remove(index)}>remove</button>
+            <button onClick={() => fields.emails.removeField(index)}>
+              remove
+            </button>
           </div>
         );
       })}
@@ -584,23 +612,18 @@ function App(): JSX.Element {
 
 ### Adding Items
 
-The `addFields` methods takes an array of items that can be either a simple value or an object with value and validation. Being an array extension, it is also possible to add items to FieldSet using array methods like `push`;
+The `addFields` can be called with one or more items.
 
 ```ts
 // simple value
 <button onClick={() => fields.emails.addFields('example@email.com')}>Add Field</button>
-// value with validation
-<button onClick={() => fields.emails.addFields({
-  value: '',
-  validation: 'email'
-})}>Add Field</button>
 // Multiple Fields
-<button onClick={() => fields.emails.addFields('example@email.com', '', 'another-example@emal.com')}>Add Field</button>
+<button onClick={() => fields.emails.addFields('example@email.com', '', 'another-example@email.com')}>Add Field</button>
 ```
 
-**!important**
+**Important !!**
 
-`addFields` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it
+`addFields` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it.
 
 ```ts
 const newValues = ['example@email.com', '', 'another-example@emal.com'];
@@ -614,49 +637,30 @@ const newValues = ['example@email.com', '', 'another-example@emal.com'];
 There is a `removeField` helper function that takes in an index number as parameter. Under the hood it is a simple call to `splice`. You can also use array methods like `pop` or `shift` to remove items.
 
 ```ts
-<button onClick={() => fields.emails.remove(index)}>remove</button>
+<button onClick={() => fields.emails.removeField(index)}>remove</button>
 ```
 
 <p>&nbsp</p>
 
 ### Validating a FieldSet
 
-There are a couple ways to validate a FieldSet. The first one is to simply assing a validation string or function (or an array of both) to each index of the property we want to validate:
+A `FieldSet` takes the same kind of validation as any other field. On instantiation it will be saved in memory and it will
+be further applied to any new field created.
 
 ```ts
 const { model, fields, onSubmit, valid } = useForm({
   model: {
-    // Initialize the field with one empty subfield
-    names: [''],
-    emails: ['', ''],
+    // Initialize the field
+    emails: [],
   },
   validations: {
-    // Will make only the first item to be required.
-    names: ['required'],
-    // Will make only the first item to be required and to be an email, the second item is optional but it needs to be an email
-    emails: [['required', 'email'], 'email'],
+    // Will be applied to any item added to emails
+    emails: ['required', 'email'],
   },
 });
 ```
 
-<p>&nbsp</p>
-
-#### Group validation
-
-If instead of defining an array type for the key you use a simple validation (string, function or array of both), this rule will be applied to all _defined_ items of the array in the model.
-
-```ts
-const { model, fields, onSubmit, valid } = useForm({
-  model: {
-    emails: ['', ''],
-  },
-  validations: {
-    emails: 'email',
-  },
-});
-```
-
-If the group validation is of the type `required`, it will also make the field invalid unless it has at least one element.
+If the validation is of the type `required`, it will also make the field invalid unless it has at least one element.
 
 ```ts
 const { model, fields, onSubmit, valid } = useForm({
@@ -668,19 +672,6 @@ const { model, fields, onSubmit, valid } = useForm({
     emails: 'required',
   },
 });
-```
-
-<p>&nbsp</p>
-
-#### Validation of new items
-
-Defined validations as parameters of the hook will not apply to new items added to the array. For this you need to use an object instead of a simple value when you call `addFields`
-
-```ts
-<button onClick={() => fields.emails.addFields({
-  value: '',
-  validation: 'email',
-})};
 ```
 
 <p>&nbsp</p>
@@ -763,6 +754,7 @@ These following methods will behave differently if the FormField has nested fiel
 
 | Property    | Details                                                                                                                                                                                            |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| fields      | An array of FormField objects                                                                                                                                                                      |
 | onChange    | Useful to update many fields at the same time. It takes an array value and will update every field based on the index. If the passed array is longer than the generated items, it will create more |
 | setTouched  | It takes a boolean parameter and will set every item touched property to this value                                                                                                                |
 | reset       | It resets every field                                                                                                                                                                              |
