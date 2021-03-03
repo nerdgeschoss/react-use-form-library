@@ -558,11 +558,11 @@ return (
   <form onSubmit={onSubmit}>
     /* This will result in an error because emails has been instantiated as a
     FormField not as a FieldSet */
-    {fields.emails.fields.map((field, index) => {
+    {fields.emails.fields.map((field) => {
       // ...
     })}
     /* This will work as intented */
-    {fields.images.fields.map((field, index) => {
+    {fields.images.fields.map((field) => {
       // ...
     })}
   </form>
@@ -585,7 +585,7 @@ function App(): JSX.Element {
   return (
     <form onSubmit={onSubmit}>
       // a FieldSet fields property is iterable
-      {fields.emails.fields.map((field, index) => {
+      {fields.emails.fields.map((field) => {
         // Every FieldSet field is a FormField
         return (
           <div className="input">
@@ -670,6 +670,54 @@ const { model, fields, onSubmit, valid } = useForm({
     emails: 'required',
   },
 });
+```
+
+<p>&nbsp</p>
+
+### Advanced FieldSet
+
+A common escenario would be to have an array of objects in your model.
+
+```ts
+const { model, fields, onSubmit, valid } = useForm<{
+  images: Array<{
+    id: string;
+    url: string;
+  }>;
+}>({
+  model: {
+    // Initialize the field
+    images: [],
+  },
+});
+
+return (
+  <form onSubmit={onSubmit}>
+    {fields.images.fields.map((field) => {
+      return (
+        <div className="input">
+          /* You can access a property whithin the field, as you would with a
+          nested object */
+          <input
+            value={field.fields.url.value}
+            onChange={(v) => field.fields.url.onChange(v.target.value)}
+          />
+          <button onClick={() => field.remove()}>remove</button>
+        </div>
+      );
+    })}
+    <button
+      onClick={() =>
+        fields.images.insert({
+          id: generateId(),
+        })
+      }
+    >
+      Add Field
+    </button>
+    <button>Submit</button>
+  </form>
+);
 ```
 
 <p>&nbsp</p>
