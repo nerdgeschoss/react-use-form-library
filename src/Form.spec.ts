@@ -355,7 +355,7 @@ describe(Form, () => {
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
       expect(emails.fields.length).toEqual(0);
-      emails.addFields('test');
+      emails.insert('test');
       expect(emails.fields.length).toEqual(1);
       expect(emails.fields[0].value).toEqual('test');
     });
@@ -367,7 +367,7 @@ describe(Form, () => {
 
       expect(emails.fields.length).toEqual(0);
       const newFields = ['test', 'test', 'test'];
-      emails.addFields(...newFields);
+      emails.insert(...newFields);
       expect(emails.fields.length).toEqual(3);
       expect(emails.fields[0].value).toEqual('test');
     });
@@ -435,9 +435,9 @@ describe(Form, () => {
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
       expect(emails.fields.length).toEqual(0);
-      emails.addFields('test');
+      emails.insert('test');
       expect(emails.fields.length).toEqual(1);
-      emails.removeField(0);
+      emails.fields[0].remove();
       expect(emails.fields.length).toEqual(0);
     });
     // Validation
@@ -488,7 +488,7 @@ describe(Form, () => {
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
       expect(emails.valid).toBeFalsy();
-      emails.addFields('test');
+      emails.insert('test');
       expect(emails.valid).toBeTruthy();
     });
   });

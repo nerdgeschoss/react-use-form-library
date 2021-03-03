@@ -18,15 +18,18 @@ export class FormField<T> {
   private fieldTouched = false;
   // Nested Objects
   private cachedFields = {} as MappedFields<T>;
+  private removeField?: (item: FormField<T>) => void;
 
   constructor({
     value,
     validation,
     onUpdate,
+    removeField,
   }: {
     value: T;
     validation?: FieldValidation<unknown>;
     onUpdate: () => void;
+    removeField?: (item: FormField<T>) => void;
   }) {
     this.originalValue = value;
     this.value = value;
@@ -35,6 +38,7 @@ export class FormField<T> {
       this.required = this.validation?.includes('required') ? true : false;
     }
     this.onUpdate = onUpdate;
+    this.removeField = removeField;
   }
 
   // CLASS METHODS
@@ -256,5 +260,10 @@ export class FormField<T> {
 
   private checkNestedValue(): boolean {
     return this.nestedKeys.every((key) => this.fields[key].hasValue());
+  }
+
+  // FIELDSET
+  public remove(): void {
+    this.removeField?.(this);
   }
 }

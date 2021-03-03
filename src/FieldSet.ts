@@ -25,14 +25,14 @@ export class FieldSet<T extends Array<T[number]>> {
     }
 
     if (value?.length) {
-      this.addFields(...value);
+      this.insert(...value);
     }
   }
 
   public onChange = (value?: T): void => {
     value?.forEach((val, index) => {
       if (this.fields[index] === undefined) {
-        this.addFields(val);
+        this.insert(val);
       } else {
         this.fields[index].onChange(val);
       }
@@ -51,21 +51,22 @@ export class FieldSet<T extends Array<T[number]>> {
     this.fields.forEach((field) => field.validate(model));
   }
 
-  public addFields(...items: Array<T[number]>): void {
+  public insert(...items: Array<T[number]>): void {
     items.forEach((item) => {
       this.fields.push(
         new FormField({
           value: item,
           onUpdate: this.onUpdate,
           validation: this.validation,
+          removeField: this.removeField.bind(this),
         })
       );
     });
     this.onUpdate();
   }
 
-  public removeField(index: number): void {
-    this.fields.splice(index, 1);
+  public removeField(item: FormField<T[number]>): void {
+    this.fields = this.fields.filter((field) => field !== item);
     this.onUpdate();
   }
 
