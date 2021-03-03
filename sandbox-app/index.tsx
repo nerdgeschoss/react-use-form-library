@@ -66,10 +66,7 @@ function App(): JSX.Element {
                     value={field.value}
                     onChange={(v) => field.onChange(v.target.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => fields.emails.removeField(index)}
-                  >
+                  <button type="button" onClick={() => field.remove()}>
                     x
                   </button>
                 </div>
@@ -82,7 +79,7 @@ function App(): JSX.Element {
           })}
 
           <footer>
-            <button type="button" onClick={() => fields.emails.addFields('')}>
+            <button type="button" onClick={() => fields.emails.insert('')}>
               Add email
             </button>
           </footer>
@@ -99,10 +96,7 @@ function App(): JSX.Element {
                     value={field.fields.url.value}
                     onChange={(v) => field.fields.url.onChange(v.target.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => fields.images.removeField(index)}
-                  >
+                  <button type="button" onClick={() => field.remove()}>
                     x
                   </button>
                 </div>
@@ -118,7 +112,7 @@ function App(): JSX.Element {
             <button
               type="button"
               onClick={() =>
-                fields.images.addFields({
+                fields.images.insert({
                   id: fields.images.fields.length,
                 })
               }

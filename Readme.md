@@ -593,15 +593,13 @@ function App(): JSX.Element {
               value={field.value}
               onChange={(v) => field.onChange(v.target.value)}
             />
-            // FieldSet has a helpful removeField method
-            <button onClick={() => fields.emails.removeField(index)}>
-              remove
-            </button>
+            // FormFields regenerated from a FieldSet also have a remove method
+            <button onClick={() => field.remove()}>remove</button>
           </div>
         );
       })}
-      // FieldSet also has an addFields method to create new items
-      <button onClick={() => fields.emails.addFields('')}>Add Field</button>
+      // FieldSet also has an insert method to create new items
+      <button onClick={() => fields.emails.insert('')}>Add Field</button>
       <button>Submit</button>
     </form>
   );
@@ -612,32 +610,32 @@ function App(): JSX.Element {
 
 ### Adding Items
 
-The `addFields` can be called with one or more items.
+The `insert` can be called with one or more items.
 
 ```ts
 // simple value
-<button onClick={() => fields.emails.addFields('example@email.com')}>Add Field</button>
+<button onClick={() => fields.emails.insert('example@email.com')}>Add Field</button>
 // Multiple Fields
-<button onClick={() => fields.emails.addFields('example@email.com', '', 'another-example@email.com')}>Add Field</button>
+<button onClick={() => fields.emails.insert('example@email.com', '', 'another-example@email.com')}>Add Field</button>
 ```
 
 **Important !!**
 
-`addFields` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it.
+`insert` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it.
 
 ```ts
 const newValues = ['example@email.com', '', 'another-example@emal.com'];
-<button onClick={() => fields.emails.addFields(...newValues)}
+<button onClick={() => fields.emails.insert(...newValues)}
 ```
 
 <p>&nbsp</p>
 
 ### Removing Items
 
-There is a `removeField` helper function that takes in an index number as parameter. Under the hood it is a simple call to `splice`. You can also use array methods like `pop` or `shift` to remove items.
+`FormField` objects inside a `FieldSet` include a `remove` method, that compares the instance with the items in the `fields` collection inside `FieldSet` and filters it out.
 
 ```ts
-<button onClick={() => fields.emails.removeField(index)}>remove</button>
+<button onClick={() => fields.emails.fields[0].remove()}>remove</button>
 ```
 
 <p>&nbsp</p>
@@ -729,6 +727,7 @@ const { model, fields, onSubmit, valid } = useForm({
 | valid      | a getter that checks if the field has any errors                                                             |
 | dirty      | a getter that compares the current value to the original value passed on instantiation                       |
 | touched    | a touched state, initially false and changed to true when calling onChange/onBlur                            |
+| remove     | Only within a `FieldSet`, it removes the object from the collection                                          |
 
 <p>&nbsp</p>
 
@@ -759,8 +758,8 @@ These following methods will behave differently if the FormField has nested fiel
 | setTouched  | It takes a boolean parameter and will set every item touched property to this value                                                                                                                |
 | reset       | It resets every field                                                                                                                                                                              |
 | validate    | It validates every field                                                                                                                                                                           |
-| addFields   | It takes a comma separated array of arguments and adds a new FormField for each value                                                                                                              |
-| removeField | It removes a field given an index value                                                                                                                                                            |
+| insert      | It takes a comma separated array of arguments and adds a new FormField for each value                                                                                                              |
+| removeField | It removes a field given an object reference value                                                                                                                                                 |
 | value       | It returns an array with the value of every FormField item                                                                                                                                         |
 | dirty       | Will be true if any item is dirty                                                                                                                                                                  |
 | touched     | Will be true if every item is touched                                                                                                                                                              |
