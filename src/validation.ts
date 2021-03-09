@@ -14,7 +14,7 @@ export type ValidationType<T> =
 export type FieldValidation<T> = ValidationType<T> | ValidationType<T>[];
 
 export type MappedValidation<T> = {
-  [P in keyof T]: FieldValidation<T>;
+  [P in keyof T]: FieldValidation<T> | MappedValidation<T[P]>;
 };
 
 export function validateValue<T>({

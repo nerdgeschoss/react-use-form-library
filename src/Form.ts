@@ -1,12 +1,17 @@
-import isEmpty from 'lodash.isempty';
 import { FormField } from './FormField';
 import { MappedValidation } from './validation';
+import { FieldSet } from './FieldSet';
+import { isEmpty } from './util';
 
 /* This type is used to take a model, parse it an return a different type
 for each field. In this case, for each field of T, string | number you
 get back a FormField type */
 export type MappedFields<T> = {
-  [P in keyof Required<T>]: FormField<T[P]>;
+  // Here we are only checking if T[P] is actually an array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [P in keyof Required<T>]: T[P] extends any[]
+    ? FieldSet<T[P]>
+    : FormField<T[P]>;
 };
 
 export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
@@ -50,19 +55,10 @@ export class Form<T> {
     this.onSubmitError = onSubmitError;
   }
 
-  private addField(key: string): void {
-    this.cachedFields[key] = new FormField({
-      value: this.originalModel[key],
-      onUpdate: this.onUpdate.bind(this),
-      validation: this.validations?.[key],
-    });
-    this.cachedFields[key].validate(this.model);
-  }
-
   // This method will touch every field, for the purpose of displaying the errors in the view
   public touchFields(): void {
     for (const key in this.fields) {
-      this.fields[key].touched = true;
+      this.fields[key].setTouched(true);
     }
   }
 
@@ -115,7 +111,7 @@ export class Form<T> {
   }
 
   private validateFields(): void {
-    for (const key in this.validations) {
+    for (const key in this.fields) {
       const field = this.fields[key];
 
       if (field) {
@@ -184,6 +180,20 @@ export class Form<T> {
   // can submit
   public get canSubmit(): boolean {
     return this.valid && this.dirty;
+  }
+
+  private addField(key: string): void {
+    const options = {
+      value: this.originalModel[key],
+      onUpdate: this.onUpdate.bind(this),
+      validation: this.validations?.[key],
+    };
+    if (Array.isArray(this.originalModel[key])) {
+      this.cachedFields[key] = new FieldSet(options);
+    } else {
+      this.cachedFields[key] = new FormField(options);
+    }
+    this.cachedFields[key].validate(this.model);
   }
 
   // Fields getter uses a proxy object to generate fields on demand. It also binds the instance methods.
