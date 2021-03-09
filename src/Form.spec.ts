@@ -377,9 +377,9 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
-      expect(emails instanceof FieldSet);
-      expect(emails.fields[0] instanceof FormField);
-      expect(emails.fields[1] instanceof FormField);
+      expect(emails instanceof FieldSet).toBeTruthy();
+      expect(emails.fields[0] instanceof FormField).toBeTruthy();
+      expect(emails.fields[1] instanceof FormField).toBeTruthy();
       expect(emails.fields[0].value).toEqual('google.com');
       expect(emails.fields[1].value).toEqual('facebook.com');
     });
