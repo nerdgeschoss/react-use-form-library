@@ -9,7 +9,6 @@
     "dist"
   ],
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "build": "yarn build:js && yarn build:types",
     "build:js": "NODE_ENV=production rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
