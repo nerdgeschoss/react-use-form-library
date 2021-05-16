@@ -178,7 +178,7 @@ export class FormField<T> {
   }
 
   private get isNestedObject(): boolean {
-    return !!this.nestedKeys.length;
+    return this.value !== null && !!this.nestedKeys.length;
   }
 
   private addField(key: string): void {

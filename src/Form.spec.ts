@@ -30,6 +30,7 @@ interface Model {
   name: string;
   age: number;
   description?: string;
+  nullableValue?: string | null;
   emails?: string[];
   address?: {
     streetName: string;
@@ -79,6 +80,16 @@ describe(Form, () => {
       expect(onChange).toBeDefined();
       expect(onFocus).toBeDefined();
       expect(onBlur).toBeDefined();
+    });
+    it('can create fields from null value', () => {
+      const form2 = createForm({
+        value: {
+          nullableValue: null,
+        },
+      });
+      expect(form2.fields.nullableValue.value).toBeNull();
+      form2.fields.nullableValue.onChange('test');
+      expect(form2.fields.nullableValue.value).toBe('test');
     });
   });
 
