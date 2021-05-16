@@ -263,6 +263,16 @@ describe(Form, () => {
       expect(form.fields.name.touched).toBeTruthy();
     });
 
+    it('can submit with null value', async () => {
+      const form2 = createForm({
+        value: {
+          nullableValue: null,
+        },
+      });
+      expect(form2.fields.nullableValue.value).toBeNull();
+      await form2.onSubmit();
+    });
+
     it('handles async functions', async () => {
       const form = createForm({
         onSubmit: async (form) => {

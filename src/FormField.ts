@@ -169,6 +169,9 @@ export class FormField<T> {
   initialized with an empty value and fields created on demand */
   private get nestedKeys(): string[] {
     let keys: string[] = [];
+    if (this.value === null) {
+      return [];
+    }
     if (typeof this.value === 'object') {
       keys = [...Object.keys(this.value)];
     }
@@ -178,7 +181,7 @@ export class FormField<T> {
   }
 
   private get isNestedObject(): boolean {
-    return this.value !== null && !!this.nestedKeys.length;
+    return !!this.nestedKeys.length;
   }
 
   private addField(key: string): void {
