@@ -67,16 +67,16 @@ describe(Form, () => {
     it('creates an empty field name', () => {
       expect(form.fields.name).toBeTruthy();
       expect(form.fields.name.value).toBeFalsy();
-      expect(form.fields.name.dirty).toBeFalsy();
+      expect(form.fields.name.isDirty()).toBeFalsy();
     });
     it('creates an pre filled field age', () => {
       expect(form.fields.age).toBeTruthy();
       expect(form.fields.age.value).toBeTruthy();
-      expect(form.fields.age.dirty).toBeFalsy();
+      expect(form.fields.age.isDirty()).toBeFalsy();
     });
     it('can be destructured', () => {
-      const { valid, onChange, onBlur, onFocus } = form.fields.age;
-      expect(valid).toEqual(true);
+      const { isValid, onChange, onBlur, onFocus } = form.fields.age;
+      expect(isValid()).toEqual(true);
       expect(onChange).toBeDefined();
       expect(onFocus).toBeDefined();
       expect(onBlur).toBeDefined();
@@ -111,10 +111,10 @@ describe(Form, () => {
 
     it('invokes the callback when a value changes', () => {
       const form = createForm();
-      expect(form.fields.name.dirty).toBeFalsy();
-      expect(form.fields.name.touched).toBeFalsy();
+      expect(form.fields.name.isDirty()).toBeFalsy();
+      expect(form.fields.name.isTouched()).toBeFalsy();
       form.fields.name.onChange('Freddy');
-      expect(form.fields.name.dirty).toBeTruthy();
+      expect(form.fields.name.isDirty()).toBeTruthy();
       expect(tracker.wasCalled).toBeTruthy();
     });
 
@@ -137,7 +137,7 @@ describe(Form, () => {
     it("doesn't track same value as a change", () => {
       const form = createForm();
       form.fields.age.onChange(18);
-      expect(form.fields.name.dirty).toBeFalsy();
+      expect(form.fields.name.isDirty()).toBeFalsy();
       expect(form.changes).toEqual({});
     });
   });
@@ -148,13 +148,13 @@ describe(Form, () => {
         validations: { name: 'required' },
       });
       expect(form.fields.name.required).toBeTruthy();
-      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.fields.name.isValid()).toBeFalsy();
       expect(form.valid).toBeFalsy();
       form.fields.name.onChange('');
-      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.fields.name.isValid()).toBeFalsy();
       expect(form.valid).toBeFalsy();
       form.fields.name.onChange('Freddy');
-      expect(form.fields.name.valid).toBeTruthy();
+      expect(form.fields.name.isValid()).toBeTruthy();
       expect(form.valid).toBeTruthy();
     });
 
@@ -163,10 +163,10 @@ describe(Form, () => {
         value: { name: '' },
         validations: { name: ['email'] },
       });
-      expect(form.fields.name.valid).toBeTruthy();
+      expect(form.fields.name.isValid()).toBeTruthy();
       expect(form.valid).toBeTruthy();
       form.fields.name.onChange('test');
-      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.fields.name.isValid()).toBeFalsy();
       expect(form.valid).toBeFalsy();
     });
 
@@ -174,7 +174,7 @@ describe(Form, () => {
       const form = createForm({
         validations: { name: [() => ['custom error']] },
       });
-      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.fields.name.isValid()).toBeFalsy();
       expect(form.fields.name.errors).toEqual(['custom error']);
     });
 
@@ -258,9 +258,9 @@ describe(Form, () => {
 
     it('touches fields', () => {
       const form = createForm();
-      expect(form.fields.name.touched).toBeFalsy();
+      expect(form.fields.name.isTouched()).toBeFalsy();
       form.onSubmit();
-      expect(form.fields.name.touched).toBeTruthy();
+      expect(form.fields.name.isTouched()).toBeTruthy();
     });
 
     it('can submit with null value', async () => {
@@ -443,10 +443,10 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
-      expect(emails.fields[0].touched).toEqual(false);
+      expect(emails.fields[0].isTouched()).toEqual(false);
       emails.setTouched(true);
-      expect(emails.fields[0].touched).toEqual(true);
-      expect(emails.touched).toEqual(true);
+      expect(emails.fields[0].isTouched()).toEqual(true);
+      expect(emails.isTouched()).toEqual(true);
     });
     // DELETE
     it('removes a field', () => {
@@ -472,9 +472,9 @@ describe(Form, () => {
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
       emails.fields[0].onChange('test');
-      expect(emails.fields[0].valid).toEqual(false);
+      expect(emails.fields[0].isValid()).toEqual(false);
       emails.fields[1].onChange('test');
-      expect(emails.fields[1].valid).toEqual(false);
+      expect(emails.fields[1].isValid()).toEqual(false);
     });
     it('has the correct value', () => {
       const form = createForm({
@@ -493,11 +493,11 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
-      expect(emails.dirty).toBeFalsy();
+      expect(emails.isDirty()).toBeFalsy();
       emails.fields[0].onChange('linkedin.com');
-      expect(emails.fields[0].dirty).toBeTruthy();
-      expect(emails.fields[1].dirty).toBeFalsy();
-      expect(emails.dirty).toBeTruthy();
+      expect(emails.fields[0].isDirty()).toBeTruthy();
+      expect(emails.fields[1].isDirty()).toBeFalsy();
+      expect(emails.isDirty()).toBeTruthy();
     });
     it("is valid when it has at least one field if it's required", () => {
       const form = createForm({
@@ -508,9 +508,9 @@ describe(Form, () => {
       });
       const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
 
-      expect(emails.valid).toBeFalsy();
+      expect(emails.isValid()).toBeFalsy();
       emails.insert('test');
-      expect(emails.valid).toBeTruthy();
+      expect(emails.isValid()).toBeTruthy();
     });
   });
 
@@ -554,18 +554,18 @@ describe(Form, () => {
       });
 
       form.fields.address.validate(form.model);
-      expect(form.fields.address.fields?.streetName.valid).toBeTruthy();
+      expect(form.fields.address.fields?.streetName.isValid()).toBeTruthy();
       form.fields.address.fields?.streetName.onChange('');
-      expect(form.fields.address.fields?.streetName.valid).toBeFalsy();
+      expect(form.fields.address.fields?.streetName.isValid()).toBeFalsy();
     });
     it('touches every field', () => {
       const form = createForm({});
 
-      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
-      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetName.isTouched()).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.isTouched()).toBeFalsy();
       form.fields.address.setTouched(true);
-      expect(form.fields.address.fields?.streetName.touched).toBeTruthy();
-      expect(form.fields.address.fields?.streetNumber.touched).toBeTruthy();
+      expect(form.fields.address.fields?.streetName.isTouched()).toBeTruthy();
+      expect(form.fields.address.fields?.streetNumber.isTouched()).toBeTruthy();
     });
     it('resets every field', () => {
       const form = createForm({});
@@ -581,8 +581,8 @@ describe(Form, () => {
       form.fields.address.reset();
       expect(form.fields.address.fields?.streetName.value).toBeFalsy();
       expect(form.fields.address.fields?.streetNumber.value).toBeFalsy();
-      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
-      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetName.isTouched()).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.isTouched()).toBeFalsy();
     });
     it('is valid when all fields are valid', () => {
       const form = createForm({
@@ -600,32 +600,32 @@ describe(Form, () => {
         },
       });
       expect(form.valid).toBeFalsy();
-      expect(form.fields.address.valid).toBeFalsy();
+      expect(form.fields.address.isValid()).toBeFalsy();
       form.fields.address.fields?.streetName.onChange('Test Address');
-      expect(form.fields.address.valid).toBeTruthy();
+      expect(form.fields.address.isValid()).toBeTruthy();
       expect(form.valid).toBeTruthy();
     });
     it('is touched when all fields are touched', () => {
       const form = createForm({});
 
-      expect(form.fields.address.touched).toBeFalsy();
+      expect(form.fields.address.isTouched()).toBeFalsy();
       // Instanciate the fields
-      expect(form.fields.address.fields?.streetName.touched).toBeFalsy();
-      expect(form.fields.address.fields?.streetNumber.touched).toBeFalsy();
+      expect(form.fields.address.fields?.streetName.isTouched()).toBeFalsy();
+      expect(form.fields.address.fields?.streetNumber.isTouched()).toBeFalsy();
       form.fields.address.fields?.streetName.setTouched(true);
-      expect(form.fields.address.touched).toBeFalsy();
+      expect(form.fields.address.isTouched()).toBeFalsy();
       form.fields.address.fields?.streetNumber.setTouched(true);
-      expect(form.fields.address.touched).toBeTruthy();
+      expect(form.fields.address.isTouched()).toBeTruthy();
     });
     it('is dirty when some fields are dirty', () => {
       const form = createForm({});
       expect(form.dirty).toBeFalsy();
-      expect(form.fields.address.dirty).toBeFalsy();
+      expect(form.fields.address.isDirty()).toBeFalsy();
       // Instantiate street Number
       form.fields.address.fields?.streetName.onChange('Test Address');
-      expect(form.fields.address.fields?.streetName.dirty).toBeTruthy();
-      expect(form.fields.address.fields?.streetNumber.dirty).toBeFalsy();
-      expect(form.fields.address.dirty).toBeTruthy();
+      expect(form.fields.address.fields?.streetName.isDirty()).toBeTruthy();
+      expect(form.fields.address.fields?.streetNumber.isDirty()).toBeFalsy();
+      expect(form.fields.address.isDirty()).toBeTruthy();
     });
     it('has value when all fields have value', () => {
       const form = createForm({});

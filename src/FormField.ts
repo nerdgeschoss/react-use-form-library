@@ -51,7 +51,7 @@ export class FormField<T> {
   };
 
   public onBlur = (): void => {
-    if (!this.touched) {
+    if (!this.isTouched()) {
       this.setTouched(true);
     }
     this.focused = false;
@@ -143,26 +143,26 @@ export class FormField<T> {
   };
 
   // CLASS GETTERS
-  public get touched(): boolean {
+  public isTouched = (): boolean => {
     if (this.isNestedObject) {
       return this.checkNestedTouched();
     }
     return this.fieldTouched;
-  }
+  };
 
-  public get valid(): boolean {
+  public isValid = (): boolean => {
     if (this.isNestedObject) {
       return this.checkNestedValid();
     }
     return !this.errors.length;
-  }
+  };
 
-  public get dirty(): boolean {
+  public isDirty = (): boolean => {
     if (this.isNestedObject) {
       return this.checkNestedDirty();
     }
     return this.originalValue !== this.value;
-  }
+  };
 
   // NESTED OBJECTS
   /* We need to check both in the original value and the generated fields because the field could be 
@@ -249,24 +249,26 @@ export class FormField<T> {
 
   private checkNestedDirty(): boolean {
     return this.nestedKeys.some((key) => {
-      return this.fields[key].dirty;
+      return this.fields[key].isDirty();
     });
   }
 
-  private checkNestedValid(): boolean {
-    return this.nestedKeys.every((key) => this.fields[key].valid);
-  }
+  private checkNestedValid = (): boolean => {
+    return this.nestedKeys.every((key) => this.fields[key].isValid());
+  };
 
-  private checkNestedTouched(): boolean {
-    return this.nestedKeys.every((key) => this.fields[key].touched);
-  }
+  private checkNestedTouched = (): boolean => {
+    return this.nestedKeys.every((key) => this.fields[key].isTouched());
+  };
 
-  private checkNestedValue(): boolean {
+  private checkNestedValue = (): boolean => {
     return this.nestedKeys.every((key) => this.fields[key].hasValue());
-  }
+  };
 
   // FIELDSET
   public remove(): void {
     this.removeField?.(this);
   }
 }
+
+Object.defineProperty(FormField.prototype, 'dirty', { enumerable: true });

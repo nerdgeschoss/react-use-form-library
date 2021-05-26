@@ -81,18 +81,18 @@ export class FieldSet<T extends Array<T[number]>> {
     return compact(values) as T;
   }
 
-  public get dirty(): boolean {
-    return this.fields.some((field) => field.dirty);
-  }
+  public isDirty = (): boolean => {
+    return this.fields.some((field) => field.isDirty());
+  };
 
-  public get touched(): boolean {
-    return this.fields.every((field) => field.touched);
-  }
+  public isTouched = (): boolean => {
+    return this.fields.every((field) => field.isTouched());
+  };
 
-  public get valid(): boolean {
+  public isValid = (): boolean => {
     if (this.required && !this.fields.length) {
       return false;
     }
-    return this.fields.every((field) => field.valid);
-  }
+    return this.fields.every((field) => field.isValid());
+  };
 }

@@ -314,9 +314,9 @@ Or a more complex solution:
 
 ### Helpful properties
 
-#### Touched
+#### isTouched
 
-If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the touched property which will be true once the field has lost focus for the first time (`onBlur` event).
+If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the isTouched property which will be true once the field has lost focus for the first time (`onBlur` event).
 
 **Important !!**
 
@@ -347,18 +347,18 @@ const displayErrors = fields.name.touched && fields.name.errors.length;
 
 <p>&nbsp</p>
 
-#### Valid
+#### isValid
 
-A simple getter that returns true if there aren't any errors. This would simplify the above conditional to:
+A simple method that returns true if there aren't any errors. This would simplify the above conditional to:
 
 ```ts
-const displayErrors = fields.name.touched && !fields.name.valid;
+const displayErrors = fields.name.touched && !fields.name.isValid();
 ```
 
 It is also useful if you want to give your input a conditional class to show the user if the field is valid or not
 
 ```ts
-<div className={fields.phone.valid ? 'input--valid' : ''}>
+<div className={fields.phone.isValid() ? 'input--valid' : ''}>
   <input
     value={fields.phone.value}
     onChange={(v) => fields.phone.onChange(v.target.value)}
@@ -368,9 +368,9 @@ It is also useful if you want to give your input a conditional class to show the
 
 <p>&nbsp</p>
 
-#### Dirty
+#### isDirty
 
-When instantiated, a field will store it's original value in a variable. This getter will then compare the original value to the current value and return true if they are different.
+When instantiated, a field will store it's original value in a variable. This method will then compare the original value to the current value and return true if they are different.
 
 <p>&nbsp</p>
 
@@ -772,9 +772,9 @@ return (
 | validate   | a validation function triggered on every update                                                              |
 | setTouched | takes a boolean and will set the touched state to this value                                                 |
 | reset      | a helper method that resets the field to it's original value                                                 |
-| valid      | a getter that checks if the field has any errors                                                             |
-| dirty      | a getter that compares the current value to the original value passed on instantiation                       |
-| touched    | a touched state, initially false and changed to true when calling onChange/onBlur                            |
+| isValid    | a method that checks if the field has any errors                                                             |
+| isDirty    | a method that compares the current value to the original value passed on instantiation                       |
+| isTouched  | a touched state, initially false and changed to true when calling onChange/onBlur                            |
 | remove     | Only within a `FieldSet`, it removes the object from the collection                                          |
 
 <p>&nbsp</p>
@@ -790,9 +790,9 @@ These following methods will behave differently if the FormField has nested fiel
 | validate   | It will run validations for all nested fields                                      |
 | setTouched | Takes a booleand and will set every nested field touched property to this value    |
 | reset      | It resets the value of every nested field                                          |
-| touched    | Will be touched when every fields is touched                                       |
-| valid      | Will be valid when every fields is touched                                         |
-| dirty      | Will be valid when at least one field is dirty                                     |
+| isTouched  | Will be touched when every fields is touched                                       |
+| isValid    | Will be valid when every fields is touched                                         |
+| isDirty    | Will be valid when at least one field is dirty                                     |
 | fields     | A mapped collection, which has a FormField for every key in the value              |
 
 <p>&nbsp</p>
@@ -809,8 +809,8 @@ These following methods will behave differently if the FormField has nested fiel
 | insert      | It takes a comma separated array of arguments and adds a new FormField for each value                                                                                                              |
 | removeField | It removes a field given an object reference value                                                                                                                                                 |
 | value       | It returns an array with the value of every FormField item                                                                                                                                         |
-| dirty       | Will be true if any item is dirty                                                                                                                                                                  |
-| touched     | Will be true if every item is touched                                                                                                                                                              |
+| isDirty     | Will be true if any item is dirty                                                                                                                                                                  |
+| isTouched   | Will be true if every item is touched                                                                                                                                                              |
 
 <p>&nbsp</p>
 
