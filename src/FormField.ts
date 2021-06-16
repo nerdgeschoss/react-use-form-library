@@ -43,7 +43,8 @@ export class FormField<T> {
 
   // CLASS METHODS
   public onChange = (value?: T): void => {
-    if (typeof value === 'object' || this.isNestedObject) {
+    // Object and not null needs to be checked here for instantation of new field
+    if ((typeof value === 'object' && value !== null) || this.isNestedObject) {
       return this.updateFields(value);
     }
     this.value = value;
