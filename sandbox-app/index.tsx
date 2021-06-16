@@ -19,7 +19,13 @@ function App(): JSX.Element {
     model: {
       name: '',
       emails: [],
-      images: [],
+      images: [
+        {
+          id: '1',
+          tags: [],
+          url: 'string',
+        },
+      ],
     },
     handleSubmit: async () => {
       // eslint-disable-next-line
@@ -30,6 +36,8 @@ function App(): JSX.Element {
       emails: ['email'],
     },
   });
+
+  // fields.images.fields[0].fields.tags.insert('asd');
 
   return (
     <>
@@ -49,7 +57,7 @@ function App(): JSX.Element {
               onChange={(v) => fields.name.onChange(v.target.value)}
             />
           </div>
-          {fields.name.touched &&
+          {fields.name.isTouched() &&
             fields.name.errors.map((error) => (
               <small key={error}>* {error}</small>
             ))}
@@ -70,7 +78,7 @@ function App(): JSX.Element {
                     x
                   </button>
                 </div>
-                {field.touched &&
+                {field.isTouched() &&
                   field.errors.map((error) => (
                     <small key={error}>* {error}</small>
                   ))}
@@ -96,11 +104,47 @@ function App(): JSX.Element {
                     value={field.fields.url.value}
                     onChange={(v) => field.fields.url.onChange(v.target.value)}
                   />
+                  <fieldset>
+                    <legend>Array fields</legend>
+                    {field.fields.tags.fields.map((field2, index) => {
+                      return (
+                        <div key={index}>
+                          <div>
+                            <label>Email: </label>
+                            <input
+                              onBlur={field2.onBlur}
+                              value={field2.value}
+                              onChange={(v) => field2.onChange(v.target.value)}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => field2.remove()}
+                            >
+                              x
+                            </button>
+                          </div>
+                          {field.isTouched() &&
+                            field.errors.map((error) => (
+                              <small key={error}>* {error}</small>
+                            ))}
+                        </div>
+                      );
+                    })}
+
+                    <footer>
+                      <button
+                        type="button"
+                        onClick={() => field.fields.tags.insert('')}
+                      >
+                        Add email
+                      </button>
+                    </footer>
+                  </fieldset>
                   <button type="button" onClick={() => field.remove()}>
                     x
                   </button>
                 </div>
-                {field.touched &&
+                {field.isTouched() &&
                   field.errors.map((error) => (
                     <small key={error}>* {error}</small>
                   ))}
@@ -134,7 +178,7 @@ function App(): JSX.Element {
                 }
               />
             </div>
-            {fields.address.fields.streetName.touched &&
+            {fields.address.fields.streetName.isTouched() &&
               fields.address.fields.streetName.errors.map((error) => (
                 <small key={error}>* {error}</small>
               ))}
@@ -152,7 +196,7 @@ function App(): JSX.Element {
                 }
               />
             </div>
-            {fields.address.fields.streetNumber.touched &&
+            {fields.address.fields.streetNumber.isTouched() &&
               fields.address.fields.streetNumber.errors.map((error) => (
                 <small key={error}>* {error}</small>
               ))}
