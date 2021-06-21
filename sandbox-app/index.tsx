@@ -15,6 +15,9 @@ function App(): JSX.Element {
       tags?: string[];
       url?: string;
     }>;
+    avatar?: {
+      url: string;
+    } | null;
   }>({
     model: {
       name: '',
@@ -41,6 +44,7 @@ function App(): JSX.Element {
 
   return (
     <>
+      <h2>Form</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -202,8 +206,22 @@ function App(): JSX.Element {
               ))}
           </div>
         </fieldset>
+
+        {/* AVATAR */}
+        <fieldset>
+          <legend>Avatar Url (nullable field)</legend>
+          <input
+            value={fields.avatar.fields.url.value}
+            onChange={(e) => fields.avatar.fields.url.onChange(e.target.value)}
+          />
+          <button onClick={() => fields.avatar.onChange(null)} type="button">
+            remove avatar
+          </button>
+        </fieldset>
         <button disabled={!canSubmit}>Submit</button>
       </form>
+
+      <h2>Model</h2>
       <pre>{JSON.stringify({ model, valid, dirty }, null, 2)}</pre>
     </>
   );

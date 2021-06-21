@@ -36,6 +36,9 @@ interface Model {
     streetName: string;
     streetNumber: number;
   };
+  avatar?: {
+    url: string;
+  } | null;
 }
 
 function createForm({
@@ -355,6 +358,13 @@ describe(Form, () => {
       expect(form.submissionStatus).toBe('error');
       form.fields.name.onChange('test');
       expect(form.submissionStatus).toEqual('idle');
+    });
+    it('sets value to null', () => {
+      const form = createForm();
+      form.fields.avatar.fields?.url.onChange('test-image');
+      expect(form.fields.avatar.fields?.url.value).toBe('test-image');
+      form.fields.avatar.onChange(null);
+      expect(form.fields.avatar.value).toBe(null);
     });
   });
 
