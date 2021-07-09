@@ -25,7 +25,7 @@ export class FieldSet<T extends Array<T[number]>> {
     }
 
     if (value?.length) {
-      this.insert(...value);
+      this.addFields(...value);
     }
   }
 
@@ -51,7 +51,7 @@ export class FieldSet<T extends Array<T[number]>> {
     this.fields.forEach((field) => field.validate(model));
   }
 
-  public insert(...items: Array<T[number]>): void {
+  public addFields(...items: Array<T[number]>): void {
     items.forEach((item) => {
       this.fields.push(
         new FormField({
@@ -62,6 +62,10 @@ export class FieldSet<T extends Array<T[number]>> {
         })
       );
     });
+  }
+
+  public insert(...items: Array<T[number]>): void {
+    this.addFields(...items);
     this.onUpdate();
   }
 

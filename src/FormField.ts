@@ -188,7 +188,7 @@ export class FormField<T> {
   private addField(key: string): void {
     const options = {
       value: this.originalValue?.[key],
-      onUpdate: this.nestUpdate.bind(this),
+      onUpdate: this.nestUpdate,
       validation: this.validation?.[key],
     };
 
@@ -214,20 +214,18 @@ export class FormField<T> {
     return new Proxy(this.cachedFields, handler);
   }
 
-  private nestUpdate(): void {
+  private nestUpdate = (): void => {
     const changes = {} as Partial<T>;
-
     for (const key of this.nestedKeys) {
       changes[key] = this.fields[key].value;
     }
-
     this.value = {
       ...this.value,
       ...changes,
     } as T;
     this.nestValidate();
     this.onUpdate();
-  }
+  };
 
   private nestValidate(): void {
     for (const key of this.nestedKeys) {

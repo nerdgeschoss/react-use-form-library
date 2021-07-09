@@ -3,7 +3,15 @@ import ReactDOM from 'react-dom';
 import { useForm } from '../src/index';
 
 function App(): JSX.Element {
-  const { model, fields, onSubmit, canSubmit, valid, dirty } = useForm<{
+  const {
+    model,
+    changes,
+    fields,
+    onSubmit,
+    canSubmit,
+    valid,
+    dirty,
+  } = useForm<{
     name: string;
     emails: string[];
     address?: {
@@ -25,8 +33,8 @@ function App(): JSX.Element {
       images: [
         {
           id: '1',
-          tags: [],
           url: 'string',
+          tags: ['asd'],
         },
       ],
     },
@@ -39,8 +47,6 @@ function App(): JSX.Element {
       emails: ['email'],
     },
   });
-
-  // fields.images.fields[0].fields.tags.insert('asd');
 
   return (
     <>
@@ -109,7 +115,7 @@ function App(): JSX.Element {
                     onChange={(v) => field.fields.url.onChange(v.target.value)}
                   />
                   <fieldset>
-                    <legend>Array fields</legend>
+                    <legend>Tags</legend>
                     {field.fields.tags.fields.map((field2, index) => {
                       return (
                         <div key={index}>
@@ -140,7 +146,7 @@ function App(): JSX.Element {
                         type="button"
                         onClick={() => field.fields.tags.insert('')}
                       >
-                        Add email
+                        Add Tag
                       </button>
                     </footer>
                   </fieldset>
@@ -162,6 +168,7 @@ function App(): JSX.Element {
               onClick={() =>
                 fields.images.insert({
                   id: fields.images.fields.length,
+                  tags: ['one', 'two'],
                 })
               }
             >
@@ -223,6 +230,9 @@ function App(): JSX.Element {
 
       <h2>Model</h2>
       <pre>{JSON.stringify({ model, valid, dirty }, null, 2)}</pre>
+
+      <h2>Changes</h2>
+      <pre>{JSON.stringify({ changes }, null, 2)}</pre>
     </>
   );
 }
