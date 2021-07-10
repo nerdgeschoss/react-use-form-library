@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from '../src/index';
+import { Input } from './components/Input';
+import { NumberInput } from './components/NumberInput';
 
 function App(): JSX.Element {
   const {
@@ -33,7 +35,7 @@ function App(): JSX.Element {
       images: [
         {
           id: '1',
-          url: 'string',
+          url: '',
           tags: ['asd'],
         },
       ],
@@ -59,43 +61,20 @@ function App(): JSX.Element {
       >
         <fieldset>
           <legend>Simple fields</legend>
-          <div>
-            <label>Name: </label>
-            <input
-              onBlur={fields.name.onBlur}
-              value={fields.name.value}
-              onChange={(v) => fields.name.onChange(v.target.value)}
-            />
-          </div>
-          {fields.name.isTouched() &&
-            fields.name.errors.map((error) => (
-              <small key={error}>* {error}</small>
-            ))}
+          <Input label="Name: " {...fields.name} />
         </fieldset>
         <fieldset>
           <legend>Array fields</legend>
           {fields.emails.fields.map((field, index) => {
             return (
-              <div key={index}>
-                <div>
-                  <label>Email: </label>
-                  <input
-                    onBlur={field.onBlur}
-                    value={field.value}
-                    onChange={(v) => field.onChange(v.target.value)}
-                  />
-                  <button type="button" onClick={() => field.remove()}>
-                    x
-                  </button>
-                </div>
-                {field.isTouched() &&
-                  field.errors.map((error) => (
-                    <small key={error}>* {error}</small>
-                  ))}
-              </div>
+              <Input
+                label="Email"
+                key={index}
+                {...field}
+                onRemove={() => field.remove()}
+              />
             );
           })}
-
           <footer>
             <button type="button" onClick={() => fields.emails.insert('')}>
               Add email
@@ -106,59 +85,33 @@ function App(): JSX.Element {
           <legend>Images</legend>
           {fields.images.fields.map((field, index) => {
             return (
-              <div key={index}>
+              <fieldset key={index}>
+                <legend>Image:</legend>
                 <div>
-                  <label>Image URL: </label>
-                  <input
-                    onBlur={field.onBlur}
-                    value={field.fields.url.value}
-                    onChange={(v) => field.fields.url.onChange(v.target.value)}
-                  />
-                  <fieldset>
-                    <legend>Tags</legend>
-                    {field.fields.tags.fields.map((field2, index) => {
-                      return (
-                        <div key={index}>
-                          <div>
-                            <label>Email: </label>
-                            <input
-                              onBlur={field2.onBlur}
-                              value={field2.value}
-                              onChange={(v) => field2.onChange(v.target.value)}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => field2.remove()}
-                            >
-                              x
-                            </button>
-                          </div>
-                          {field.isTouched() &&
-                            field.errors.map((error) => (
-                              <small key={error}>* {error}</small>
-                            ))}
-                        </div>
-                      );
-                    })}
-
-                    <footer>
-                      <button
-                        type="button"
-                        onClick={() => field.fields.tags.insert('')}
-                      >
-                        Add Tag
-                      </button>
-                    </footer>
-                  </fieldset>
-                  <button type="button" onClick={() => field.remove()}>
-                    x
+                  <Input label="Image URL: " {...field.fields.url} />
+                  {field.fields.tags.fields.map((field2, index) => {
+                    return (
+                      <Input
+                        key={index}
+                        label="Tag: "
+                        {...field2}
+                        onRemove={() => field2.remove()}
+                      />
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => field.fields.tags.insert('')}
+                  >
+                    Add Tag
                   </button>
+                  <footer>
+                    <button type="button" onClick={() => field.remove()}>
+                      x
+                    </button>
+                  </footer>
                 </div>
-                {field.isTouched() &&
-                  field.errors.map((error) => (
-                    <small key={error}>* {error}</small>
-                  ))}
-              </div>
+              </fieldset>
             );
           })}
 
@@ -178,52 +131,31 @@ function App(): JSX.Element {
         </fieldset>
         <fieldset>
           <legend>Nested Fields</legend>
-          <div>
-            <div>
-              <label>Street name: </label>
-              <input
-                onBlur={fields.address.fields.streetName.onBlur}
-                value={fields.address.fields.streetName.value}
-                onChange={(v) =>
-                  fields.address.fields.streetName.onChange(v.target.value)
-                }
-              />
-            </div>
-            {fields.address.fields.streetName.isTouched() &&
-              fields.address.fields.streetName.errors.map((error) => (
-                <small key={error}>* {error}</small>
-              ))}
-          </div>
-          <div>
-            <div>
-              <label>Street number: </label>
-              <input
-                onBlur={fields.address.fields.streetNumber.onBlur}
-                value={fields.address.fields.streetNumber.value}
-                onChange={(v) =>
-                  fields.address.fields.streetNumber.onChange(
-                    v.target.value === '' ? undefined : Number(v.target.value)
-                  )
-                }
-              />
-            </div>
-            {fields.address.fields.streetNumber.isTouched() &&
-              fields.address.fields.streetNumber.errors.map((error) => (
-                <small key={error}>* {error}</small>
-              ))}
-          </div>
+          <Input label="Street name: " {...fields.address.fields.streetName} />
+          <NumberInput
+            label="Street number: "
+            {...fields.address.fields.streetNumber}
+          />
         </fieldset>
 
         {/* AVATAR */}
         <fieldset>
           <legend>Avatar Url (nullable field)</legend>
-          <input
-            value={fields.avatar.fields.url.value}
-            onChange={(e) => fields.avatar.fields.url.onChange(e.target.value)}
-          />
-          <button onClick={() => fields.avatar.onChange(null)} type="button">
-            remove avatar
-          </button>
+          {model.avatar !== null ? (
+            <>
+              <Input {...fields.avatar.fields.url} />
+              <button
+                onClick={() => fields.avatar.onChange(null)}
+                type="button"
+              >
+                remove avatar
+              </button>
+            </>
+          ) : (
+            <button onClick={() => fields.avatar.fields.url.onChange('')}>
+              add avatar
+            </button>
+          )}
         </fieldset>
         <button disabled={!canSubmit}>Submit</button>
       </form>
