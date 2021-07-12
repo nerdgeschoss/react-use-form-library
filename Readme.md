@@ -29,7 +29,13 @@ Contrary to other solutions that provide you with react components and/or wrappe
 
 ## Installation
 
-Add the library to your project: `yarn add react-use-form-library` or `npm install react-use-form-library`
+Add the library to your project: 
+
+`yarn add @nerdgeschoss/react-use-form-library` 
+
+or 
+
+`npm install @nerdgeschoss/react-use-form-library`
 
 ## Basic example
 
@@ -44,7 +50,7 @@ The three main fields you get from the hook are `model`, `fields` and `onSubmit`
 - `onSubmit` is the handler you can provide to the `<form>` element. It will call `preventDefault` internally and execute the function provided to the hook as `handleSubmit`
 
 ```ts
-import { useForm } from 'react-use-form-library';
+import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
   const { model, fields, onSubmit } = useForm({
@@ -79,7 +85,7 @@ function App(): JSX.Element {
 You don't need to explicitly enumerate all properties in your model, the library will generate all necesary fields on demand by using [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy).
 
 ```ts
-import { useForm } from 'react-use-form-library';
+import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
   const { model, fields, onSubmit } = useForm({
@@ -131,7 +137,7 @@ const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
 
 The validations object needs to correspond your model object. Each key can take one of the following values:
 
-- A string that contains prebuild common validations like `required`, `email`, `number` and [more](#predefined-validation-strings).
+- A string that contains prebuild common validations. Currently supported are: `required`, `email`, `number` and [more](#predefined-validation-strings).
 - A custom validation function with the signature `(value: model): string[] => {}`. The value parameter is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.
 - An array which can contain the previous both.
 
@@ -314,13 +320,15 @@ Or a more complex solution:
 
 ### Helpful properties
 
-#### isTouched
+#### touched
 
-If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the isTouched property which will be true once the field has lost focus for the first time (`onBlur` event).
+If the field is required, the `required-field` error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the `touched` property which will be true once the field has lost focus for the first time (`onBlur` event).
 
 **Important !!**
 
-If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
+If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise it will only be displayed after an `update` event triggered by `onChange`. 
+
+Submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
 
 ```ts
 // ...
@@ -347,18 +355,18 @@ const displayErrors = fields.name.touched && fields.name.errors.length;
 
 <p>&nbsp</p>
 
-#### isValid
+#### valid
 
-A simple method that returns true if there aren't any errors. This would simplify the above conditional to:
+A simple getter that returns true if there aren't any errors. This would simplify the above conditional to:
 
 ```ts
-const displayErrors = fields.name.touched && !fields.name.isValid();
+const displayErrors = fields.name.touched && !fields.name.valid;
 ```
 
 It is also useful if you want to give your input a conditional class to show the user if the field is valid or not
 
 ```ts
-<div className={fields.phone.isValid() ? 'input--valid' : ''}>
+<div className={fields.phone.valid ? 'input--valid' : ''}>
   <input
     value={fields.phone.value}
     onChange={(v) => fields.phone.onChange(v.target.value)}
@@ -368,9 +376,9 @@ It is also useful if you want to give your input a conditional class to show the
 
 <p>&nbsp</p>
 
-#### isDirty
+#### dirty
 
-When instantiated, a field will store it's original value in a variable. This method will then compare the original value to the current value and return true if they are different.
+When instantiated, a field will store it's original value in a variable. This getter will then compare the original value to the current value and return true if they are different.
 
 <p>&nbsp</p>
 
@@ -381,7 +389,7 @@ When instantiated, a field will store it's original value in a variable. This me
 ## Advanced example
 
 ```ts
-import { useForm } from 'react-use-form-library';
+import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element => {
   const { model, changes, reset, fields, dirty, valid, onSubmit, submissionStatus } = useForm({
@@ -418,6 +426,11 @@ export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element =
           value={fields.name.value}
           onChange={(v) => fields.name.onChange(v.target.value)}
         />
+        <input
+          value={fields.age.value}
+          // Make sure you parse the value to be consistent with the model
+          onChange={(v) => fields.age.onChange(Number(v.target.value))}
+        />
         // You can use submitting to display loading state
         {submissionStatus === 'submitting' ? (
           <div>Loading...</div>
@@ -442,7 +455,7 @@ export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element =
 Each FormField object is also able to contain fields. It behaves similarly to the Form object but with slight differences in its methods (See [API](#nested-fields)).
 
 ```ts
-import { useForm } from 'react-use-form-library';
+import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
   const { model, fields, onSubmit } = useForm({
@@ -473,7 +486,7 @@ function App(): JSX.Element {
 Validations also work with nested objects
 
 ```ts
-import { useForm } from 'react-use-form-library';
+import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
   const { model, fields, onSubmit } = useForm({
@@ -495,7 +508,7 @@ function App(): JSX.Element {
   // ...
 ```
 
-Since the fields property within FormField is also based on a proxy object, you can access nested properties without
+Since the fields property within FormField is also based on a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object, you can access nested properties without
 explicitely declaring them
 
 ```ts
@@ -545,10 +558,10 @@ A FieldSet is basically an array of FormFields. Contrary to nested objects, a Fi
 
 If you don't initialize the property in the model and try to access it in your code you will get an error.
 
-This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to **implicitly** determine if the field is array-based only from the type.
+This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to **implicitly** determine if the field is array-based only from the type definition.
 
 ```ts
-const { fields } = useForm<{ emails: string[] }>({
+const { fields } = useForm<{ emails: string[], images: string[] }>({
   model: {
     images: [],
   },
@@ -772,9 +785,9 @@ return (
 | validate   | a validation function triggered on every update                                                              |
 | setTouched | takes a boolean and will set the touched state to this value                                                 |
 | reset      | a helper method that resets the field to it's original value                                                 |
-| isValid    | a method that checks if the field has any errors                                                             |
-| isDirty    | a method that compares the current value to the original value passed on instantiation                       |
-| isTouched  | a touched state, initially false and changed to true when calling onChange/onBlur                            |
+| valid    | a getter that checks if the field has any errors                                                             |
+| dirty    | a getter that compares the current value to the original value passed on instantiation                       |
+| touched  | a touched state, initially false and changed to true when calling onChange/onBlur                            |
 | remove     | Only within a `FieldSet`, it removes the object from the collection                                          |
 
 <p>&nbsp</p>
@@ -790,9 +803,9 @@ These following methods will behave differently if the FormField has nested fiel
 | validate   | It will run validations for all nested fields                                      |
 | setTouched | Takes a booleand and will set every nested field touched property to this value    |
 | reset      | It resets the value of every nested field                                          |
-| isTouched  | Will be touched when every fields is touched                                       |
-| isValid    | Will be valid when every fields is touched                                         |
-| isDirty    | Will be valid when at least one field is dirty                                     |
+| touched  | Will be touched when every fields is touched                                       |
+| valid    | Will be valid when every fields is touched                                         |
+| dirty    | Will be valid when at least one field is dirty                                     |
 | fields     | A mapped collection, which has a FormField for every key in the value              |
 
 <p>&nbsp</p>
@@ -809,8 +822,8 @@ These following methods will behave differently if the FormField has nested fiel
 | insert      | It takes a comma separated array of arguments and adds a new FormField for each value                                                                                                              |
 | removeField | It removes a field given an object reference value                                                                                                                                                 |
 | value       | It returns an array with the value of every FormField item                                                                                                                                         |
-| isDirty     | Will be true if any item is dirty                                                                                                                                                                  |
-| isTouched   | Will be true if every item is touched                                                                                                                                                              |
+| dirty     | Will be true if any item is dirty                                                                                                                                                                  |
+| touched   | Will be true if every item is touched                                                                                                                                                              |
 
 <p>&nbsp</p>
 
