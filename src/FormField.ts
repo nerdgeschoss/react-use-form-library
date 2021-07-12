@@ -76,7 +76,7 @@ export class FormField<T> {
   };
 
   public onBlur = (): void => {
-    if (!this.isTouched()) {
+    if (!this.touched) {
       this.setTouched(true);
     }
     this.focused = false;
@@ -272,16 +272,16 @@ export class FormField<T> {
 
   private checkNestedDirty(): boolean {
     return this.nestedKeys.some((key) => {
-      return this.fields[key].isDirty();
+      return this.fields[key].dirty;
     });
   }
 
   private checkNestedValid = (): boolean => {
-    return this.nestedKeys.every((key) => this.fields[key].isValid());
+    return this.nestedKeys.every((key) => this.fields[key].valid);
   };
 
   private checkNestedTouched = (): boolean => {
-    return this.nestedKeys.every((key) => this.fields[key].isTouched());
+    return this.nestedKeys.every((key) => this.fields[key].touched);
   };
 
   private checkNestedValue = (): boolean => {

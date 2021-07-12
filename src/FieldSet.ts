@@ -7,6 +7,10 @@ export class FieldSet<T extends Array<T[number]>> {
   public required = false;
   public fields: Array<FormField<T[number]>> = [];
   private validation?: FieldValidation<T[number]>;
+  // Getters Initializers
+  public touched = false;
+  public valid = false;
+  public dirty = false;
 
   constructor({
     value,
@@ -27,6 +31,26 @@ export class FieldSet<T extends Array<T[number]>> {
     if (value?.length) {
       this.addFields(...value);
     }
+
+    // Define getters in the constructor to make them enumerable;
+    Object.defineProperty(this, 'touched', {
+      enumerable: true,
+      get: function () {
+        return this.isTouched();
+      },
+    });
+    Object.defineProperty(this, 'valid', {
+      enumerable: true,
+      get: function () {
+        return this.isValid();
+      },
+    });
+    Object.defineProperty(this, 'dirty', {
+      enumerable: true,
+      get: function () {
+        return this.isDirty();
+      },
+    });
   }
 
   public onChange = (value?: T): void => {
@@ -86,17 +110,17 @@ export class FieldSet<T extends Array<T[number]>> {
   }
 
   public isDirty = (): boolean => {
-    return this.fields.some((field) => field.isDirty());
+    return this.fields.some((field) => field.dirty);
   };
 
   public isTouched = (): boolean => {
-    return this.fields.every((field) => field.isTouched());
+    return this.fields.every((field) => field.touched);
   };
 
   public isValid = (): boolean => {
     if (this.required && !this.fields.length) {
       return false;
     }
-    return this.fields.every((field) => field.isValid());
+    return this.fields.every((field) => field.valid);
   };
 }

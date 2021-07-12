@@ -147,7 +147,7 @@ export class Form<T> {
 
     for (const key in this.fields) {
       const field = this.fields[key];
-      if (field.isDirty()) {
+      if (field.dirty) {
         changes[key] = field.value;
       }
     }
@@ -175,7 +175,7 @@ export class Form<T> {
     }
     // A form is valid if all fields are valid
     return Object.keys(this.validations).every((key) => {
-      return this.fields[key].isValid();
+      return this.fields[key].valid;
     });
   }
 
