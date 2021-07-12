@@ -320,6 +320,9 @@ describe(Form, () => {
           expect(form.submissionStatus).toBe('submitting');
           throw new Error('');
         },
+        onSubmitError: () => {
+          // do nothing;
+        },
       });
       await form.onSubmit();
       // Reset error
@@ -341,7 +344,7 @@ describe(Form, () => {
       expect(form.dirty).toEqual(false);
     });
     it('resets to idle if there are new changes after submitted', async () => {
-      const form = createForm();
+      const form = createForm({});
       expect(form.submissionStatus).toEqual('idle');
       await form.onSubmit();
       expect(form.submissionStatus).toEqual('submitted');
@@ -352,6 +355,9 @@ describe(Form, () => {
       const form = createForm({
         onSubmit: async () => {
           throw new Error('');
+        },
+        onSubmitError: () => {
+          // do nothing;
         },
       });
       await form.onSubmit();
