@@ -10,9 +10,10 @@ function App(): JSX.Element {
     changes,
     fields,
     onSubmit,
-    canSubmit,
     valid,
     dirty,
+    submissionStatus,
+    reset,
   } = useForm<{
     name: string;
     age?: number;
@@ -42,6 +43,9 @@ function App(): JSX.Element {
       ],
     },
     handleSubmit: async () => {
+      if (!valid) {
+        throw new Error('fields are not valid');
+      }
       // eslint-disable-next-line
       console.log(model);
     },
@@ -160,11 +164,16 @@ function App(): JSX.Element {
             </button>
           )}
         </fieldset>
-        <button disabled={!canSubmit}>Submit</button>
+        <button>Submit</button>
+        <button onClick={reset} type="button">
+          Reset
+        </button>
       </form>
 
       <h2>Model</h2>
-      <pre>{JSON.stringify({ model, valid, dirty }, null, 2)}</pre>
+      <pre>
+        {JSON.stringify({ model, valid, dirty, submissionStatus }, null, 2)}
+      </pre>
 
       <h2>Changes</h2>
       <pre>{JSON.stringify({ changes }, null, 2)}</pre>

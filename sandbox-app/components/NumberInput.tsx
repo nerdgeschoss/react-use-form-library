@@ -6,6 +6,7 @@ export function NumberInput({
   value,
   errors,
   valid,
+  required,
   touched,
   onBlur,
   onChange,
@@ -14,10 +15,12 @@ export function NumberInput({
   return (
     <div className={!touched ? 'idle' : !valid ? 'invalid' : 'valid'}>
       <div>
-        <label>{label}</label>
+        <label>
+          {label} {required ? '* ' : ''}
+        </label>
         <input
           onBlur={onBlur}
-          value={value}
+          value={value || ''}
           onChange={(v) => onChange(Number(v.target.value))}
           type="number"
         />
