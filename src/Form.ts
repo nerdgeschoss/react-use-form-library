@@ -79,6 +79,8 @@ export class Form<T> {
         this.error = error;
         if (this.onSubmitError) {
           this.onSubmitError(error);
+        } else {
+          throw error;
         }
         this.updateSubmissionStatus('error');
       }
