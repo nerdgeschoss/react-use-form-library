@@ -1,12 +1,15 @@
 import React from 'react';
+import './Input.css';
 
 export interface InputProps<T> {
   label?: string;
   value?: T;
   errors: string[];
+  required: boolean;
+  touched: boolean;
+  valid: boolean;
   onBlur: () => void;
   onChange: (value: T) => void;
-  isTouched: () => boolean;
   onRemove?: () => void;
 }
 
@@ -14,15 +17,19 @@ export function Input({
   label,
   value,
   errors,
+  required,
+  touched,
+  valid,
   onBlur,
   onChange,
-  isTouched,
   onRemove,
 }: InputProps<string>): JSX.Element {
   return (
-    <div>
+    <div className={!touched ? 'idle' : !valid ? 'invalid' : 'valid'}>
       <div>
-        <label>{label}</label>
+        <label>
+          {label} {required ? '* ' : ''}
+        </label>
         <input
           onBlur={onBlur}
           value={value}
@@ -34,8 +41,9 @@ export function Input({
           </button>
         )}
       </div>
-      {isTouched() &&
-        errors.map((error) => <small key={error}>* {error}</small>)}
+      <div>
+        {touched && errors.map((error) => <small key={error}>* {error}</small>)}
+      </div>
     </div>
   );
 }

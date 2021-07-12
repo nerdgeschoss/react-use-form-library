@@ -19,6 +19,10 @@ export class FormField<T> {
   // Nested Objects
   private cachedFields = {} as MappedFields<T>;
   private removeField?: (item: FormField<T>) => void;
+  // Getters Initializers
+  public touched = false;
+  public valid = false;
+  public dirty = false;
 
   constructor({
     value,
@@ -39,6 +43,26 @@ export class FormField<T> {
     }
     this.onUpdate = onUpdate;
     this.removeField = removeField;
+
+    // Define getters in the constructor to make them enumerable;
+    Object.defineProperty(this, 'touched', {
+      enumerable: true,
+      get: function () {
+        return this.isTouched();
+      },
+    });
+    Object.defineProperty(this, 'valid', {
+      enumerable: true,
+      get: function () {
+        return this.isValid();
+      },
+    });
+    Object.defineProperty(this, 'dirty', {
+      enumerable: true,
+      get: function () {
+        return this.isDirty();
+      },
+    });
   }
 
   // CLASS METHODS
@@ -269,5 +293,3 @@ export class FormField<T> {
     this.removeField?.(this);
   }
 }
-
-Object.defineProperty(FormField.prototype, 'dirty', { enumerable: true });
