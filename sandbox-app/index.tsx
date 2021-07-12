@@ -15,6 +15,7 @@ function App(): JSX.Element {
     dirty,
   } = useForm<{
     name: string;
+    age?: number;
     emails: string[];
     address?: {
       streetName?: string;
@@ -46,6 +47,7 @@ function App(): JSX.Element {
     },
     validations: {
       name: 'required',
+      age: ['required', 'number'],
       emails: ['email'],
     },
   });
@@ -62,6 +64,7 @@ function App(): JSX.Element {
         <fieldset>
           <legend>Simple fields</legend>
           <Input label="Name: " {...fields.name} />
+          <NumberInput label="Age: " {...fields.age} />
         </fieldset>
         <fieldset>
           <legend>Array fields</legend>

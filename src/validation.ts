@@ -26,7 +26,10 @@ export function validateValue<T>({
 }): string | undefined {
   switch (type) {
     case 'required':
-      if (!value) {
+      if (typeof value === 'string' && !value) {
+        return 'required-field';
+      }
+      if (value === undefined || value === null) {
         return 'required-field';
       }
       break;

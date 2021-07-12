@@ -5,13 +5,14 @@ export function NumberInput({
   label,
   value,
   errors,
+  valid,
+  touched,
   onBlur,
   onChange,
-  isTouched,
   onRemove,
 }: InputProps<number>): JSX.Element {
   return (
-    <div>
+    <div className={!touched ? 'idle' : !valid ? 'invalid' : 'valid'}>
       <div>
         <label>{label}</label>
         <input
@@ -26,8 +27,7 @@ export function NumberInput({
           </button>
         )}
       </div>
-      {isTouched() &&
-        errors.map((error) => <small key={error}>* {error}</small>)}
+      {touched && errors.map((error) => <small key={error}>* {error}</small>)}
     </div>
   );
 }

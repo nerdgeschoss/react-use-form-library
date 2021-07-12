@@ -42,7 +42,12 @@ export function Input({
         )}
       </div>
       <div>
-        {touched && errors.map((error) => <small key={error}>* {error}</small>)}
+        {touched &&
+          errors.map((error) => (
+            <div key={error}>
+              <small>* {error}</small>
+            </div>
+          ))}
       </div>
     </div>
   );
