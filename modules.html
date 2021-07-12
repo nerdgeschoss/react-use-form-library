@@ -2723,7 +2723,10 @@ img {
 			<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
 				<h2>Installation</h2>
 			</a>
-			<p>Add the library to your project: <code>yarn add react-use-form-library</code> or <code>npm install react-use-form-library</code></p>
+			<p>Add the library to your project: </p>
+			<p><code>yarn add @nerdgeschoss/react-use-form-library</code> </p>
+			<p>or </p>
+			<p><code>npm install @nerdgeschoss/react-use-form-library</code></p>
 			<a href="#basic-example" id="basic-example" style="color: inherit; text-decoration: none;">
 				<h2>Basic example</h2>
 			</a>
@@ -2735,7 +2738,7 @@ img {
 				<li><code>fields</code> is an object in which each key will be generated from properties of the original model you supplied to the hook.</li>
 				<li><code>onSubmit</code> is the handler you can provide to the <code>&lt;form&gt;</code> element. It will call <code>preventDefault</code> internally and execute the function provided to the hook as <code>handleSubmit</code></li>
 			</ul>
-			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nerdgeschoss/react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">App</span><span style="color: #000000">(): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
@@ -2765,7 +2768,7 @@ img {
 				<h2>Optional Fields</h2>
 			</a>
 			<p>You don&#39;t need to explicitly enumerate all properties in your model, the library will generate all necesary fields on demand by using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a>.</p>
-			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nerdgeschoss/react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">App</span><span style="color: #000000">(): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
@@ -2810,7 +2813,7 @@ img {
 			<p><a href="https://codepen.io/falkonpunch/pen/vYXrKgQ?editors=0011">Codepen</a></p>
 			<p>The validations object needs to correspond your model object. Each key can take one of the following values:</p>
 			<ul>
-				<li>A string that contains prebuild common validations like <code>required</code>, <code>email</code>, <code>number</code> and <a href="#predefined-validation-strings">more</a>.</li>
+				<li>A string that contains prebuild common validations. Currently supported are: <code>required</code>, <code>email</code>, <code>number</code> and <a href="#predefined-validation-strings">more</a>.</li>
 				<li>A custom validation function with the signature <code>(value: model): string[] =&gt; {}</code>. The value parameter is useful to supply the updated model and make comparisons. For this validation to report an error you have to return an array of strings. Each string is supposed to be an error that you can later display in the UI.</li>
 				<li>An array which can contain the previous both.</li>
 			</ul>
@@ -3032,12 +3035,13 @@ img {
 			<a href="#helpful-properties" id="helpful-properties" style="color: inherit; text-decoration: none;">
 				<h3>Helpful properties</h3>
 			</a>
-			<a href="#istouched" id="istouched" style="color: inherit; text-decoration: none;">
-				<h4>isTouched</h4>
+			<a href="#touched" id="touched" style="color: inherit; text-decoration: none;">
+				<h4>touched</h4>
 			</a>
-			<p>If the field is required, the <code>required-field</code> error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the isTouched property which will be true once the field has lost focus for the first time (<code>onBlur</code> event).</p>
+			<p>If the field is required, the <code>required-field</code> error will always be present if the value is empty. It is good UX to only display the required error if the field has been touched, for this you can use the <code>touched</code> property which will be true once the field has lost focus for the first time (<code>onBlur</code> event).</p>
 			<p><strong>Important !!</strong></p>
-			<p>If you want to immediately display errors based on the touched property, you need to add the <code>onBlur</code> event to your input. Otherwise submitting the form will also &quot;touch&quot; all fields, to make sure errors are displayed if the form is invalid.</p>
+			<p>If you want to immediately display errors based on the touched property, you need to add the <code>onBlur</code> event to your input. Otherwise it will only be displayed after an <code>update</code> event triggered by <code>onChange</code>. </p>
+			<p>Submitting the form will also &quot;touch&quot; all fields, to make sure errors are displayed if the form is invalid.</p>
 			<pre><code class="language-ts"><span style="color: #008000">// ...</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">errors</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000">;</span>
 
@@ -3060,14 +3064,14 @@ img {
 <span style="color: #008000">// ...</span>
 </code></pre>
 			<p>&nbsp</p>
-			<a href="#isvalid" id="isvalid" style="color: inherit; text-decoration: none;">
-				<h4>isValid</h4>
+			<a href="#valid" id="valid" style="color: inherit; text-decoration: none;">
+				<h4>valid</h4>
 			</a>
-			<p>A simple method that returns true if there aren&#39;t any errors. This would simplify the above conditional to:</p>
-			<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; !</span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #795E26">isValid</span><span style="color: #000000">();</span>
+			<p>A simple getter that returns true if there aren&#39;t any errors. This would simplify the above conditional to:</p>
+			<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">displayErrors</span><span style="color: #000000"> = </span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">touched</span><span style="color: #000000"> &amp;&amp; !</span><span style="color: #001080">fields</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">.</span><span style="color: #001080">valid</span><span style="color: #000000">;</span>
 </code></pre>
 			<p>It is also useful if you want to give your input a conditional class to show the user if the field is valid or not</p>
-			<pre><code class="language-ts"><span style="color: #000000">&lt;</span><span style="color: #001080">div</span><span style="color: #000000"> </span><span style="color: #001080">className</span><span style="color: #000000">={fields.phone.isValid() ? </span><span style="color: #A31515">&#039;input--valid&#039;</span><span style="color: #001080"> :</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">}&gt;</span>
+			<pre><code class="language-ts"><span style="color: #000000">&lt;</span><span style="color: #001080">div</span><span style="color: #000000"> </span><span style="color: #001080">className</span><span style="color: #000000">={fields.phone.valid ? </span><span style="color: #A31515">&#039;input--valid&#039;</span><span style="color: #001080"> :</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">}&gt;</span>
 <span style="color: #000000">  &lt;</span><span style="color: #001080">input</span>
 <span style="color: #000000">    </span><span style="color: #001080">value</span><span style="color: #000000">={fields.phone.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
 <span style="color: #000000">    </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.phone.onChange(v.target.value)}</span>
@@ -3075,17 +3079,17 @@ img {
 <span style="color: #000000">&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
 </code></pre>
 			<p>&nbsp</p>
-			<a href="#isdirty" id="isdirty" style="color: inherit; text-decoration: none;">
-				<h4>isDirty</h4>
+			<a href="#dirty" id="dirty" style="color: inherit; text-decoration: none;">
+				<h4>dirty</h4>
 			</a>
-			<p>When instantiated, a field will store it&#39;s original value in a variable. This method will then compare the original value to the current value and return true if they are different.</p>
+			<p>When instantiated, a field will store it&#39;s original value in a variable. This getter will then compare the original value to the current value and return true if they are different.</p>
 			<p>&nbsp</p>
 			<hr>
 			<p>&nbsp</p>
 			<a href="#advanced-example" id="advanced-example" style="color: inherit; text-decoration: none;">
 				<h2>Advanced example</h2>
 			</a>
-			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nerdgeschoss/react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">MyForm</span><span style="color: #000000">({ </span><span style="color: #001080">isNewItem</span><span style="color: #000000">, </span><span style="color: #001080">addItem</span><span style="color: #000000">, </span><span style="color: #001080">updateItem</span><span style="color: #000000"> }: </span><span style="color: #267F99">Props</span><span style="color: #000000">): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #267F99">const</span><span style="color: #000000"> { </span><span style="color: #001080">model</span><span style="color: #000000">, </span><span style="color: #001080">changes</span><span style="color: #000000">, </span><span style="color: #001080">reset</span><span style="color: #000000">, </span><span style="color: #001080">fields</span><span style="color: #000000">, </span><span style="color: #001080">dirty</span><span style="color: #000000">, </span><span style="color: #001080">valid</span><span style="color: #000000">, </span><span style="color: #001080">onSubmit</span><span style="color: #000000">, </span><span style="color: #001080">submissionStatus</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
@@ -3122,6 +3126,11 @@ img {
 <span style="color: #000000">          </span><span style="color: #001080">value</span><span style="color: #000000">={fields.name.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
 <span style="color: #000000">          </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.name.onChange(v.target.value)}</span>
 <span style="color: #000000">        /&gt;</span>
+<span style="color: #000000">        &lt;</span><span style="color: #001080">input</span>
+<span style="color: #000000">          </span><span style="color: #001080">value</span><span style="color: #000000">={fields.age.</span><span style="color: #001080">value</span><span style="color: #000000">}</span>
+<span style="color: #000000">          </span><span style="color: #008000">// Make sure you parse the value to be consistent with the model</span>
+<span style="color: #000000">          </span><span style="color: #001080">onChange</span><span style="color: #000000">={(v) =&gt; fields.age.onChange(</span><span style="color: #795E26">Number</span><span style="color: #000000">(v.target.value))}</span>
+<span style="color: #000000">        /&gt;</span>
 <span style="color: #000000">        </span><span style="color: #008000">// You can use submitting to display loading state</span>
 <span style="color: #000000">        {</span><span style="color: #001080">submissionStatus</span><span style="color: #000000"> === &#039;</span><span style="color: #001080">submitting</span><span style="color: #000000">&#039; ? (</span>
 <span style="color: #000000">          &lt;</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span><span style="color: #001080">Loading</span><span style="color: #000000">...&lt;/</span><span style="color: #001080">div</span><span style="color: #000000">&gt;</span>
@@ -3141,7 +3150,7 @@ img {
 				<h2>Nested Objects</h2>
 			</a>
 			<p>Each FormField object is also able to contain fields. It behaves similarly to the Form object but with slight differences in its methods (See <a href="#nested-fields">API</a>).</p>
-			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nerdgeschoss/react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">App</span><span style="color: #000000">(): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
@@ -3169,7 +3178,7 @@ img {
 <span style="color: #000000">}</span>
 </code></pre>
 			<p>Validations also work with nested objects</p>
-			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;react-use-form-library&#039;</span><span style="color: #000000">;</span>
+			<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">useForm</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nerdgeschoss/react-use-form-library&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">App</span><span style="color: #000000">(): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">model</span><span style="color: #000000">, </span><span style="color: #0070C1">fields</span><span style="color: #000000">, </span><span style="color: #0070C1">onSubmit</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">({</span>
@@ -3190,7 +3199,7 @@ img {
 
 <span style="color: #000000">  </span><span style="color: #008000">// ...</span>
 </code></pre>
-			<p>Since the fields property within FormField is also based on a proxy object, you can access nested properties without
+			<p>Since the fields property within FormField is also based on a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a> object, you can access nested properties without
 			explicitely declaring them</p>
 			<pre><code class="language-ts"><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">App</span><span style="color: #000000">(): </span><span style="color: #267F99">JSX</span><span style="color: #000000">.</span><span style="color: #267F99">Element</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #008000">/* If you use Typescript you have to define the model interface, otherwise you&#039;ll get an error</span>
@@ -3232,8 +3241,8 @@ img {
 			<p>A FieldSet is basically an array of FormFields. Contrary to nested objects, a FieldSet will only be instantiated if it is <strong>explicitly</strong> declared in the model.</p>
 			<p><strong>Important !!</strong></p>
 			<p>If you don&#39;t initialize the property in the model and try to access it in your code you will get an error.</p>
-			<p>This is because at the moment of field instantiation, the <code>addField</code> method within a <code>Form</code> (or a <code>FormField</code> if it is a nested object) will ask if the model value is actually an Array. It is not possible to <strong>implicitly</strong> determine if the field is array-based only from the type.</p>
-			<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">fields</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">&lt;{ </span><span style="color: #001080">emails</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">[] }&gt;({</span>
+			<p>This is because at the moment of field instantiation, the <code>addField</code> method within a <code>Form</code> (or a <code>FormField</code> if it is a nested object) will ask if the model value is actually an Array. It is not possible to <strong>implicitly</strong> determine if the field is array-based only from the type definition.</p>
+			<pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">fields</span><span style="color: #000000"> } = </span><span style="color: #795E26">useForm</span><span style="color: #000000">&lt;{ </span><span style="color: #001080">emails</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">[], </span><span style="color: #001080">images</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">[] }&gt;({</span>
 <span style="color: #000000">  </span><span style="color: #001080">model:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">images:</span><span style="color: #000000"> [],</span>
 <span style="color: #000000">  },</span>
@@ -3522,15 +3531,15 @@ img {
 						<td>a helper method that resets the field to it&#39;s original value</td>
 					</tr>
 					<tr>
-						<td>isValid</td>
-						<td>a method that checks if the field has any errors</td>
+						<td>valid</td>
+						<td>a getter that checks if the field has any errors</td>
 					</tr>
 					<tr>
-						<td>isDirty</td>
-						<td>a method that compares the current value to the original value passed on instantiation</td>
+						<td>dirty</td>
+						<td>a getter that compares the current value to the original value passed on instantiation</td>
 					</tr>
 					<tr>
-						<td>isTouched</td>
+						<td>touched</td>
 						<td>a touched state, initially false and changed to true when calling onChange/onBlur</td>
 					</tr>
 					<tr>
@@ -3571,15 +3580,15 @@ img {
 						<td>It resets the value of every nested field</td>
 					</tr>
 					<tr>
-						<td>isTouched</td>
+						<td>touched</td>
 						<td>Will be touched when every fields is touched</td>
 					</tr>
 					<tr>
-						<td>isValid</td>
+						<td>valid</td>
 						<td>Will be valid when every fields is touched</td>
 					</tr>
 					<tr>
-						<td>isDirty</td>
+						<td>dirty</td>
 						<td>Will be valid when at least one field is dirty</td>
 					</tr>
 					<tr>
@@ -3631,11 +3640,11 @@ img {
 						<td>It returns an array with the value of every FormField item</td>
 					</tr>
 					<tr>
-						<td>isDirty</td>
+						<td>dirty</td>
 						<td>Will be true if any item is dirty</td>
 					</tr>
 					<tr>
-						<td>isTouched</td>
+						<td>touched</td>
 						<td>Will be true if every item is touched</td>
 					</tr>
 			</tbody></table>
@@ -3702,7 +3711,7 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/nerdgeschoss/react-use-form-library/blob/55dfa6d/src/hooks.ts#L32">hooks.ts:32</a></li>
+								<li>Defined in <a href="https://github.com/nerdgeschoss/react-use-form-library/blob/67590f5/src/hooks.ts#L32">hooks.ts:32</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
