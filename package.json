@@ -1,6 +1,6 @@
 {
   "name": "react-use-form-library",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "A simple form library using react hooks",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -20,7 +20,7 @@
     "test:ci": "jest --coverage",
     "test": "jest --watchAll",
     "watch": "rimraf dist && tsc -w",
-    "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive --access public",
+    "release": "yarn build && yarn version --patch && git push --tags && yarn publish --non-interactive",
     "start": "parcel sandbox-app/index.html",
     "document": "yarn build:docs"
   },
