@@ -7,6 +7,7 @@ export class FieldSet<T extends Array<T[number]>> {
   public required = false;
   public fields: Array<FormField<T[number]>> = [];
   private validation?: FieldValidation<T[number]>;
+  private originalValue?: T;
   // Getters Initializers
   public touched = false;
   public valid = false;
@@ -23,6 +24,7 @@ export class FieldSet<T extends Array<T[number]>> {
   }) {
     this.onUpdate = onUpdate;
     this.validation = validation;
+    this.originalValue = value;
 
     if (typeof validation === 'string') {
       this.required = validation?.includes('required') ? true : false;
@@ -110,6 +112,13 @@ export class FieldSet<T extends Array<T[number]>> {
   }
 
   public isDirty = (): boolean => {
+    if (this.value.length !== this.fields.length) {
+      return true;
+    }
+    if (this.value.length !== this.originalValue?.length) {
+      return true;
+    }
+
     return this.fields.some((field) => field.dirty);
   };
 
