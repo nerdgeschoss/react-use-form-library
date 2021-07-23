@@ -38,9 +38,6 @@ export class FormField<T> {
     this.originalValue = value;
     this.value = value;
     this.validation = validation;
-    if (typeof this.validation === 'string') {
-      this.required = this.validation?.includes('required') ? true : false;
-    }
     this.onUpdate = onUpdate;
     this.removeField = removeField;
 
@@ -146,6 +143,11 @@ export class FormField<T> {
         }
       });
     }
+
+    if (errors.includes('required-field')) {
+      this.required = true;
+    }
+
     this.errors = errors;
   };
 

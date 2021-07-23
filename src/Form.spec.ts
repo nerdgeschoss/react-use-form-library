@@ -190,6 +190,14 @@ describe(Form, () => {
       form.fields.name.onChange('ade');
       expect(form.valid).toBeTruthy();
     });
+
+    it('is required when required is in the validations array', () => {
+      const form = createForm({
+        value: { name: '' },
+        validations: { name: ['email', 'required'] },
+      });
+      expect(form.fields.name.required).toBeTruthy();
+    });
   });
 
   describe('pre-defined validation', () => {
