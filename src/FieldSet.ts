@@ -58,11 +58,12 @@ export class FieldSet<T extends Array<T[number]>> {
   public onChange = (value?: T): void => {
     value?.forEach((val, index) => {
       if (this.fields[index] === undefined) {
-        this.insert(val);
+        this.addFields(val);
       } else {
-        this.fields[index].onChange(val);
+        this.fields[index].onChange(val, true);
       }
     });
+    this.onUpdate();
   };
 
   public setTouched(value: boolean): void {

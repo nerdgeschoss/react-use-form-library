@@ -107,7 +107,7 @@ export class Form<T> {
   // Mass update method.
   public updateFields(model: Partial<T>): void {
     for (const key in model) {
-      this.fields[key].onChange(model[key]);
+      this.fields[key].onChange(model[key], true);
     }
     this.onUpdate();
   }

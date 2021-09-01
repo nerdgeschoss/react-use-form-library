@@ -63,13 +63,15 @@ export class FormField<T> {
   }
 
   // CLASS METHODS
-  public onChange = (value?: T): void => {
+  public onChange = (value?: T, disableUpdate?: boolean): void => {
     // Object and not null needs to be checked here for instantation of new field
     if (value !== null && (typeof value === 'object' || this.isNestedObject)) {
       return this.updateFields(value);
     }
     this.value = value;
-    this.onUpdate();
+    if (!disableUpdate) {
+      this.onUpdate();
+    }
   };
 
   public onBlur = (): void => {
@@ -267,7 +269,7 @@ export class FormField<T> {
 
   private updateFields(model?: Partial<T>): void {
     for (const key in model) {
-      this.fields[key].onChange(model[key]);
+      this.fields[key].onChange(model[key], true);
     }
     this.onUpdate();
   }
