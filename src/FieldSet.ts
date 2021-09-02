@@ -71,6 +71,9 @@ export class FieldSet<T extends Array<T[number]>> {
   }
 
   public reset(): void {
+    if (this.originalValue?.length === 0) {
+      this.fields = [];
+    }
     this.fields.forEach((field) => field.reset());
   }
 
