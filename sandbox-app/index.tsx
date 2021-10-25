@@ -30,6 +30,10 @@ function App(): JSX.Element {
     avatar?: {
       url: string;
     } | null;
+    simpleObject?: {
+      value: string;
+      label: string;
+    };
   }>({
     model: {
       name: '',
@@ -164,6 +168,21 @@ function App(): JSX.Element {
             </button>
           )}
         </fieldset>
+
+        {/* SIMPLE OBJECT FIELD */}
+        <fieldset>
+          <input
+            type="text"
+            value={fields.simpleObject.value?.label}
+            onChange={(event) =>
+              fields.simpleObject.onChange({
+                label: event.target.value,
+                value: event.target.value,
+              })
+            }
+          />
+        </fieldset>
+
         <button>Submit</button>
         <button onClick={reset} type="button">
           Reset

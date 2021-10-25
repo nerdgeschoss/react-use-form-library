@@ -64,11 +64,11 @@ export class FormField<T> {
 
   // CLASS METHODS
   public onChange = (value?: T, disableUpdate?: boolean): void => {
+    this.value = value;
     // Object and not null needs to be checked here for instantation of new field
     if (value !== null && (typeof value === 'object' || this.isNestedObject)) {
       return this.updateFields(value);
     }
-    this.value = value;
     if (!disableUpdate) {
       this.onUpdate();
     }
