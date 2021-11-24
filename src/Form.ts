@@ -70,19 +70,24 @@ export class Form<T> {
     }
     // Touch fields to display errors
     this.touchFields();
+    if (!this.valid) {
+      return;
+    }
     this.updateSubmissionStatus('submitting');
     if (this.handleSubmit) {
       try {
         await this.handleSubmit(this);
         this.updateSubmissionStatus('submitted');
-      } catch (error) {
-        this.error = error;
-        if (this.onSubmitError) {
-          this.onSubmitError(error);
-        } else {
-          throw error;
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.error = error;
+          if (this.onSubmitError) {
+            this.onSubmitError(error);
+          } else {
+            throw error;
+          }
+          this.updateSubmissionStatus('error');
         }
-        this.updateSubmissionStatus('error');
       }
     }
   }

@@ -252,9 +252,9 @@ describe(Form, () => {
   describe('submitting', () => {
     it('prevents the event default', () => {
       const mock = jest.fn();
-      const submitEvent = ({ preventDefault: mock } as unknown) as FormEvent<
-        HTMLFormElement
-      >;
+      const submitEvent = {
+        preventDefault: mock,
+      } as unknown as FormEvent<HTMLFormElement>;
       const form = createForm();
       form.onSubmit(submitEvent);
       expect(mock).toBeCalled();
@@ -265,6 +265,12 @@ describe(Form, () => {
       expect(tracker.submitted).toBeFalsy();
       form.onSubmit();
       expect(tracker.submitted).toBeTruthy();
+    });
+
+    it('does not submit if the fields are not valid', () => {
+      const form = createForm({ validations: { name: 'required' } });
+      form.onSubmit();
+      expect(tracker.submitted).toBeFalsy();
     });
 
     it('touches fields', () => {
@@ -388,7 +394,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: [] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(Array.isArray(emails.fields)).toEqual(true);
       expect(emails.fields?.length).toEqual(0);
@@ -397,7 +403,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: [] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.fields.length).toEqual(0);
       emails.insert('test');
@@ -408,7 +414,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: [] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.fields.length).toEqual(0);
       const newFields = ['test', 'test', 'test'];
@@ -420,7 +426,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails instanceof FieldSet).toBeTruthy();
       expect(emails.fields[0] instanceof FormField).toBeTruthy();
@@ -433,7 +439,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       emails.onChange(['linkedin.com', 'twitter.com']);
       expect(emails.fields[0].value).toEqual('linkedin.com');
@@ -443,7 +449,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: [] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       emails.onChange(['linkedin.com', 'twitter.com']);
       expect(emails.fields[0].value).toEqual('linkedin.com');
@@ -453,7 +459,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       emails.fields[0].onChange('linkedin.com');
       emails.fields[1].onChange('twitter.com');
@@ -465,7 +471,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.fields[0].touched).toEqual(false);
       emails.setTouched(true);
@@ -477,7 +483,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: [] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.fields.length).toEqual(0);
       emails.insert('test');
@@ -493,7 +499,7 @@ describe(Form, () => {
           emails: 'email',
         },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       emails.fields[0].onChange('test');
       expect(emails.fields[0].valid).toEqual(false);
@@ -504,7 +510,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       emails.onChange(['linkedin.com', 'twitter.com']);
       expect(emails.value.length).toEqual(2);
@@ -515,7 +521,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.dirty).toBeFalsy();
       emails.fields[0].onChange('linkedin.com');
@@ -528,7 +534,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.dirty).toBeFalsy();
       emails.insert('instagram.com');
@@ -539,7 +545,7 @@ describe(Form, () => {
       const form = createForm({
         value: { emails: ['google.com', 'facebook.com'] },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.dirty).toBeFalsy();
       emails.fields[0].remove();
@@ -553,7 +559,7 @@ describe(Form, () => {
           emails: 'required',
         },
       });
-      const emails = (form.fields.emails as unknown) as FieldSet<string[]>;
+      const emails = form.fields.emails as unknown as FieldSet<string[]>;
 
       expect(emails.valid).toBeFalsy();
       emails.insert('test');
