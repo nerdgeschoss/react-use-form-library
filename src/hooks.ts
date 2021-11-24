@@ -5,7 +5,7 @@ import { MappedValidation } from './validation';
 
 export interface UseFormProps<T> {
   model: T;
-  handleSubmit?: () => void | Promise<void>;
+  handleSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   validations?: Partial<MappedValidation<T>>;
 }
