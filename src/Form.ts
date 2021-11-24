@@ -71,6 +71,7 @@ export class Form<T> {
     // Touch fields to display errors
     this.touchFields();
     if (!this.valid) {
+      this.cachedOnUpdate();
       return;
     }
     this.updateSubmissionStatus('submitting');
