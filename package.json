@@ -12,7 +12,7 @@
     "build": "yarn build:js && yarn build:types",
     "build:js": "NODE_ENV=production rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:docs": "rm -rf docs && typedoc --out docs --theme minimal src/index.ts",
+    "build:docs": "rm -rf docs && typedoc --out docs src/index.ts",
     "format": "prettier --write \"src/**/*.{ts,css,scss,json,yml}\"",
     "lint": "yarn lint:types && yarn lint:style",
     "lint:types": "tsc --noEmit",
