@@ -29,11 +29,11 @@ Contrary to other solutions that provide you with react components and/or wrappe
 
 ## Installation
 
-Add the library to your project: 
+Add the library to your project:
 
-`yarn add @nerdgeschoss/react-use-form-library` 
+`yarn add @nerdgeschoss/react-use-form-library`
 
-or 
+or
 
 `npm install @nerdgeschoss/react-use-form-library`
 
@@ -326,7 +326,7 @@ If the field is required, the `required-field` error will always be present if t
 
 **Important !!**
 
-If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise it will only be displayed after an `update` event triggered by `onChange`. 
+If you want to immediately display errors based on the touched property, you need to add the `onBlur` event to your input. Otherwise it will only be displayed after an `update` event triggered by `onChange`.
 
 Submitting the form will also "touch" all fields, to make sure errors are displayed if the form is invalid.
 
@@ -561,7 +561,7 @@ If you don't initialize the property in the model and try to access it in your c
 This is because at the moment of field instantiation, the `addField` method within a `Form` (or a `FormField` if it is a nested object) will ask if the model value is actually an Array. It is not possible to **implicitly** determine if the field is array-based only from the type definition.
 
 ```ts
-const { fields } = useForm<{ emails: string[], images: string[] }>({
+const { fields } = useForm<{ emails: string[]; images: string[] }>({
   model: {
     images: [],
   },
@@ -785,9 +785,9 @@ return (
 | validate   | a validation function triggered on every update                                                              |
 | setTouched | takes a boolean and will set the touched state to this value                                                 |
 | reset      | a helper method that resets the field to it's original value                                                 |
-| valid    | a getter that checks if the field has any errors                                                             |
-| dirty    | a getter that compares the current value to the original value passed on instantiation                       |
-| touched  | a touched state, initially false and changed to true when calling onChange/onBlur                            |
+| valid      | a getter that checks if the field has any errors                                                             |
+| dirty      | a getter that compares the current value to the original value passed on instantiation                       |
+| touched    | a touched state, initially false and changed to true when calling onChange/onBlur                            |
 | remove     | Only within a `FieldSet`, it removes the object from the collection                                          |
 
 <p>&nbsp</p>
@@ -803,9 +803,9 @@ These following methods will behave differently if the FormField has nested fiel
 | validate   | It will run validations for all nested fields                                      |
 | setTouched | Takes a booleand and will set every nested field touched property to this value    |
 | reset      | It resets the value of every nested field                                          |
-| touched  | Will be touched when every fields is touched                                       |
-| valid    | Will be valid when every fields is touched                                         |
-| dirty    | Will be valid when at least one field is dirty                                     |
+| touched    | Will be touched when every fields is touched                                       |
+| valid      | Will be valid when every fields is touched                                         |
+| dirty      | Will be valid when at least one field is dirty                                     |
 | fields     | A mapped collection, which has a FormField for every key in the value              |
 
 <p>&nbsp</p>
@@ -822,8 +822,8 @@ These following methods will behave differently if the FormField has nested fiel
 | insert      | It takes a comma separated array of arguments and adds a new FormField for each value                                                                                                              |
 | removeField | It removes a field given an object reference value                                                                                                                                                 |
 | value       | It returns an array with the value of every FormField item                                                                                                                                         |
-| dirty     | Will be true if any item is dirty                                                                                                                                                                  |
-| touched   | Will be true if every item is touched                                                                                                                                                              |
+| dirty       | Will be true if any item is dirty                                                                                                                                                                  |
+| touched     | Will be true if every item is touched                                                                                                                                                              |
 
 <p>&nbsp</p>
 
@@ -838,6 +838,8 @@ Install dependencies with `yarn install`. You can run interactive tests with `ya
 If you work with VSCode, it automatically switches to the correct TS version and formats on save via prettier. There is also an included launch config, so you can run and debug tests.
 
 The [VSCode Jest Extension](https://github.com/jest-community/vscode-jest) is highly recommended as it gives you inline test results, code coverage and debugging right within VSCode (VSCode will automatically prompt you to install this extension).
+
+Releases are done via GitHub Releases. Create a new release there, this will automatically trigger a workflow to publish the package.
 
 <p>&nbsp</p>
 
