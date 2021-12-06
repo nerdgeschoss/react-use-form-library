@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 export function useForceUpdate(): () => void {
-  const [, updateState] = useState(true);
+  const [, updateState] = useState(0);
   return () => {
-    updateState((state) => !state);
+    updateState((state) => state + 1);
   };
 }
 
