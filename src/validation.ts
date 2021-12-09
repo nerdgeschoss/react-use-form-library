@@ -1,26 +1,35 @@
 import { compact } from './util';
 
-type ValidationFunction<T> = (value?: T) => string[] | void;
+type ValidationFunction<T, Model> = (content: {
+  value: T;
+  model: Model;
+}) => string[];
 type ValidationString = 'required' | 'json' | 'email' | 'website' | 'number';
 
-type ValidationType<T> = RegExp | ValidationString | ValidationFunction<T>;
+type ValidationType<T, Model> =
+  | RegExp
+  | ValidationString
+  | ValidationFunction<T, Model>;
 
-export type FieldValidation<T> = ValidationType<T> | ValidationType<T>[];
+export type FieldValidation<T, Model> =
+  | ValidationType<T, Model>
+  | ValidationType<T, Model>[];
 
 export type MappedValidation<T> = Partial<{
-  [P in keyof T]: FieldValidation<T> | MappedValidation<T[P]>;
+  [P in keyof T]: FieldValidation<T, T> | MappedValidation<T[P]>;
 }>;
 
-export function validateValue<T>(
+export function validateValue<T, Model>(
   value: T,
-  validation: FieldValidation<T>
+  model: Model,
+  validation: FieldValidation<T, Model>
 ): string[] {
   // console.log('validate', value, validation);
   if (Array.isArray(value)) {
-    return value.flatMap((e) => validateValue(e, validation));
+    return value.flatMap((e) => validateValue(e, model, validation));
   }
   if (Array.isArray(validation)) {
-    return validation.flatMap((e) => validateValue(value, e));
+    return validation.flatMap((e) => validateValue(value, model, e));
   }
   if (typeof validation === 'string') {
     return compact([runValidationString(value, validation)]);
@@ -31,7 +40,7 @@ export function validateValue<T>(
     }
   }
   if (typeof validation === 'function') {
-    return validation(value) ?? [];
+    return validation({ value, model }) ?? [];
   }
   return [];
 }

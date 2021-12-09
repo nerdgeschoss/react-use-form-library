@@ -43,7 +43,7 @@ interface FieldSet<T> extends Field<T[]> {
 
 type NestedFieldSetField<T> = NestedField<T> & FieldSetField<T>;
 
-export class FieldImplementation<T>
+export class FieldImplementation<T, Model>
   implements NestedField<T>, FieldSetField<T>
 {
   value: T;
@@ -51,11 +51,12 @@ export class FieldImplementation<T>
   focused = false;
   touched = false;
   errors: string[] = [];
-  elements: FieldImplementation<T>[] = [];
+  elements: FieldImplementation<T, Model>[] = [];
 
   #fields: Partial<MappedFields<T>> = {};
   #originalValue: T;
   #validations: MappedValidation<T>;
+  #model: Model;
   #onUpdate: () => void;
   #onRemove?: () => void;
 
@@ -66,15 +67,18 @@ export class FieldImplementation<T>
     validations,
     onUpdate,
     onRemove,
+    model,
   }: {
     value: T;
     onUpdate: () => void;
     validations: MappedValidation<T>;
     onRemove?: () => void;
+    model: Model;
   }) {
     this.value = copy(value);
     this.#originalValue = value;
     this.#validations = validations;
+    this.#model = model;
     if (
       (Array.isArray(validations) &&
         validations.some((e) => e === 'required')) ||
@@ -109,6 +113,7 @@ export class FieldImplementation<T>
               this.#onUpdate();
             },
             validations: this.#validations[key] || {},
+            model: this.#model,
           });
           target[key] = field;
         }
@@ -180,7 +185,7 @@ export class FieldImplementation<T>
       });
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.errors = validateValue(this.value, validations as any);
+      this.errors = validateValue(this.value, this.#model, validations as any);
     }
     this.elements.forEach((e) => e.validate());
   }
@@ -189,9 +194,9 @@ export class FieldImplementation<T>
     return !isEqual(this.value, this.#originalValue);
   }
 
-  private get subfields(): Array<FieldImplementation<unknown>> {
+  private get subfields(): Array<FieldImplementation<unknown, Model>> {
     return this.elements.concat(Object.values(this.#fields)) as Array<
-      FieldImplementation<unknown>
+      FieldImplementation<unknown, Model>
     >;
   }
 
@@ -219,7 +224,7 @@ export class FieldImplementation<T>
     }
   }
 
-  private createFieldSetField(value: T): FieldImplementation<T> {
+  private createFieldSetField(value: T): FieldImplementation<T, Model> {
     const field = new FieldImplementation({
       value,
       onUpdate: () => {
@@ -234,6 +239,7 @@ export class FieldImplementation<T>
         this.elements.splice(index, 1);
         this.#onUpdate();
       },
+      model: this.#model,
     });
     return field;
   }

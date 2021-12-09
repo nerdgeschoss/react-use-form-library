@@ -218,9 +218,10 @@ describe(Form, () => {
 
     it('uses a custom validation function', () => {
       const form = createForm({
-        validations: { name: () => ['custom error'] },
+        value: { age: 12 },
+        validations: { name: ({ model }) => [`custom error: ${model.age}`] },
       });
-      expect(form.fields.name.errors).toEqual(['custom error']);
+      expect(form.fields.name.errors).toEqual(['custom error: 12']);
       expect(form.fields.name.valid).toBeFalsy();
     });
 

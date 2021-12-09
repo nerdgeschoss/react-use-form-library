@@ -11,7 +11,7 @@ export class Form<T> {
   #onUpdate?: () => void;
   #onSubmit?: (form: Form<T>) => void | Promise<void>;
   #onSubmitError: ((error: Error) => void) | undefined;
-  #field: FieldImplementation<T>;
+  #field: FieldImplementation<T, T>;
 
   constructor({
     model,
@@ -27,10 +27,11 @@ export class Form<T> {
     onSubmitError?: (error: Error) => void;
   }) {
     this.#validations = validations ?? {};
-    this.#field = new FieldImplementation<T>({
+    this.#field = new FieldImplementation<T, T>({
       value: model,
       onUpdate: this.onUpdate.bind(this),
       validations: this.#validations,
+      model,
     });
     this.validate(); // called before assigning the callbacks so the outside world is not called during initialization
     this.#onUpdate = onUpdate;
