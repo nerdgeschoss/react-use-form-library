@@ -164,6 +164,7 @@ export class FieldImplementation<T>
         this.fields[key].validate();
       });
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.errors = validateValue(this.value, validations as any);
     }
     this.elements.forEach((e) => e.validate());
@@ -174,7 +175,6 @@ export class FieldImplementation<T>
   }
 
   get dirty(): boolean {
-    // console.log('check', this.value, this.#originalValue);
     return !isEqual(this.value, this.#originalValue);
   }
 

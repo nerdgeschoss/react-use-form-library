@@ -1,11 +1,12 @@
 import { useForceUpdate } from './util';
 import { useRef } from 'react';
-import { Form, MappedFields, SubmissionStatus } from './Form';
+import { Form, SubmissionStatus } from './form';
 import { MappedValidation } from './validation';
+import { MappedFields } from './field';
 
 export interface UseFormProps<T> {
   model: T;
-  handleSubmit?: (form: Form<T>) => void | Promise<void>;
+  onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   validations?: Partial<MappedValidation<T>>;
 }
@@ -17,12 +18,11 @@ export interface FormModel<T> {
   changes: Partial<T>;
   dirty: boolean;
   valid: boolean;
-  canSubmit: boolean;
   submissionStatus: SubmissionStatus;
   validations?: Partial<MappedValidation<T>>;
   error?: Error;
   updateFields: (model: Partial<T>) => void;
-  onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (event?: Event) => void;
   reset: () => void;
   resetError: () => void;
   handleSubmit?: (form: Form<T>) => void | Promise<void>;
@@ -31,27 +31,23 @@ export interface FormModel<T> {
 // The actual hook
 export function useForm<T>({
   model,
-  handleSubmit,
+  onSubmit,
   onSubmitError,
   validations,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
-  // Saving the form in a ref, to have only 1 instance throghout the lifetime of the hook
-  const formRef = useRef<Form<T> | null>(null);
-  if (!formRef.current) {
-    formRef.current = new Form({
+  const formRef = useRef<Form<T>>(
+    new Form({
       model,
       onUpdate,
       validations,
-      handleSubmit,
+      onSubmit,
       onSubmitError,
-    });
-  }
+    })
+  );
 
   const form = formRef.current;
-  // If the submit function depends on the model, it needs to be updated on each re render to take the updated model
-  form.handleSubmit = handleSubmit;
 
   return {
     model: form.model,
@@ -59,7 +55,6 @@ export function useForm<T>({
     changes: form.changes,
     dirty: form.dirty,
     valid: form.valid,
-    canSubmit: form.canSubmit,
     error: form.error,
     submissionStatus: form.submissionStatus,
     updateFields: form.updateFields.bind(form),

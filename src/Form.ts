@@ -108,6 +108,7 @@ export class Form<T> {
     for (const key in this.fields) {
       const field = this.fields[key];
       if (field.dirty) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         changes[key] = field.value as any;
       }
     }
