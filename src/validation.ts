@@ -1,35 +1,48 @@
-export type ValidationFunction<T> = (value?: T) => string[] | void;
-export type ValidationStrings =
-  | 'required'
-  | 'json'
-  | 'email'
-  | 'website'
-  | 'number';
+import { compact } from './util';
 
-export type ValidationType<T> =
-  | RegExp
-  | ValidationStrings
-  | ValidationFunction<T>;
+type ValidationFunction<T> = (value?: T) => string[] | void;
+type ValidationString = 'required' | 'json' | 'email' | 'website' | 'number';
+
+type ValidationType<T> = RegExp | ValidationString | ValidationFunction<T>;
 
 export type FieldValidation<T> = ValidationType<T> | ValidationType<T>[];
 
-export type MappedValidation<T> = {
+export type MappedValidation<T> = Partial<{
   [P in keyof T]: FieldValidation<T> | MappedValidation<T[P]>;
-};
+}>;
 
-export function validateValue<T>({
-  value,
-  type,
-}: {
-  value?: T;
-  type: ValidationStrings;
-}): string | undefined {
+export function validateValue<T>(
+  value: T,
+  validation: FieldValidation<T>
+): string[] {
+  // console.log('validate', value, validation);
+  if (Array.isArray(value)) {
+    return value.flatMap((e) => validateValue(e, validation));
+  }
+  if (Array.isArray(validation)) {
+    return validation.flatMap((e) => validateValue(value, e));
+  }
+  if (typeof validation === 'string') {
+    return compact([runValidationString(value, validation)]);
+  }
+  if (validation instanceof RegExp) {
+    if (!validation.test(String(value))) {
+      return ['regex-failed'];
+    }
+  }
+  if (typeof validation === 'function') {
+    return validation(value) ?? [];
+  }
+  return [];
+}
+
+function runValidationString<T>(
+  value: T,
+  type: ValidationString
+): string | undefined {
   switch (type) {
     case 'required':
       if (typeof value === 'string' && !value) {
-        return 'required-field';
-      }
-      if (value === undefined || value === null) {
         return 'required-field';
       }
       break;

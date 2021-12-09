@@ -7,8 +7,8 @@ export function useForceUpdate(): () => void {
   };
 }
 
-export function isEmpty(value: object): boolean {
-  return !Object.keys(value).length;
+export function isEqual<T>(a: T, b: T): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export function uniq(value: string[]): string[] {
@@ -17,4 +17,13 @@ export function uniq(value: string[]): string[] {
 
 export function compact<T>(array: Array<T | undefined | false | null>): T[] {
   return array.filter(Boolean) as T[];
+}
+
+export function copy<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.slice() as unknown as T;
+  } else if (value && typeof value === 'object') {
+    return { ...value };
+  }
+  return value;
 }

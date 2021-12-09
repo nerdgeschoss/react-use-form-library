@@ -4,6 +4,40 @@ import { useForm } from '../src/index';
 import { Input } from './components/Input';
 import { NumberInput } from './components/NumberInput';
 
+interface Model {
+  name: string;
+  age?: number;
+  emails: string[];
+  address?: {
+    streetName?: string;
+    streetNumber?: number;
+  };
+  images: Array<{
+    id: string | number;
+    tags?: string[];
+    url?: string;
+  }>;
+  avatar?: {
+    url: string;
+  } | null;
+  simpleObject?: {
+    value: string;
+    label: string;
+  };
+}
+
+const initialValue: Model = {
+  name: '',
+  emails: [],
+  images: [
+    {
+      id: '1',
+      url: '',
+      tags: ['asd'],
+    },
+  ],
+};
+
 function App(): JSX.Element {
   const {
     model,
@@ -14,43 +48,10 @@ function App(): JSX.Element {
     dirty,
     submissionStatus,
     reset,
-  } = useForm<{
-    name: string;
-    age?: number;
-    emails: string[];
-    address?: {
-      streetName?: string;
-      streetNumber?: number;
-    };
-    images: Array<{
-      id: string | number;
-      tags?: string[];
-      url?: string;
-    }>;
-    avatar?: {
-      url: string;
-    } | null;
-    simpleObject?: {
-      value: string;
-      label: string;
-    };
-  }>({
-    model: {
-      name: '',
-      emails: [],
-      images: [
-        {
-          id: '1',
-          url: '',
-          tags: ['asd'],
-        },
-      ],
-    },
-    handleSubmit: async () => {
-      if (!valid) {
-        throw new Error('fields are not valid');
-      }
-      // eslint-disable-next-line
+  } = useForm({
+    model: initialValue,
+    onSubmit: async ({ model }) => {
+      // eslint-disable-next-line no-console
       console.log(model);
     },
     validations: {
@@ -63,12 +64,7 @@ function App(): JSX.Element {
   return (
     <>
       <h2>Form</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit(e);
-        }}
-      >
+      <form onSubmit={onSubmit}>
         <fieldset>
           <legend>Simple fields</legend>
           <Input label="Name: " {...fields.name} />
@@ -76,7 +72,7 @@ function App(): JSX.Element {
         </fieldset>
         <fieldset>
           <legend>Array fields</legend>
-          {fields.emails.fields.map((field, index) => {
+          {fields.emails.elements.map((field, index) => {
             return (
               <Input
                 label="Email"
@@ -87,20 +83,20 @@ function App(): JSX.Element {
             );
           })}
           <footer>
-            <button type="button" onClick={() => fields.emails.insert('')}>
+            <button type="button" onClick={() => fields.emails.add('')}>
               Add email
             </button>
           </footer>
         </fieldset>
         <fieldset>
           <legend>Images</legend>
-          {fields.images.fields.map((field, index) => {
+          {fields.images.elements.map((field, index) => {
             return (
               <fieldset key={index}>
                 <legend>Image:</legend>
                 <div>
                   <Input label="Image URL: " {...field.fields.url} />
-                  {field.fields.tags.fields.map((field2, index) => {
+                  {field.fields.tags.elements.map((field2, index) => {
                     return (
                       <Input
                         key={index}
@@ -112,7 +108,7 @@ function App(): JSX.Element {
                   })}
                   <button
                     type="button"
-                    onClick={() => field.fields.tags.insert('')}
+                    onClick={() => field.fields.tags.add('')}
                   >
                     Add Tag
                   </button>
@@ -130,8 +126,8 @@ function App(): JSX.Element {
             <button
               type="button"
               onClick={() =>
-                fields.images.insert({
-                  id: fields.images.fields.length,
+                fields.images.add({
+                  id: fields.images.elements.length,
                   tags: ['one', 'two'],
                 })
               }

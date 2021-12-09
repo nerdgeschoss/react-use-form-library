@@ -41,23 +41,23 @@ or
 
 [Codepen](https://codepen.io/falkonpunch/pen/oNzyvQG)
 
-To initialize the hook you will need to supply a valid `model` object and a custom `handleSubmit` function.
+To initialize the hook you will need to supply a valid `model` object and a custom `onSubmit` function.
 
 The three main fields you get from the hook are `model`, `fields` and `onSubmit`.
 
 - `model` is the updated object which will contain the modified fields.
 - `fields` is an object in which each key will be generated from properties of the original model you supplied to the hook.
-- `onSubmit` is the handler you can provide to the `<form>` element. It will call `preventDefault` internally and execute the function provided to the hook as `handleSubmit`
+- `onSubmit` is the handler you can provide to the `<form>` element. It will call `preventDefault` internally and execute the function provided to the hook as `onSubmit`
 
 ```ts
 import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  const { fields, onSubmit } = useForm({
     model: {
       name: '',
     },
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
   });
@@ -88,10 +88,10 @@ You don't need to explicitly enumerate all properties in your model, the library
 import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  const { fields, onSubmit } = useForm({
     // You can supply an empty object
     model: {},
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
   });
@@ -116,9 +116,9 @@ If you use Typescript you will have to supply the interface for your model
 
 ```ts
 // ...
-const { model, fields, onSubmit } = useForm<{ name: string; phone: number }>({
+const { model, fields, onSubmit } = useForm<{ name?: string; phone?: number }>({
   model: {},
-  handleSubmit: async () => {
+  onSubmit: async () => {
     console.log(model);
   },
 });
@@ -198,7 +198,7 @@ const { model, fields, onSubmit, valid } = useForm({
 
 [Codepen](https://codepen.io/falkonpunch/pen/jOMKMxz?editors=0010)
 
-The hook also exposes another method: `onSubmitError`, which is handy if you don't want to use a try/catch in your `handleSubmit` function.
+The hook also exposes another method: `onSubmitError`, which is handy if you don't want to use a try/catch in your `onSubmit` function.
 
 ```ts
 const { model, fields, onSubmit, valid } = useForm({
@@ -206,7 +206,7 @@ const { model, fields, onSubmit, valid } = useForm({
     name: '',
     phone: '',
   },
-  handleSubmit: async () => {
+  onSubmit: async () => {
     throw new Error('submit error');
   },
   onSubmitError: (error) => {
@@ -231,7 +231,7 @@ There are several properties exposed from the hook to deal with the state throug
 | ---------------- | ------------------------------------------------------------------------------------------------------ |
 | dirty            | A boolean value indicating that one or more fields have been changed                                   |
 | valid            | A boolean indicating that the form is valid or not, this one depends on the validation rules provided. |
-| error            | any error thrown within the handleSubmit function is stored here as an error object                    |
+| error            | any error thrown within the onSubmit function is stored here as an error object                        |
 | submissionStatus | Displays the current status of the submission process                                                  |
 
 <p>&nbsp</p>
@@ -392,26 +392,21 @@ When instantiated, a field will store it's original value in a variable. This ge
 import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 export function MyForm({ isNewItem, addItem, updateItem }: Props): JSX.Element => {
-  const { model, changes, reset, fields, dirty, valid, onSubmit, submissionStatus } = useForm({
+  const { fields, onSubmit, submissionStatus } = useForm({
     model: {
       name: '',
       age: 25,
     },
-    handleSubmit: async () => {
-      if (valid) {
-        if (isNewItem) {
-          // You can use here the updated model, which includes the original model and any changes made
-          await addItem(model);
-        } else {
-          // For updating, you can use only the changes that were made
-          await updateItem(changes);
-        }
-        // If you need to clear the fields, you can call on reset form
-        reset();
+    onSubmit: async ({model, changes, reset}) => {
+      if (isNewItem) {
+        // You can use here the updated model, which includes the original model and any changes made
+        await addItem(model);
       } else {
-        // throw custom errors
-        throw new Error('invalid form');
+        // For updating, you can use only the changes that were made
+        await updateItem(changes);
       }
+      // If you need to clear the fields, you can call on reset form
+      reset();
     },
     // Handle any errors
     onSubmitError: (error) => {
@@ -458,13 +453,13 @@ Each FormField object is also able to contain fields. It behaves similarly to th
 import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  const { fields, onSubmit } = useForm({
     model: {
       address: {
         streetName: '',
       },
     },
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
   });
@@ -489,13 +484,13 @@ Validations also work with nested objects
 import { useForm } from '@nerdgeschoss/react-use-form-library';
 
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  const { fields, onSubmit } = useForm({
     model: {
       address: {
         streetName: '',
       },
     },
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
     validations: {
@@ -515,15 +510,15 @@ explicitely declaring them
 function App(): JSX.Element {
   /* If you use Typescript you have to define the model interface, otherwise you'll get an error
   while trying to access the nested properties */
-  const { model, fields, onSubmit } = useForm<{
-    bankDetails: {
-      address: {
+  const { fields, onSubmit } = useForm<{
+    bankDetails?: {
+      address?: {
         screetName: string;
       };
     };
   }>({
     model: {},
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
   });
@@ -531,9 +526,9 @@ function App(): JSX.Element {
   return (
     <form onSubmit={onSubmit}>
       <input
-        value={fields.bankDetails.fields?.address.fields?.streetName.value}
+        value={fields.bankDetails.fields.address.fields.streetName.value}
         onChange={(v) =>
-          fields.bankDetails.fields?.address.fields?.streetName.onChange(
+          fields.bankDetails.fields.address.fields.streetName.onChange(
             v.target.value
           )
         }
@@ -571,26 +566,26 @@ return (
   <form onSubmit={onSubmit}>
     /* This will result in an error because emails has been instantiated as a
     FormField not as a FieldSet */
-    {fields.emails.fields.map((field) => {
+    {fields.emails.elements.map((field) => {
       // ...
     })}
     /* This will work as intented */
-    {fields.images.fields.map((field) => {
+    {fields.images.elements.map((field) => {
       // ...
     })}
   </form>
 );
 ```
 
-The `FieldSet` object has a `fields` property, which is an array of `FormField` (more in the [API](#fieldset-1))
+The `FieldSet` object has a `elements` property, which is an array of `FormField` (more in the [API](#fieldset-1))
 
 ```ts
 function App(): JSX.Element {
-  const { model, fields, onSubmit } = useForm({
+  const { fields, onSubmit } = useForm({
     model: {
       emails: ['example@email.com'],
     },
-    handleSubmit: async () => {
+    onSubmit: async ({ model }) => {
       console.log(model);
     },
   });
@@ -612,7 +607,7 @@ function App(): JSX.Element {
         );
       })}
       // FieldSet also has an insert method to create new items
-      <button onClick={() => fields.emails.insert('')}>Add Field</button>
+      <button onClick={() => fields.emails.add('')}>Add Field</button>
       <button>Submit</button>
     </form>
   );
@@ -621,31 +616,9 @@ function App(): JSX.Element {
 
 <p>&nbsp</p>
 
-### Adding Items
-
-The `insert` can be called with one or more items.
-
-```ts
-// simple value
-<button onClick={() => fields.emails.insert('example@email.com')}>Add Field</button>
-// Multiple Fields
-<button onClick={() => fields.emails.insert('example@email.com', '', 'another-example@email.com')}>Add Field</button>
-```
-
-**Important !!**
-
-`insert` takes a comma separated array of parameters, if you would like to pass an array you will need to destructure it.
-
-```ts
-const newValues = ['example@email.com', '', 'another-example@emal.com'];
-<button onClick={() => fields.emails.insert(...newValues)}
-```
-
-<p>&nbsp</p>
-
 ### Removing Items
 
-`FormField` objects inside a `FieldSet` include a `remove` method, that compares the instance with the items in the `fields` collection inside `FieldSet` and filters it out.
+`FormField` objects inside a `FieldSet` include a `remove` method to remove the corresponding element..
 
 ```ts
 <button onClick={() => fields.emails.fields[0].remove()}>remove</button>
@@ -659,7 +632,7 @@ A `FieldSet` takes the same kind of validation as any other field. On instantiat
 be further applied to any new field created.
 
 ```ts
-const { model, fields, onSubmit, valid } = useForm({
+useForm({
   model: {
     // Initialize the field
     emails: [],
@@ -674,7 +647,7 @@ const { model, fields, onSubmit, valid } = useForm({
 If the validation is of the type `required`, it will also make the field invalid unless it has at least one element.
 
 ```ts
-const { model, fields, onSubmit, valid } = useForm({
+useForm({
   model: {
     // emails.valid will be false because we're initializing it with no elements.
     emails: [],
@@ -692,10 +665,10 @@ const { model, fields, onSubmit, valid } = useForm({
 A common escenario would be to have an array of objects in your model.
 
 ```ts
-const { model, fields, onSubmit, valid } = useForm<{
+const { fields, onSubmit } = useForm<{
   images: Array<{
     id: string;
-    url: string;
+    url?: string;
   }>;
 }>({
   model: {
@@ -748,7 +721,7 @@ return (
 | Property      | Details                                                                                                          |
 | ------------- | ---------------------------------------------------------------------------------------------------------------- |
 | model         | Your form model, it should be an object (can be empty). Every property will be mapped into a field.              |
-| handleSubmit  | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
+| onSubmit      | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
 | onSubmitError | A useful handler to deal with errors.                                                                            |
 | validations   | A validations object.                                                                                            |
 
@@ -763,7 +736,7 @@ return (
 | fields     | A mapped collection, which has a FormField for every key in the model |
 | dirty      | a getter checking if there are any changes                            |
 | valid      | a getter checking if all **required** fields are valid                |
-| onSubmit   | a method that triggers the function passed as handleSubmit param.     |
+| onSubmit   | a method that triggers the function passed as onSubmit param.         |
 | submitting | a loading state for the onSubmit method                               |
 | reset      | this helper method will reset every field to it's original value      |
 
