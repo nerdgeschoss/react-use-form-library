@@ -219,10 +219,15 @@ describe(Form, () => {
     it('uses a custom validation function', () => {
       const form = createForm({
         value: { age: 12 },
-        validations: { name: ({ model }) => [`custom error: ${model.age}`] },
+        validations: {
+          age: ({ model }) => (model.age < 18 ? ['too young'] : []),
+        },
       });
-      expect(form.fields.name.errors).toEqual(['custom error: 12']);
-      expect(form.fields.name.valid).toBeFalsy();
+      expect(form.fields.age.errors).toEqual(['too young']);
+      expect(form.fields.age.valid).toBeFalsy();
+      form.fields.age.onChange(20);
+      expect(form.fields.age.errors).toEqual([]);
+      expect(form.fields.age.valid).toBeTruthy();
     });
 
     it('uses a custom regex for validation', () => {

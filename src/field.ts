@@ -56,7 +56,7 @@ export class FieldImplementation<T, Model>
   #fields: Partial<MappedFields<T>> = {};
   #originalValue: T;
   #validations: MappedValidation<T>;
-  #model: Model;
+  #getModel: () => Model;
   #onUpdate: () => void;
   #onRemove?: () => void;
 
@@ -67,18 +67,18 @@ export class FieldImplementation<T, Model>
     validations,
     onUpdate,
     onRemove,
-    model,
+    getModel,
   }: {
     value: T;
     onUpdate: () => void;
     validations: MappedValidation<T>;
     onRemove?: () => void;
-    model: Model;
+    getModel: () => Model;
   }) {
     this.value = copy(value);
     this.#originalValue = value;
     this.#validations = validations;
-    this.#model = model;
+    this.#getModel = getModel;
     if (
       (Array.isArray(validations) &&
         validations.some((e) => e === 'required')) ||
@@ -113,7 +113,7 @@ export class FieldImplementation<T, Model>
               this.#onUpdate();
             },
             validations: this.#validations[key] || {},
-            model: this.#model,
+            getModel: this.#getModel,
           });
           target[key] = field;
         }
@@ -184,8 +184,12 @@ export class FieldImplementation<T, Model>
         this.fields[key].validate();
       });
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.errors = validateValue(this.value, this.#model, validations as any);
+      this.errors = validateValue(
+        this.value,
+        this.#getModel(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        validations as any
+      );
     }
     this.elements.forEach((e) => e.validate());
   }
@@ -239,7 +243,7 @@ export class FieldImplementation<T, Model>
         this.elements.splice(index, 1);
         this.#onUpdate();
       },
-      model: this.#model,
+      getModel: this.#getModel,
     });
     return field;
   }

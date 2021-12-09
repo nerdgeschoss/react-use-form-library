@@ -31,7 +31,7 @@ export class Form<T> {
       value: model,
       onUpdate: this.onUpdate.bind(this),
       validations: this.#validations,
-      model,
+      getModel: () => this.model,
     });
     this.validate(); // called before assigning the callbacks so the outside world is not called during initialization
     this.#onUpdate = onUpdate;
