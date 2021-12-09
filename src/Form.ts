@@ -45,7 +45,7 @@ export class Form<T> {
 
   // onSubmit method is a wrapper around the handleSubmit param passed to the constructor.
   // It handles the loading state and executes the handleSubmit function if it is defined.
-  async onSubmit(e?: Event): Promise<void> {
+  async onSubmit(e?: { preventDefault: () => void }): Promise<void> {
     e?.preventDefault();
 
     this.touch();

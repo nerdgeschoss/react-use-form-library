@@ -22,10 +22,9 @@ export interface FormModel<T> {
   validations?: Partial<MappedValidation<T>>;
   error?: Error;
   updateFields: (model: Partial<T>) => void;
-  onSubmit: (event?: Event) => void;
+  onSubmit: Form<T>['onSubmit'];
   reset: () => void;
   resetError: () => void;
-  handleSubmit?: (form: Form<T>) => void | Promise<void>;
 }
 
 // The actual hook

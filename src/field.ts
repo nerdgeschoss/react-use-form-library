@@ -37,9 +37,11 @@ interface FieldSetField<T> extends Field<T> {
 }
 
 interface FieldSet<T> extends Field<T[]> {
-  get elements(): Array<FieldSetField<T>>;
+  get elements(): Array<NestedFieldSetField<T>>;
   add: (element: T) => void;
 }
+
+type NestedFieldSetField<T> = NestedField<T> & FieldSetField<T>;
 
 export class FieldImplementation<T>
   implements NestedField<T>, FieldSetField<T>
@@ -56,6 +58,8 @@ export class FieldImplementation<T>
   #validations: MappedValidation<T>;
   #onUpdate: () => void;
   #onRemove?: () => void;
+
+  declare valid: boolean;
 
   constructor({
     value,
@@ -81,9 +85,20 @@ export class FieldImplementation<T>
     this.createSubfields();
     this.#onUpdate = onUpdate;
     this.#onRemove = onRemove;
+
+    Object.defineProperty(this, 'valid', {
+      enumerable: true,
+      get: () => {
+        return this.errors.length === 0 && this.subfields.every((e) => e.valid);
+      },
+    });
   }
 
   get fields(): MappedFields<T> {
+    if (!this.value) {
+      this.value = {} as T;
+      this.#onUpdate();
+    }
     const handler = {
       get: (target: MappedFields<T>, key: string) => {
         if (!target[key]) {
@@ -129,7 +144,7 @@ export class FieldImplementation<T>
     this.#onUpdate();
   }
 
-  onChange(value: T): void {
+  onChange = (value: T): void => {
     this.value = value;
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
@@ -144,18 +159,18 @@ export class FieldImplementation<T>
       }
     }
     this.#onUpdate();
-  }
+  };
 
-  onFocus(): void {
+  onFocus: () => void = () => {
     this.focused = true;
     this.#onUpdate();
-  }
+  };
 
-  onBlur(): void {
+  onBlur: () => void = () => {
     this.focused = false;
     this.touched = true;
     this.#onUpdate();
-  }
+  };
 
   validate(): void {
     const validations = this.#validations;
@@ -170,16 +185,14 @@ export class FieldImplementation<T>
     this.elements.forEach((e) => e.validate());
   }
 
-  get valid(): boolean {
-    return this.errors.length === 0 && this.subfields.every((e) => e.valid);
-  }
-
   get dirty(): boolean {
     return !isEqual(this.value, this.#originalValue);
   }
 
   private get subfields(): Array<FieldImplementation<unknown>> {
-    return this.elements.concat(Object.values(this.#fields));
+    return this.elements.concat(Object.values(this.#fields)) as Array<
+      FieldImplementation<unknown>
+    >;
   }
 
   private get isNestedValidation(): boolean {
