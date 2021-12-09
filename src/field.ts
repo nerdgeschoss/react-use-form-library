@@ -7,8 +7,8 @@ get back a FormField type */
 export type MappedFields<T> = {
   [P in keyof Required<T>]: T[P] extends unknown[]
     ? FieldSet<T[P][0]>
-    : T[P] extends Record<string, unknown>
-    ? NestedField<T[P]>
+    : T[P] extends Record<string, unknown> | undefined | null
+    ? NestedField<NonNullable<T[P]>>
     : Field<T[P]>;
 };
 

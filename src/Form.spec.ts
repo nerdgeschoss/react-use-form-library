@@ -33,6 +33,9 @@ interface Model {
     streetName?: string;
     streetNumber?: number;
   };
+  optionalContent?: {
+    name?: string;
+  };
   hobbies: Array<{ name: string }>;
 }
 
@@ -97,6 +100,12 @@ describe(Form, () => {
       expect(form2.fields.nullableValue.value).toBeNull();
       form2.fields.nullableValue.onChange('test');
       expect(form2.fields.nullableValue.value).toBe('test');
+    });
+    it('creates optional content by accessing it', () => {
+      const form = createForm();
+      expect(form.model.optionalContent).toBeUndefined();
+      expect(form.fields.optionalContent.fields.name.value).toBeUndefined();
+      expect(form.model.optionalContent).not.toBeUndefined();
     });
   });
 
