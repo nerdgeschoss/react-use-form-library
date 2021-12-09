@@ -297,27 +297,27 @@ describe(Form, () => {
         preventDefault: mock,
       } as unknown as Event;
       const form = createForm();
-      form.onSubmit(submitEvent);
+      form.submit(submitEvent);
       expect(mock).toBeCalled();
     });
 
     it('invokes the submit handler if all fields are valid', () => {
       const form = createForm();
       expect(tracker.submitted).toBeFalsy();
-      form.onSubmit();
+      form.submit();
       expect(tracker.submitted).toBeTruthy();
     });
 
     it('does not submit if the fields are not valid', () => {
       const form = createForm({ validations: { name: 'required' } });
-      form.onSubmit();
+      form.submit();
       expect(tracker.submitted).toBeFalsy();
     });
 
     it('touches fields', () => {
       const form = createForm();
       expect(form.fields.name.touched).toBeFalsy();
-      form.onSubmit();
+      form.submit();
       expect(form.fields.name.touched).toBeTruthy();
     });
 
@@ -328,7 +328,7 @@ describe(Form, () => {
         },
       });
       expect(form2.fields.nullableValue.value).toBeNull();
-      await form2.onSubmit();
+      await form2.submit();
     });
 
     it('handles async functions', async () => {
@@ -338,7 +338,7 @@ describe(Form, () => {
         },
       });
       expect(form.submissionStatus).toBe('idle');
-      await form.onSubmit();
+      await form.submit();
       expect(form.submissionStatus).toBe('submitted');
     });
 
@@ -353,7 +353,7 @@ describe(Form, () => {
           error = e;
         },
       });
-      await form.onSubmit();
+      await form.submit();
       expect(form.submissionStatus).toBe('error');
       expect(form.error).toBeTruthy();
       // Custom error handling
@@ -379,7 +379,7 @@ describe(Form, () => {
           // do nothing;
         },
       });
-      await form.onSubmit();
+      await form.submit();
       // Reset error
       form.resetError();
       expect(form.submissionStatus).toBe('idle');
@@ -401,7 +401,7 @@ describe(Form, () => {
     it('resets to idle if there are new changes after submitted', async () => {
       const form = createForm({});
       expect(form.submissionStatus).toEqual('idle');
-      await form.onSubmit();
+      await form.submit();
       expect(form.submissionStatus).toEqual('submitted');
       form.fields.name.onChange('test');
       expect(form.submissionStatus).toEqual('idle');
@@ -415,7 +415,7 @@ describe(Form, () => {
           // do nothing;
         },
       });
-      await form.onSubmit();
+      await form.submit();
       expect(form.submissionStatus).toBe('error');
       form.fields.name.onChange('test');
       expect(form.submissionStatus).toEqual('idle');

@@ -22,7 +22,7 @@ export interface FormModel<T> {
   validations?: Partial<MappedValidation<T>>;
   error?: Error;
   updateFields: (model: Partial<T>) => void;
-  onSubmit: Form<T>['onSubmit'];
+  onSubmit: Form<T>['submit'];
   reset: () => void;
   resetError: () => void;
 }
@@ -47,6 +47,8 @@ export function useForm<T>({
   );
 
   const form = formRef.current;
+  form.onSubmit = onSubmit;
+  form.onSubmitError = onSubmitError;
 
   return {
     model: form.model,
@@ -57,7 +59,7 @@ export function useForm<T>({
     error: form.error,
     submissionStatus: form.submissionStatus,
     updateFields: form.updateFields.bind(form),
-    onSubmit: form.onSubmit.bind(form),
+    onSubmit: form.submit.bind(form),
     reset: form.reset.bind(form),
     resetError: form.resetError.bind(form),
   };

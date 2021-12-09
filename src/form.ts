@@ -6,11 +6,11 @@ export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
 export class Form<T> {
   error: Error | undefined;
   submissionStatus: SubmissionStatus = 'idle';
+  onSubmit?: (form: Form<T>) => void | Promise<void>;
+  onSubmitError: ((error: Error) => void) | undefined;
 
   #validations: MappedValidation<T>;
   #onUpdate?: () => void;
-  #onSubmit?: (form: Form<T>) => void | Promise<void>;
-  #onSubmitError: ((error: Error) => void) | undefined;
   #field: FieldImplementation<T, T>;
 
   constructor({
@@ -35,8 +35,8 @@ export class Form<T> {
     });
     this.validate(); // called before assigning the callbacks so the outside world is not called during initialization
     this.#onUpdate = onUpdate;
-    this.#onSubmit = onSubmit;
-    this.#onSubmitError = onSubmitError;
+    this.onSubmit = onSubmit;
+    this.onSubmitError = onSubmitError;
   }
 
   // This method will touch every field, for the purpose of displaying the errors in the view
@@ -46,7 +46,7 @@ export class Form<T> {
 
   // onSubmit method is a wrapper around the handleSubmit param passed to the constructor.
   // It handles the loading state and executes the handleSubmit function if it is defined.
-  async onSubmit(e?: { preventDefault: () => void }): Promise<void> {
+  async submit(e?: { preventDefault: () => void }): Promise<void> {
     e?.preventDefault();
 
     this.touch();
@@ -56,9 +56,9 @@ export class Form<T> {
     }
     this.submissionStatus = 'submitting';
     this.#onUpdate?.();
-    if (this.#onSubmit) {
+    if (this.onSubmit) {
       try {
-        await this.#onSubmit(this);
+        await this.onSubmit(this);
         this.submissionStatus = 'submitted';
         this.#onUpdate?.();
       } catch (error: unknown) {
@@ -66,8 +66,8 @@ export class Form<T> {
           this.error = error;
           this.submissionStatus = 'error';
           this.#onUpdate?.();
-          if (this.#onSubmitError) {
-            this.#onSubmitError(error);
+          if (this.onSubmitError) {
+            this.onSubmitError(error);
           } else {
             throw error;
           }
