@@ -1,155 +1,109 @@
-import { FormField } from './FormField';
 import { MappedValidation } from './validation';
-import { FieldSet } from './FieldSet';
-import { isEmpty } from './util';
-
-/* This type is used to take a model, parse it an return a different type
-for each field. In this case, for each field of T, string | number you
-get back a FormField type */
-export type MappedFields<T> = {
-  // Here we are only checking if T[P] is actually an array
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [P in keyof Required<T>]: T[P] extends any[]
-    ? FieldSet<T[P]>
-    : FormField<T[P]>;
-};
+import { Field, FieldImplementation, MappedFields } from './field';
 
 export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
 
 export class Form<T> {
-  // CLASS PROPERTIES
-  // Original model
-  private originalModel: T;
-  // Cached fields created with addField().
-  private cachedFields = {} as MappedFields<T>;
-  // OnUpdate function used to update the view after any changes
-  private cachedOnUpdate: () => void;
-  // Form submit function
-  public handleSubmit: ((form: Form<T>) => void | Promise<void>) | undefined;
-  // Loading state for submit function
-  public submissionStatus: SubmissionStatus = 'idle';
-  // Validations object
-  private validations?: Partial<MappedValidation<T>>;
-  // Error handling
-  public error: Error | undefined;
-  // Function for custom error handling
-  public onSubmitError: ((error: Error) => void) | undefined;
+  error: Error | undefined;
+  submissionStatus: SubmissionStatus = 'idle';
+
+  #validations: MappedValidation<T>;
+  #onUpdate?: () => void;
+  #onSubmit?: (form: Form<T>) => void | Promise<void>;
+  #onSubmitError: ((error: Error) => void) | undefined;
+  #field: FieldImplementation<T>;
 
   constructor({
     model,
     onUpdate,
     validations,
-    handleSubmit,
+    onSubmit,
     onSubmitError,
   }: {
     model: T;
-    onUpdate: () => void;
-    validations?: Partial<MappedValidation<T>>;
-    handleSubmit?: (form: Form<T>) => void | Promise<void>;
+    validations?: MappedValidation<T>;
+    onUpdate?: () => void;
+    onSubmit?: (form: Form<T>) => void | Promise<void>;
     onSubmitError?: (error: Error) => void;
   }) {
-    this.originalModel = model;
-    this.cachedOnUpdate = onUpdate;
-    this.validations = validations;
-    this.handleSubmit = handleSubmit;
-    this.onSubmitError = onSubmitError;
+    this.#validations = validations ?? {};
+    this.#field = new FieldImplementation<T>({
+      value: model,
+      onUpdate: this.onUpdate.bind(this),
+      validations: this.#validations,
+    });
+    this.validate(); // called before assigning the callbacks so the outside world is not called during initialization
+    this.#onUpdate = onUpdate;
+    this.#onSubmit = onSubmit;
+    this.#onSubmitError = onSubmitError;
   }
 
   // This method will touch every field, for the purpose of displaying the errors in the view
-  public touchFields(): void {
-    for (const key in this.fields) {
-      this.fields[key].setTouched(true);
-    }
+  touch(): void {
+    this.#field.touch();
   }
 
   // onSubmit method is a wrapper around the handleSubmit param passed to the constructor.
   // It handles the loading state and executes the handleSubmit function if it is defined.
-  public async onSubmit(e?: React.FormEvent<HTMLFormElement>): Promise<void> {
-    if (e) {
-      e.preventDefault();
-    }
-    // Touch fields to display errors
-    this.touchFields();
-    if (!this.valid) {
-      this.cachedOnUpdate();
+  async onSubmit(e?: Event): Promise<void> {
+    e?.preventDefault();
+
+    this.touch();
+    if (!this.#field.valid) {
+      this.#onUpdate?.();
       return;
     }
-    this.updateSubmissionStatus('submitting');
-    if (this.handleSubmit) {
+    this.submissionStatus = 'submitting';
+    this.#onUpdate?.();
+    if (this.#onSubmit) {
       try {
-        await this.handleSubmit(this);
-        this.updateSubmissionStatus('submitted');
+        await this.#onSubmit(this);
+        this.submissionStatus = 'submitted';
+        this.#onUpdate?.();
       } catch (error: unknown) {
         if (error instanceof Error) {
           this.error = error;
-          if (this.onSubmitError) {
-            this.onSubmitError(error);
+          this.submissionStatus = 'error';
+          this.#onUpdate?.();
+          if (this.#onSubmitError) {
+            this.#onSubmitError(error);
           } else {
             throw error;
           }
-          this.updateSubmissionStatus('error');
         }
       }
     }
   }
 
   // Reset function will clear the value of every field
-  public reset(): void {
-    for (const key in this.fields) {
-      this.fields[key].reset();
-      this.fields[key].validate(this.model);
-    }
-    this.updateSubmissionStatus('idle');
+  reset(): void {
+    this.#field.reset();
   }
 
   // Reset function to reset error state
-  public resetError(): void {
+  resetError(): void {
     if (this.error) {
       this.error = undefined;
-      this.updateSubmissionStatus('idle');
+      this.onUpdate();
     }
   }
 
   // Mass update method.
-  public updateFields(model: Partial<T>): void {
-    for (const key in model) {
-      this.fields[key].onChange(model[key], true);
-    }
+  updateFields(model: Partial<T>): void {
+    Object.keys(model).forEach((key) => {
+      const field: Field<unknown> = this.fields[key];
+      field.onChange(model[key]);
+    });
     this.onUpdate();
   }
 
-  private validateFields(): void {
-    for (const key in this.fields) {
-      const field = this.fields[key];
-
-      if (field) {
-        field.validate(this.model);
-      }
-    }
+  validate(): void {
+    this.#field.validate();
   }
 
-  public onUpdate(): void {
-    this.validateFields();
-    // Reset submission status if there are new changes
-    if (
-      this.submissionStatus === 'error' ||
-      this.submissionStatus === 'submitted'
-    ) {
-      this.updateSubmissionStatus('idle');
-    } else {
-      this.cachedOnUpdate();
-    }
-  }
-
-  private updateSubmissionStatus(status: SubmissionStatus): void {
-    this.submissionStatus = status;
-    this.cachedOnUpdate();
-  }
-
-  // CLASS GETTERS
   // The changes object contains only the keys of fields which are dirty (value !== originalValue)
-  public get changes(): Partial<T> {
-    const changes = {} as Partial<T>;
+  get changes(): Partial<T> {
+    const changes: Partial<T> = {};
 
     for (const key in this.fields) {
       const field = this.fields[key];
@@ -162,59 +116,30 @@ export class Form<T> {
   }
 
   // The exposed updated model contains both the original model and the changes object on top
-  public get model(): T {
-    return {
-      ...this.originalModel,
-      ...this.changes,
-    };
+  get model(): T {
+    return this.#field.value;
   }
 
-  // A form is dirty only if it has any changes
-  public get dirty(): boolean {
-    return !isEmpty(this.changes);
+  get dirty(): boolean {
+    return this.#field.dirty;
   }
 
-  public get valid(): boolean {
-    // If there are no validations, forms are valid by default.
-    if (!this.validations || Object.keys(this.validations).length === 0) {
-      return true;
+  get valid(): boolean {
+    return this.#field.valid;
+  }
+
+  get fields(): MappedFields<T> {
+    return this.#field.fields;
+  }
+
+  private onUpdate(): void {
+    this.validate();
+    if (
+      this.submissionStatus === 'error' ||
+      this.submissionStatus === 'submitted'
+    ) {
+      this.submissionStatus = 'idle';
     }
-    // A form is valid if all fields are valid
-    return Object.keys(this.validations).every((key) => {
-      return this.fields[key].valid;
-    });
-  }
-
-  // can submit
-  public get canSubmit(): boolean {
-    return this.valid && this.dirty;
-  }
-
-  private addField(key: string): void {
-    const options = {
-      value: this.originalModel[key],
-      onUpdate: this.onUpdate.bind(this),
-      validation: this.validations?.[key],
-    };
-    if (Array.isArray(this.originalModel[key])) {
-      this.cachedFields[key] = new FieldSet(options);
-    } else {
-      this.cachedFields[key] = new FormField(options);
-    }
-    this.cachedFields[key].validate(this.model);
-  }
-
-  // Fields getter uses a proxy object to generate fields on demand. It also binds the instance methods.
-  public get fields(): MappedFields<T> {
-    const handler = {
-      get: (target: MappedFields<T>, key: string) => {
-        if (!target[key]) {
-          this.addField(key);
-        }
-        return target[key];
-      },
-    };
-
-    return new Proxy(this.cachedFields, handler);
+    this.#onUpdate?.();
   }
 }
