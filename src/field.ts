@@ -1,4 +1,4 @@
-import { isEqual, uniq } from './util';
+import { copy, isEqual, uniq } from './util';
 import { MappedValidation, validateValue } from './validation';
 
 /* This type is used to take a model, parse it an return a different type
@@ -6,7 +6,7 @@ for each field. In this case, for each field of T, string | number you
 get back a FormField type */
 export type MappedFields<T> = {
   [P in keyof Required<T>]: T[P] extends unknown[]
-    ? FieldSet<T[P]>
+    ? FieldSet<T[P][0]>
     : T[P] extends Record<string, unknown>
     ? NestedField<T[P]>
     : Field<T[P]>;
@@ -28,42 +28,47 @@ export interface Field<T> {
   onFocus: () => void;
 }
 
-export interface NestedField<T> extends Field<T> {
+interface NestedField<T> extends Field<T> {
   get fields(): MappedFields<T>;
 }
 
-export interface FieldSetField<T> extends Field<T> {
+interface FieldSetField<T> extends Field<T> {
   remove: () => void;
 }
 
-export interface FieldSet<T> extends Field<T> {
+interface FieldSet<T> extends Field<T[]> {
   get elements(): Array<FieldSetField<T>>;
   add: (element: T) => void;
 }
 
-export class FieldImplementation<T> implements NestedField<T> {
+export class FieldImplementation<T>
+  implements NestedField<T>, FieldSetField<T>
+{
   value: T;
   required = false;
   focused = false;
   touched = false;
-  dirty = false;
   errors: string[] = [];
+  elements: FieldImplementation<T>[] = [];
 
   #fields: Partial<MappedFields<T>> = {};
   #originalValue: T;
   #validations: MappedValidation<T>;
   #onUpdate: () => void;
+  #onRemove?: () => void;
 
   constructor({
     value,
-    onUpdate,
     validations,
+    onUpdate,
+    onRemove,
   }: {
     value: T;
     onUpdate: () => void;
     validations: MappedValidation<T>;
+    onRemove?: () => void;
   }) {
-    this.value = value;
+    this.value = copy(value);
     this.#originalValue = value;
     this.#validations = validations;
     if (
@@ -75,6 +80,7 @@ export class FieldImplementation<T> implements NestedField<T> {
     }
     this.createSubfields();
     this.#onUpdate = onUpdate;
+    this.#onRemove = onRemove;
   }
 
   get fields(): MappedFields<T> {
@@ -84,7 +90,6 @@ export class FieldImplementation<T> implements NestedField<T> {
           const field = new FieldImplementation({
             value: this.value[key],
             onUpdate: () => {
-              this.dirty = this.subfields.some((e) => e.dirty);
               this.value[key] = field.value;
               this.#onUpdate();
             },
@@ -98,9 +103,21 @@ export class FieldImplementation<T> implements NestedField<T> {
     return new Proxy(this.#fields as MappedFields<T>, handler);
   }
 
+  add(element: T): void {
+    this.value = [
+      ...(this.value as unknown as unknown[]),
+      element,
+    ] as unknown as T;
+    this.elements.push(this.createFieldSetField(element));
+    this.#onUpdate();
+  }
+
+  remove(): void {
+    this.#onRemove?.();
+  }
+
   reset(): void {
     this.value = this.#originalValue;
-    this.dirty = false;
     this.touched = false;
     this.subfields.forEach((e) => e.reset());
     this.#onUpdate();
@@ -114,9 +131,10 @@ export class FieldImplementation<T> implements NestedField<T> {
 
   onChange(value: T): void {
     this.value = value;
-    this.dirty = !isEqual(value, this.#originalValue);
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
+        this.elements = [];
+        this.createSubfields();
       } else {
         uniq([...Object.keys(this.#fields), ...Object.keys(value)]).forEach(
           (key) => {
@@ -135,6 +153,7 @@ export class FieldImplementation<T> implements NestedField<T> {
 
   onBlur(): void {
     this.focused = false;
+    this.touched = true;
     this.#onUpdate();
   }
 
@@ -147,14 +166,20 @@ export class FieldImplementation<T> implements NestedField<T> {
     } else {
       this.errors = validateValue(this.value, validations as any);
     }
+    this.elements.forEach((e) => e.validate());
   }
 
   get valid(): boolean {
     return this.errors.length === 0 && this.subfields.every((e) => e.valid);
   }
 
+  get dirty(): boolean {
+    // console.log('check', this.value, this.#originalValue);
+    return !isEqual(this.value, this.#originalValue);
+  }
+
   private get subfields(): Array<FieldImplementation<unknown>> {
-    return Object.values(this.#fields);
+    return this.elements.concat(Object.values(this.#fields));
   }
 
   private get isNestedValidation(): boolean {
@@ -167,16 +192,36 @@ export class FieldImplementation<T> implements NestedField<T> {
   }
 
   private createSubfields(): void {
-    // make sure as many fields as possible are initialized
-    if (this.isNestedValidation) {
-      Object.keys(this.#validations).forEach((e) => this.fields[e]);
+    const value = this.value;
+    if (Array.isArray(value)) {
+      this.elements = value.map((e) => this.createFieldSetField(e));
+    } else {
+      // make sure as many fields as possible are initialized
+      if (this.isNestedValidation) {
+        Object.keys(this.#validations).forEach((e) => this.fields[e]);
+      }
+      if (value && typeof value === 'object') {
+        Object.keys(value).forEach((e) => this.fields[e]);
+      }
     }
-    if (
-      this.value &&
-      typeof this.value === 'object' &&
-      !Array.isArray(this.value)
-    ) {
-      Object.keys(this.value).forEach((e) => this.fields[e]);
-    }
+  }
+
+  private createFieldSetField(value: T): FieldImplementation<T> {
+    const field = new FieldImplementation({
+      value,
+      onUpdate: () => {
+        const index = this.elements.indexOf(field);
+        this.value[index] = field.value;
+        this.#onUpdate();
+      },
+      validations: this.#validations,
+      onRemove: () => {
+        const index = this.elements.indexOf(field);
+        (this.value as unknown as unknown[]).splice(index, 1);
+        this.elements.splice(index, 1);
+        this.#onUpdate();
+      },
+    });
+    return field;
   }
 }

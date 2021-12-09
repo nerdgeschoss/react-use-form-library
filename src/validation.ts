@@ -15,6 +15,10 @@ export function validateValue<T>(
   value: T,
   validation: FieldValidation<T>
 ): string[] {
+  // console.log('validate', value, validation);
+  if (Array.isArray(value)) {
+    return value.flatMap((e) => validateValue(e, validation));
+  }
   if (Array.isArray(validation)) {
     return validation.flatMap((e) => validateValue(value, e));
   }

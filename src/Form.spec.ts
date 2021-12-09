@@ -156,6 +156,14 @@ describe(Form, () => {
       form.fields.emails.onChange(['hello@example.com']);
       expect(form.fields.emails.value).toEqual(['hello@example.com']);
     });
+
+    it('touches fields on blur', () => {
+      expect(form.fields.name.touched).toEqual(false);
+      form.fields.name.onFocus();
+      expect(form.fields.name.touched).toEqual(false);
+      form.fields.name.onBlur();
+      expect(form.fields.name.touched).toEqual(true);
+    });
   });
 
   describe('validation', () => {
@@ -399,184 +407,151 @@ describe(Form, () => {
     });
   });
 
-  // describe('fields array', () => {
-  //   // CREATE
-  //   it('creates empty array', () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(Array.isArray(emails.fields)).toEqual(true);
-  //     expect(emails.fields?.length).toEqual(0);
-  //   });
-  //   it('adds a new field', () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.fields.length).toEqual(0);
-  //     emails.insert('test');
-  //     expect(emails.fields.length).toEqual(1);
-  //     expect(emails.fields[0].value).toEqual('test');
-  //   });
-  //   it('adds multiple fields', () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.fields.length).toEqual(0);
-  //     const newFields = ['test', 'test', 'test'];
-  //     emails.insert(...newFields);
-  //     expect(emails.fields.length).toEqual(3);
-  //     expect(emails.fields[0].value).toEqual('test');
-  //   });
-  //   it('creates FormField for each element of the array', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails instanceof FieldSet).toBeTruthy();
-  //     expect(emails.fields[0] instanceof FormField).toBeTruthy();
-  //     expect(emails.fields[1] instanceof FormField).toBeTruthy();
-  //     expect(emails.fields[0].value).toEqual('google.com');
-  //     expect(emails.fields[1].value).toEqual('facebook.com');
-  //   });
-  //   // UPDATE
-  //   it('updates every field', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     emails.onChange(['linkedin.com', 'twitter.com']);
-  //     expect(emails.fields[0].value).toEqual('linkedin.com');
-  //     expect(emails.fields[1].value).toEqual('twitter.com');
-  //   });
-  //   it('creates new fields when mass updating', () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     emails.onChange(['linkedin.com', 'twitter.com']);
-  //     expect(emails.fields[0].value).toEqual('linkedin.com');
-  //     expect(emails.fields[1].value).toEqual('twitter.com');
-  //   });
-  //   it('resets all fields', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     emails.fields[0].onChange('linkedin.com');
-  //     emails.fields[1].onChange('twitter.com');
-  //     emails.reset();
-  //     expect(emails.fields[0].value).toEqual('google.com');
-  //     expect(emails.fields[1].value).toEqual('facebook.com');
-  //   });
-  //   it('touches every field', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.fields[0].touched).toEqual(false);
-  //     emails.setTouched(true);
-  //     expect(emails.fields[0].touched).toEqual(true);
-  //     expect(emails.touched).toEqual(true);
-  //   });
-  //   // DELETE
-  //   it('removes a field', () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.fields.length).toEqual(0);
-  //     emails.insert('test');
-  //     expect(emails.fields.length).toEqual(1);
-  //     emails.fields[0].remove();
-  //     expect(emails.fields.length).toEqual(0);
-  //   });
-  //   // Validation
-  //   it('validates fields', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google@gmail.com', 'facebook@gmail.com'] },
-  //       validations: {
-  //         emails: 'email',
-  //       },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     emails.fields[0].onChange('test');
-  //     expect(emails.fields[0].valid).toEqual(false);
-  //     emails.fields[1].onChange('test');
-  //     expect(emails.fields[1].valid).toEqual(false);
-  //   });
-  //   it('has the correct value', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     emails.onChange(['linkedin.com', 'twitter.com']);
-  //     expect(emails.value.length).toEqual(2);
-  //     expect(emails.value[0]).toEqual('linkedin.com');
-  //     expect(emails.value[1]).toEqual('twitter.com');
-  //   });
-  //   it('is dirty', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.dirty).toBeFalsy();
-  //     emails.fields[0].onChange('linkedin.com');
-  //     expect(emails.fields[0].dirty).toBeTruthy();
-  //     expect(emails.fields[1].dirty).toBeFalsy();
-  //     expect(emails.dirty).toBeTruthy();
-  //     expect(form.dirty).toBeTruthy();
-  //   });
-  //   it('is dirty when adding fields', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.dirty).toBeFalsy();
-  //     emails.insert('instagram.com');
-  //     expect(emails.dirty).toBeTruthy();
-  //     expect(form.dirty).toBeTruthy();
-  //   });
-  //   it('is dirty when removing fields', () => {
-  //     const form = createForm({
-  //       value: { emails: ['google.com', 'facebook.com'] },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.dirty).toBeFalsy();
-  //     emails.fields[0].remove();
-  //     expect(emails.dirty).toBeTruthy();
-  //     expect(form.dirty).toBeTruthy();
-  //   });
-  //   it("is valid when it has at least one field if it's required", () => {
-  //     const form = createForm({
-  //       value: { emails: [] },
-  //       validations: {
-  //         emails: 'required',
-  //       },
-  //     });
-  //     const emails = form.fields.emails as unknown as FieldSet<string[]>;
-
-  //     expect(emails.valid).toBeFalsy();
-  //     emails.insert('test');
-  //     expect(emails.valid).toBeTruthy();
-  //   });
-  // });
+  describe('fields array', () => {
+    describe('creating', () => {
+      it('creates empty array', () => {
+        const form = createForm({
+          value: { emails: [] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.elements).toBeDefined();
+        expect(Array.isArray(emails.elements)).toEqual(true);
+        expect(emails.elements.length).toEqual(0);
+      });
+      it('adds a new field', () => {
+        const form = createForm({
+          value: { emails: [] },
+        });
+        const emails = form.fields.emails;
+        emails.add('test');
+        expect(emails.value.length).toEqual(1);
+        expect(emails.elements.length).toEqual(1);
+        expect(emails.elements[0].value).toEqual('test');
+      });
+      it('creates FormField for each element of the array', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.elements[0].value).toEqual('google.com');
+        expect(emails.elements[1].value).toEqual('facebook.com');
+      });
+    });
+    describe('updating', () => {
+      it('updates every field', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        emails.onChange(['linkedin.com', 'twitter.com']);
+        expect(emails.elements[0].value).toEqual('linkedin.com');
+        expect(emails.elements[1].value).toEqual('twitter.com');
+      });
+      it('creates new fields when mass updating', () => {
+        const form = createForm({
+          value: { emails: [] },
+        });
+        const emails = form.fields.emails;
+        emails.onChange(['linkedin.com', 'twitter.com']);
+        expect(emails.elements[0].value).toEqual('linkedin.com');
+        expect(emails.elements[1].value).toEqual('twitter.com');
+      });
+      it('resets all fields', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        emails.elements[0].onChange('linkedin.com');
+        emails.elements[1].onChange('twitter.com');
+        emails.reset();
+        expect(emails.elements[0].value).toEqual('google.com');
+        expect(emails.elements[1].value).toEqual('facebook.com');
+      });
+      it('touches every field', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.elements[0].touched).toEqual(false);
+        emails.touch();
+        expect(emails.elements[0].touched).toEqual(true);
+        expect(emails.touched).toEqual(true);
+      });
+    });
+    describe('deleting', () => {
+      // DELETE
+      it('removes a field', () => {
+        const form = createForm({
+          value: { emails: ['hello'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.elements.length).toEqual(1);
+        emails.add('test');
+        expect(emails.elements.length).toEqual(2);
+        emails.elements[1].remove();
+        expect(emails.elements.length).toEqual(1);
+        expect(emails.value).toEqual(['hello']);
+      });
+    });
+    describe('validating', () => {
+      it('validates fields', () => {
+        const form = createForm({
+          value: { emails: ['google@gmail.com', 'facebook@gmail.com'] },
+          validations: {
+            emails: 'email',
+          },
+        });
+        const emails = form.fields.emails;
+        emails.elements[0].onChange('test');
+        expect(emails.elements[0].valid).toEqual(false);
+        emails.elements[1].onChange('test');
+        expect(emails.elements[1].valid).toEqual(false);
+        expect(emails.valid).toEqual(false);
+      });
+      it('has the correct value', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        emails.onChange(['linkedin.com', 'twitter.com']);
+        expect(emails.value.length).toEqual(2);
+        expect(emails.value[0]).toEqual('linkedin.com');
+        expect(emails.value[1]).toEqual('twitter.com');
+      });
+      it('is dirty', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.dirty).toBeFalsy();
+        emails.elements[0].onChange('linkedin.com');
+        expect(emails.elements[0].dirty).toBeTruthy();
+        expect(emails.elements[1].dirty).toBeFalsy();
+        expect(emails.dirty).toBeTruthy();
+        expect(form.dirty).toBeTruthy();
+      });
+      it('is dirty when adding fields', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.dirty).toBeFalsy();
+        emails.add('instagram.com');
+        expect(emails.dirty).toBeTruthy();
+        expect(form.dirty).toBeTruthy();
+      });
+      it('is dirty when removing fields', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        expect(emails.dirty).toBeFalsy();
+        emails.elements[0].remove();
+        expect(emails.dirty).toBeTruthy();
+        expect(form.dirty).toBeTruthy();
+      });
+    });
+  });
 
   describe('nested objects', () => {
     it('updates the value after changing nested fields', () => {

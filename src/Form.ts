@@ -108,7 +108,7 @@ export class Form<T> {
     for (const key in this.fields) {
       const field = this.fields[key];
       if (field.dirty) {
-        changes[key] = field.value;
+        changes[key] = field.value as any;
       }
     }
 
