@@ -239,6 +239,19 @@ describe(Form, () => {
       form.fields.name.onChange('ade');
       expect(form.valid).toBeTruthy();
     });
+
+    it('validates arrays with custom functions', () => {
+      const form = createForm({
+        validations: {
+          emails: ({ model }) =>
+            model.emails.length === 0 ? ['specify at least one'] : [],
+        },
+      });
+      expect(form.fields.emails.errors).toEqual(['specify at least one']);
+      expect(form.fields.emails.valid).toEqual(false);
+      form.fields.emails.onChange(['hello@example.com']);
+      expect(form.fields.emails.valid).toEqual(true);
+    });
   });
 
   describe('pre-defined validation', () => {

@@ -24,7 +24,9 @@ export function validateValue<T, Model>(
   model: Model,
   validation: FieldValidation<T, Model>
 ): string[] {
-  // console.log('validate', value, validation);
+  if (typeof validation === 'function') {
+    return validation({ value, model }) ?? [];
+  }
   if (Array.isArray(value)) {
     return value.flatMap((e) => validateValue(e, model, validation));
   }
@@ -38,9 +40,6 @@ export function validateValue<T, Model>(
     if (!validation.test(String(value))) {
       return ['regex-failed'];
     }
-  }
-  if (typeof validation === 'function') {
-    return validation({ value, model }) ?? [];
   }
   return [];
 }
