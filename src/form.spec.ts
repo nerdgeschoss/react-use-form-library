@@ -376,10 +376,21 @@ describe(Form, () => {
 
   describe('reseting', () => {
     it('resets fields', () => {
-      const form = createForm();
+      const form = createForm({
+        value: {
+          emails: ['bye@example.com', 'stay@example.com'],
+        }
+      });
       form.fields.name.onChange('hello');
+      form.fields.emails.onChange([
+        'hello@example.com', 'stay@example.com'
+      ]);
       form.reset();
       expect(form.changes).toEqual({});
+      expect(form.fields.name.value).toEqual('');
+      expect(form.fields.emails.value).toEqual([
+        'bye@example.com', 'stay@example.com'
+      ]);
     });
 
     it('resets error', async () => {
