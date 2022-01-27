@@ -72,7 +72,8 @@ describe(Form, () => {
   beforeEach(() => tracker.reset());
 
   describe('instantiation', () => {
-    const form = createForm();
+    let form = null as unknown as Form<Model>;
+    beforeEach(() => (form = createForm()));
     it('creates an empty field name', () => {
       expect(form.fields.name).toBeTruthy();
       expect(form.fields.name.value).toEqual('');
@@ -110,7 +111,7 @@ describe(Form, () => {
   });
 
   describe('tracking changes', () => {
-    let form: Form<Model> = createForm();
+    let form = null as unknown as Form<Model>;
     beforeEach(() => (form = createForm()));
 
     it('returns the updated model', () => {
@@ -376,10 +377,20 @@ describe(Form, () => {
 
   describe('reseting', () => {
     it('resets fields', () => {
-      const form = createForm();
+      const form = createForm({
+        value: {
+          emails: ['bye@example.com', 'stay@example.com'],
+        },
+      });
       form.fields.name.onChange('hello');
+      form.fields.emails.onChange(['hello@example.com', 'stay@example.com']);
       form.reset();
       expect(form.changes).toEqual({});
+      expect(form.fields.name.value).toEqual('');
+      expect(form.fields.emails.value).toEqual([
+        'bye@example.com',
+        'stay@example.com',
+      ]);
     });
 
     it('resets error', async () => {

@@ -29,6 +29,7 @@ export class Form<T> {
     this.#validations = validations ?? {};
     this.#field = new FieldImplementation<T, T>({
       value: model,
+      originalValue: model,
       onUpdate: this.onUpdate.bind(this),
       validations: this.#validations,
       getModel: () => this.model,

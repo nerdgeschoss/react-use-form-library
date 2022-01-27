@@ -64,19 +64,21 @@ export class FieldImplementation<T, Model>
 
   constructor({
     value,
+    originalValue,
     validations,
     onUpdate,
     onRemove,
     getModel,
   }: {
     value: T;
+    originalValue: T;
     onUpdate: () => void;
     validations: MappedValidation<T>;
     onRemove?: () => void;
     getModel: () => Model;
   }) {
     this.value = copy(value);
-    this.#originalValue = value;
+    this.#originalValue = originalValue ?? value;
     this.#validations = validations;
     this.#getModel = getModel;
     if (
@@ -108,6 +110,7 @@ export class FieldImplementation<T, Model>
         if (!target[key]) {
           const field = new FieldImplementation({
             value: this.value[key],
+            originalValue: this.value[key],
             onUpdate: () => {
               this.value[key] = field.value;
               this.#onUpdate();
@@ -128,7 +131,7 @@ export class FieldImplementation<T, Model>
       ...(this.value as unknown as unknown[]),
       element,
     ] as unknown as T;
-    this.elements.push(this.createFieldSetField(element));
+    this.elements.push(this.createFieldSetField(element, element));
     this.#onUpdate();
   }
 
@@ -216,7 +219,9 @@ export class FieldImplementation<T, Model>
   private createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
-      this.elements = value.map((e) => this.createFieldSetField(e));
+      this.elements = value.map((e, index) =>
+        this.createFieldSetField(e, this.#originalValue[index])
+      );
     } else {
       // make sure as many fields as possible are initialized
       if (this.isNestedValidation) {
@@ -228,9 +233,13 @@ export class FieldImplementation<T, Model>
     }
   }
 
-  private createFieldSetField(value: T): FieldImplementation<T, Model> {
+  private createFieldSetField(
+    value: T,
+    originalValue: T
+  ): FieldImplementation<T, Model> {
     const field = new FieldImplementation({
       value,
+      originalValue,
       onUpdate: () => {
         const index = this.elements.indexOf(field);
         this.value[index] = field.value;
