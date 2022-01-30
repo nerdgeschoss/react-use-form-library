@@ -393,6 +393,21 @@ describe(Form, () => {
       ]);
     });
 
+    it('resets items added to an array', () => {
+      const form = createForm({
+        value: {
+          emails: ['bye@example.com', 'stay@example.com'],
+        },
+      });
+      form.fields.emails.onChange(['bye@example.com', 'stay@example.com', 'hello@example.com']);
+      form.reset();
+      expect(form.changes).toEqual({});
+      expect(form.fields.emails.value).toEqual([
+        'bye@example.com',
+        'stay@example.com',
+      ]);
+    });
+
     it('resets error', async () => {
       const form = createForm({
         onSubmit: async (form) => {
