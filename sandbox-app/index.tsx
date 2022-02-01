@@ -25,11 +25,8 @@ function App(): JSX.Element {
         {examples.map((example) => {
           return (
             <li key={example}>
-              <a href={`#${example}`}>
-                {example
-                  .split('-')
-                  .map((item) => `${item[0].toUpperCase()}${item.slice(1)}`)
-                  .join(' ')}
+              <a href={`#${example}`} style={{ textTransform: 'capitalize' }}>
+                {example.split('-').join(' ')}
               </a>
             </li>
           );
