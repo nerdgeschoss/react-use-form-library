@@ -72,7 +72,7 @@ describe(Form, () => {
   beforeEach(() => tracker.reset());
 
   describe('instantiation', () => {
-    let form = null as unknown as Form<Model>;
+    let form = (null as unknown) as Form<Model>;
     beforeEach(() => (form = createForm()));
     it('creates an empty field name', () => {
       expect(form.fields.name).toBeTruthy();
@@ -111,7 +111,7 @@ describe(Form, () => {
   });
 
   describe('tracking changes', () => {
-    let form = null as unknown as Form<Model>;
+    let form = (null as unknown) as Form<Model>;
     beforeEach(() => (form = createForm()));
 
     it('returns the updated model', () => {
@@ -307,9 +307,9 @@ describe(Form, () => {
   describe('submitting', () => {
     it('prevents the event default', () => {
       const mock = jest.fn();
-      const submitEvent = {
+      const submitEvent = ({
         preventDefault: mock,
-      } as unknown as Event;
+      } as unknown) as Event;
       const form = createForm();
       form.submit(submitEvent);
       expect(mock).toBeCalled();
@@ -387,6 +387,25 @@ describe(Form, () => {
       form.reset();
       expect(form.changes).toEqual({});
       expect(form.fields.name.value).toEqual('');
+      expect(form.fields.emails.value).toEqual([
+        'bye@example.com',
+        'stay@example.com',
+      ]);
+    });
+
+    it('resets items added to an array', () => {
+      const form = createForm({
+        value: {
+          emails: ['bye@example.com', 'stay@example.com'],
+        },
+      });
+      form.fields.emails.onChange([
+        'bye@example.com',
+        'stay@example.com',
+        'hello@example.com',
+      ]);
+      form.reset();
+      expect(form.changes).toEqual({});
       expect(form.fields.emails.value).toEqual([
         'bye@example.com',
         'stay@example.com',

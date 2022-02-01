@@ -62,7 +62,7 @@ export class Form<T> {
         await this.onSubmit(this);
         this.submissionStatus = 'submitted';
         this.#onUpdate?.();
-      } catch (error: unknown) {
+      } catch (error) {
         if (error instanceof Error) {
           this.error = error;
           this.submissionStatus = 'error';
@@ -79,6 +79,8 @@ export class Form<T> {
 
   // Reset function will clear the value of every field
   reset(): void {
+    console.log('reset!!');
+
     this.#field.reset();
   }
 

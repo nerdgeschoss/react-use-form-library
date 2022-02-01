@@ -112,7 +112,9 @@ export class FieldImplementation<T, Model>
             value: this.value[key],
             originalValue: this.value[key],
             onUpdate: () => {
-              this.value[key] = field.value;
+              if (this.value) {
+                this.value[key] = field.value;
+              }
               this.#onUpdate();
             },
             validations: this.#validations[key] || {},
