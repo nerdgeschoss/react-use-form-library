@@ -72,7 +72,7 @@ describe(Form, () => {
   beforeEach(() => tracker.reset());
 
   describe('instantiation', () => {
-    let form = (null as unknown) as Form<Model>;
+    let form = null as unknown as Form<Model>;
     beforeEach(() => (form = createForm()));
     it('creates an empty field name', () => {
       expect(form.fields.name).toBeTruthy();
@@ -111,7 +111,7 @@ describe(Form, () => {
   });
 
   describe('tracking changes', () => {
-    let form = (null as unknown) as Form<Model>;
+    let form = null as unknown as Form<Model>;
     beforeEach(() => (form = createForm()));
 
     it('returns the updated model', () => {
@@ -307,9 +307,9 @@ describe(Form, () => {
   describe('submitting', () => {
     it('prevents the event default', () => {
       const mock = jest.fn();
-      const submitEvent = ({
+      const submitEvent = {
         preventDefault: mock,
-      } as unknown) as Event;
+      } as unknown as Event;
       const form = createForm();
       form.submit(submitEvent);
       expect(mock).toBeCalled();

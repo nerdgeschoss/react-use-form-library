@@ -88,7 +88,7 @@ export class FieldImplementation<T, Model>
     ) {
       this.required = true;
     }
-    this.createSubfields();
+    this.#createSubfields();
     this.#onUpdate = onUpdate;
     this.#onRemove = onRemove;
 
@@ -144,7 +144,14 @@ export class FieldImplementation<T, Model>
   reset(): void {
     this.value = this.#originalValue;
     this.touched = false;
-    this.subfields.forEach((e) => e.reset());
+
+    if (Array.isArray(this.value)) {
+      this.elements = [];
+      this.#createSubfields();
+    } else {
+      this.subfields.forEach((e) => e.reset());
+    }
+
     this.#onUpdate();
   }
 
@@ -158,8 +165,7 @@ export class FieldImplementation<T, Model>
     this.value = value;
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
-        this.elements = [];
-        this.createSubfields();
+        this.#resetArray();
       } else {
         uniq([...Object.keys(this.#fields), ...Object.keys(value)]).forEach(
           (key) => {
@@ -218,7 +224,7 @@ export class FieldImplementation<T, Model>
     );
   }
 
-  private createSubfields(): void {
+  #createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
       this.elements = value.map((e, index) =>
@@ -257,5 +263,10 @@ export class FieldImplementation<T, Model>
       getModel: this.#getModel,
     });
     return field;
+  }
+
+  #resetArray(): void {
+    this.elements = [];
+    this.#createSubfields();
   }
 }

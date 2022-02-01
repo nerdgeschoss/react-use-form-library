@@ -7,7 +7,7 @@ interface Model {
 }
 
 const initialValue: Model = {
-  emails: [],
+  emails: ['bye@example.com', 'stay@example.com'],
 };
 
 export function SimpleArray(): JSX.Element {

@@ -79,8 +79,6 @@ export class Form<T> {
 
   // Reset function will clear the value of every field
   reset(): void {
-    console.log('reset!!');
-
     this.#field.reset();
   }
 
