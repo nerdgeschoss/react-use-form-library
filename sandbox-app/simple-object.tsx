@@ -35,7 +35,7 @@ export function SimpleObject(): JSX.Element {
       <form onSubmit={onSubmit}>
         <input
           type="text"
-          value={fields.simpleObject.value?.label}
+          value={fields.simpleObject.value?.label || ''}
           onChange={(event) =>
             fields.simpleObject.onChange({
               label: event.target.value,
@@ -43,6 +43,12 @@ export function SimpleObject(): JSX.Element {
             })
           }
         />
+        <footer>
+          <button>Submit</button>
+          <button onClick={reset} type="button">
+            Reset
+          </button>
+        </footer>
       </form>
       <h4>Model</h4>
       <pre>
