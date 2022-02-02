@@ -112,9 +112,7 @@ export class FieldImplementation<T, Model>
             value: this.value[key],
             originalValue: this.value[key],
             onUpdate: () => {
-              if (this.value) {
-                this.value[key] = field.value;
-              }
+              this.value[key] = field.value;
               this.#onUpdate();
             },
             validations: this.#validations[key] || {},
@@ -146,8 +144,7 @@ export class FieldImplementation<T, Model>
     this.touched = false;
 
     if (Array.isArray(this.value)) {
-      this.elements = [];
-      this.#createSubfields();
+      this.#resetArray();
     } else {
       this.subfields.forEach((e) => e.reset());
     }
