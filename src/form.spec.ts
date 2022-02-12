@@ -53,17 +53,20 @@ function createForm({
   value,
   onSubmit,
   onSubmitError,
+  onInit,
 }: {
   value?: Partial<Model>;
   validations?: Partial<MappedValidation<Model>>;
   onSubmit?: (form: Form<Model>) => Promise<void> | void;
   onSubmitError?: (error: Error) => void;
+  onInit?: (form: Form<Model>) => void;
 } = {}): Form<Model> {
   return new Form<Model>({
     model: { ...defaultValue, ...(value || {}) },
     onUpdate: tracker.onUpdate,
     onSubmit: onSubmit ?? tracker.onSubmit,
     onSubmitError,
+    onInit,
     validations,
   });
 }
@@ -107,6 +110,12 @@ describe(Form, () => {
       expect(form.model.optionalContent).toBeUndefined();
       expect(form.fields.optionalContent.fields.name.value).toBeUndefined();
       expect(form.model.optionalContent).not.toBeUndefined();
+    });
+    it('calls onInit function and updates changes object', () => {
+      const form = createForm({
+        onInit: (form) => form.fields.name.onChange('Test'),
+      });
+      expect(form.changes.name).toBe('Test');
     });
   });
 
