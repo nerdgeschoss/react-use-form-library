@@ -1,3 +1,4 @@
+import { FieldSet } from './field';
 import { Form } from './form';
 import { MappedValidation } from './validation';
 
@@ -28,8 +29,8 @@ interface Model {
   age: number;
   description?: string;
   nullableValue: string | null;
-  emails: string[];
-  address: {
+  emails?: string[];
+  address?: {
     streetName?: string;
     streetNumber?: number;
   };
@@ -43,7 +44,6 @@ const defaultValue: Model = {
   name: '',
   age: 18,
   nullableValue: null,
-  emails: [],
   address: {},
   hobbies: [],
 };
@@ -245,7 +245,7 @@ describe(Form, () => {
       const form = createForm({
         validations: {
           emails: ({ model }) =>
-            model.emails.length === 0 ? ['specify at least one'] : [],
+            model.emails?.length === undefined ? ['specify at least one'] : [],
         },
       });
       expect(form.fields.emails.errors).toEqual(['specify at least one']);
@@ -471,7 +471,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: [] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.elements).toBeDefined();
         expect(Array.isArray(emails.elements)).toEqual(true);
         expect(emails.elements.length).toEqual(0);
@@ -480,7 +480,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: [] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.add('test');
         expect(emails.value.length).toEqual(1);
         expect(emails.elements.length).toEqual(1);
@@ -490,7 +490,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.elements[0].value).toEqual('google.com');
         expect(emails.elements[1].value).toEqual('facebook.com');
       });
@@ -500,7 +500,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.onChange(['linkedin.com', 'twitter.com']);
         expect(emails.elements[0].value).toEqual('linkedin.com');
         expect(emails.elements[1].value).toEqual('twitter.com');
@@ -509,7 +509,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: [] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.onChange(['linkedin.com', 'twitter.com']);
         expect(emails.elements[0].value).toEqual('linkedin.com');
         expect(emails.elements[1].value).toEqual('twitter.com');
@@ -518,7 +518,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.elements[0].onChange('linkedin.com');
         emails.elements[1].onChange('twitter.com');
         emails.reset();
@@ -529,7 +529,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.elements[0].touched).toEqual(false);
         emails.touch();
         expect(emails.elements[0].touched).toEqual(true);
@@ -542,7 +542,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['hello'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.elements.length).toEqual(1);
         emails.add('test');
         expect(emails.elements.length).toEqual(2);
@@ -559,7 +559,7 @@ describe(Form, () => {
             emails: 'email',
           },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.elements[0].onChange('test');
         expect(emails.elements[0].valid).toEqual(false);
         emails.elements[1].onChange('test');
@@ -570,7 +570,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         emails.onChange(['linkedin.com', 'twitter.com']);
         expect(emails.value.length).toEqual(2);
         expect(emails.value[0]).toEqual('linkedin.com');
@@ -580,7 +580,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.dirty).toBeFalsy();
         emails.elements[0].onChange('linkedin.com');
         expect(emails.elements[0].dirty).toBeTruthy();
@@ -592,7 +592,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.dirty).toBeFalsy();
         emails.add('instagram.com');
         expect(emails.dirty).toBeTruthy();
@@ -602,7 +602,7 @@ describe(Form, () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
-        const emails = form.fields.emails;
+        const emails = form.fields.emails as FieldSet<string>;
         expect(emails.dirty).toBeFalsy();
         emails.elements[0].remove();
         expect(emails.dirty).toBeTruthy();

@@ -36,7 +36,7 @@ interface FieldSetField<T> extends Field<T> {
   remove: () => void;
 }
 
-interface FieldSet<T> extends Field<T[]> {
+export interface FieldSet<T> extends Field<T[]> {
   get elements(): Array<NestedFieldSetField<T>>;
   add: (element: T) => void;
 }
@@ -127,6 +127,9 @@ export class FieldImplementation<T, Model>
   }
 
   add(element: T): void {
+    if (!this.value) {
+      this.value = [] as unknown as T;
+    }
     this.value = [
       ...(this.value as unknown as unknown[]),
       element,
@@ -224,9 +227,12 @@ export class FieldImplementation<T, Model>
   #createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
-      this.elements = value.map((e, index) =>
-        this.createFieldSetField(e, this.#originalValue[index])
-      );
+      this.elements = value.map((e, index) => {
+        if (this.#originalValue === undefined) {
+          return this.createFieldSetField(e, e);
+        }
+        return this.createFieldSetField(e, this.#originalValue[index]);
+      });
     } else {
       // make sure as many fields as possible are initialized
       if (this.isNestedValidation) {
