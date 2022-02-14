@@ -29,7 +29,7 @@ interface Model {
   description?: string;
   nullableValue: string | null;
   emails: string[];
-  address: {
+  address?: {
     streetName?: string;
     streetNumber?: number;
   };
@@ -44,7 +44,6 @@ const defaultValue: Model = {
   age: 18,
   nullableValue: null,
   emails: [],
-  address: {},
   hobbies: [],
 };
 
@@ -623,7 +622,8 @@ describe(Form, () => {
   describe('nested objects', () => {
     it('updates the value after changing nested fields', () => {
       const form = createForm();
-      expect(form.fields.address.value).toEqual({});
+      expect(form.fields.address.value).toEqual(undefined);
+      expect(form.fields.address.fields.streetName.value).toEqual(undefined);
       form.fields.address.fields.streetName.onChange('Test Address 123');
       expect(form.fields.address.value.streetName).toEqual('Test Address 123');
     });
