@@ -252,7 +252,7 @@ describe(Form, () => {
       const form = createForm({
         validations: {
           emails: ({ model }) =>
-            model.emails?.length === undefined ? ['specify at least one'] : [],
+            (model.emails ?? []).length === 0 ? ['specify at least one'] : [],
         },
       });
       expect(form.fields.emails.errors).toEqual(['specify at least one']);
