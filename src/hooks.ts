@@ -6,9 +6,10 @@ import { MappedFields } from './field';
 
 export interface UseFormProps<T> {
   model: T;
+  validations?: Partial<MappedValidation<T>>;
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
-  validations?: Partial<MappedValidation<T>>;
+  onInit?: (form: Form<T>) => void;
 }
 
 // This interface is what you get back from the useForm hook
@@ -33,6 +34,7 @@ export function useForm<T>({
   onSubmit,
   onSubmitError,
   validations,
+  onInit,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
@@ -43,6 +45,7 @@ export function useForm<T>({
       validations,
       onSubmit,
       onSubmitError,
+      onInit,
     })
   );
 
