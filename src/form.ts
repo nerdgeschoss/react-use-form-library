@@ -8,7 +8,6 @@ export class Form<T> {
   submissionStatus: SubmissionStatus = 'idle';
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError: ((error: Error) => void) | undefined;
-
   #validations: MappedValidation<T>;
   #onUpdate?: () => void;
   #field: FieldImplementation<T, T>;
@@ -19,12 +18,14 @@ export class Form<T> {
     validations,
     onSubmit,
     onSubmitError,
+    onInit,
   }: {
     model: T;
     validations?: MappedValidation<T>;
     onUpdate?: () => void;
     onSubmit?: (form: Form<T>) => void | Promise<void>;
     onSubmitError?: (error: Error) => void;
+    onInit?: (form: Form<T>) => void;
   }) {
     this.#validations = validations ?? {};
     this.#field = new FieldImplementation<T, T>({
@@ -34,6 +35,7 @@ export class Form<T> {
       validations: this.#validations,
       getModel: () => this.model,
     });
+    onInit?.(this);
     this.validate(); // called before assigning the callbacks so the outside world is not called during initialization
     this.#onUpdate = onUpdate;
     this.onSubmit = onSubmit;
