@@ -482,9 +482,7 @@ describe(Form, () => {
         expect(emails.elements.length).toEqual(0);
       });
       it('adds a new field', () => {
-        const form = createForm({
-          value: { emails: [] },
-        });
+        const form = createForm();
         const emails = form.fields.emails;
         emails.add('test');
         expect(emails.value.length).toEqual(1);

@@ -127,6 +127,10 @@ export class FieldImplementation<T, Model>
   }
 
   add(element: T): void {
+    if (!this.value) {
+      this.value = [] as unknown as T;
+    }
+
     this.value = [
       ...(this.value as unknown as unknown[]),
       element,
