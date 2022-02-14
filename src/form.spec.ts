@@ -28,7 +28,7 @@ interface Model {
   age: number;
   description?: string;
   nullableValue: string | null;
-  emails: string[];
+  emails?: string[];
   address?: {
     streetName?: string;
     streetNumber?: number;
@@ -43,7 +43,6 @@ const defaultValue: Model = {
   name: '',
   age: 18,
   nullableValue: null,
-  emails: [],
   hobbies: [],
 };
 
@@ -253,7 +252,7 @@ describe(Form, () => {
       const form = createForm({
         validations: {
           emails: ({ model }) =>
-            model.emails.length === 0 ? ['specify at least one'] : [],
+            (model.emails ?? []).length === 0 ? ['specify at least one'] : [],
         },
       });
       expect(form.fields.emails.errors).toEqual(['specify at least one']);
@@ -476,18 +475,14 @@ describe(Form, () => {
   describe('fields array', () => {
     describe('creating', () => {
       it('creates empty array', () => {
-        const form = createForm({
-          value: { emails: [] },
-        });
+        const form = createForm();
         const emails = form.fields.emails;
         expect(emails.elements).toBeDefined();
         expect(Array.isArray(emails.elements)).toEqual(true);
         expect(emails.elements.length).toEqual(0);
       });
       it('adds a new field', () => {
-        const form = createForm({
-          value: { emails: [] },
-        });
+        const form = createForm();
         const emails = form.fields.emails;
         emails.add('test');
         expect(emails.value.length).toEqual(1);
