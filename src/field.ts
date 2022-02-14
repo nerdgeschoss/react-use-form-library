@@ -224,9 +224,12 @@ export class FieldImplementation<T, Model>
   #createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
-      this.elements = value.map((e, index) =>
-        this.createFieldSetField(e, this.#originalValue[index])
-      );
+      this.elements = value.map((e, index) => {
+        if (this.#originalValue === undefined) {
+          return this.createFieldSetField(e, e);
+        }
+        return this.createFieldSetField(e, this.#originalValue[index]);
+      });
     } else {
       // make sure as many fields as possible are initialized
       if (this.isNestedValidation) {

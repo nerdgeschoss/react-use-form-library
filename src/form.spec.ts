@@ -43,7 +43,6 @@ const defaultValue: Model = {
   name: '',
   age: 18,
   nullableValue: null,
-  address: {},
   hobbies: [],
 };
 
