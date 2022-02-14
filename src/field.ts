@@ -36,7 +36,7 @@ interface FieldSetField<T> extends Field<T> {
   remove: () => void;
 }
 
-export interface FieldSet<T> extends Field<T[]> {
+interface FieldSet<T> extends Field<T[]> {
   get elements(): Array<NestedFieldSetField<T>>;
   add: (element: T) => void;
 }

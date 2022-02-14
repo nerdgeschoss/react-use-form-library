@@ -1,4 +1,3 @@
-import { FieldSet } from './field';
 import { Form } from './form';
 import { MappedValidation } from './validation';
 
