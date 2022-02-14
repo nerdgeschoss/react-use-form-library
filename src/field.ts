@@ -5,8 +5,8 @@ import { MappedValidation, validateValue } from './validation';
 for each field. In this case, for each field of T, string | number you
 get back a FormField type */
 export type MappedFields<T> = {
-  [P in keyof Required<T>]: T[P] extends unknown[]
-    ? FieldSet<T[P][0]>
+  [P in keyof Required<T>]: T[P] extends unknown[] | undefined
+    ? FieldSet<NonNullable<T[P]>[0]>
     : T[P] extends Record<string, unknown> | undefined | null
     ? NestedField<NonNullable<T[P]>>
     : Field<T[P]>;
@@ -127,9 +127,6 @@ export class FieldImplementation<T, Model>
   }
 
   add(element: T): void {
-    if (!this.value) {
-      this.value = [] as unknown as T;
-    }
     this.value = [
       ...(this.value as unknown as unknown[]),
       element,
@@ -227,12 +224,9 @@ export class FieldImplementation<T, Model>
   #createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
-      this.elements = value.map((e, index) => {
-        if (this.#originalValue === undefined) {
-          return this.createFieldSetField(e, e);
-        }
-        return this.createFieldSetField(e, this.#originalValue[index]);
-      });
+      this.elements = value.map((e, index) =>
+        this.createFieldSetField(e, this.#originalValue[index])
+      );
     } else {
       // make sure as many fields as possible are initialized
       if (this.isNestedValidation) {
