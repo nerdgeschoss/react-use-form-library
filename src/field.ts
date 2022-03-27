@@ -23,7 +23,7 @@ export interface Field<T> {
 
   reset: () => void;
   touch: () => void;
-  onChange: (value: T) => void;
+  onChange: (value: T | null) => void;
   onBlur: () => void;
   onFocus: () => void;
 }
@@ -162,8 +162,8 @@ export class FieldImplementation<T, Model>
     this.#onUpdate();
   }
 
-  onChange = (value: T): void => {
-    this.value = value;
+  onChange = (value: T | null): void => {
+    this.value = value as T;
 
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
@@ -212,7 +212,7 @@ export class FieldImplementation<T, Model>
   }
 
   private get subfields(): Array<FieldImplementation<unknown, Model>> {
-    if (this.value === null) return [];
+    if (this.value === null || this.value === undefined) return [];
 
     return this.elements.concat(Object.values(this.#fields)) as Array<
       FieldImplementation<unknown, Model>

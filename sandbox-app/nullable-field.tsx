@@ -6,15 +6,16 @@ interface Model {
   avatar?: {
     id: number;
     url: string;
+    thumbs?: Record<number, string>;
   } | null;
 }
 
-const initialValue: Model = {};
-
 export function NullableField(): JSX.Element {
   const { model, changes, fields, onSubmit, valid, dirty, submissionStatus } =
-    useForm({
-      model: initialValue,
+    useForm<Model>({
+      model: {
+        avatar: { id: 1, url: 'test', thumbs: { 10: 'test', 75: 'test' } },
+      },
       onSubmit: async ({ model }) => {
         // eslint-disable-next-line no-console
         console.log(model);

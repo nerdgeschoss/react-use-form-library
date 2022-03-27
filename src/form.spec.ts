@@ -27,7 +27,7 @@ interface Model {
   name: string;
   age: number;
   description?: string;
-  nullableValue: string | null;
+  nullableValue: string | { id: string } | null;
   emails?: string[];
   address?: {
     streetName?: string;
@@ -348,6 +348,17 @@ describe(Form, () => {
           nullableValue: null,
         },
       });
+      expect(form2.fields.nullableValue.value).toBeNull();
+      await form2.submit();
+    });
+
+    it('can submit after updating to null value', async () => {
+      const form2 = createForm({
+        value: {
+          nullableValue: { id: '1' },
+        },
+      });
+      form2.fields.nullableValue.onChange(null);
       expect(form2.fields.nullableValue.value).toBeNull();
       await form2.submit();
     });
