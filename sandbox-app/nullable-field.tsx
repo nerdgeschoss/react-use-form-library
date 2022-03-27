@@ -4,6 +4,7 @@ import { Input } from './components/Input';
 
 interface Model {
   avatar?: {
+    id: number;
     url: string;
   } | null;
 }
@@ -11,28 +12,20 @@ interface Model {
 const initialValue: Model = {};
 
 export function NullableField(): JSX.Element {
-  const {
-    model,
-    changes,
-    fields,
-    onSubmit,
-    valid,
-    dirty,
-    submissionStatus,
-    reset,
-  } = useForm({
-    model: initialValue,
-    onSubmit: async ({ model }) => {
-      // eslint-disable-next-line no-console
-      console.log(model);
-    },
-  });
+  const { model, changes, fields, onSubmit, valid, dirty, submissionStatus } =
+    useForm({
+      model: initialValue,
+      onSubmit: async ({ model }) => {
+        // eslint-disable-next-line no-console
+        console.log(model);
+      },
+    });
 
   return (
     <>
       <h2 id="nullable-field">Nullable Field</h2>
       <form onSubmit={onSubmit}>
-        {model.avatar !== null ? (
+        {Object.keys(model.avatar || {}).length ? (
           <>
             <Input {...fields.avatar.fields.url} />
             <button onClick={() => fields.avatar.onChange(null)} type="button">
@@ -40,10 +33,13 @@ export function NullableField(): JSX.Element {
             </button>
           </>
         ) : (
-          <button onClick={() => fields.avatar.fields.url.onChange('')}>
+          <button onClick={() => fields.avatar.onChange({ id: 1, url: '' })}>
             add avatar
           </button>
         )}
+        <footer style={{ marginTop: 16 }}>
+          <button>Submit</button>
+        </footer>
       </form>
       <h4>Model</h4>
       <pre>

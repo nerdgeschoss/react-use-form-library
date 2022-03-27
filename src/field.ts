@@ -164,6 +164,7 @@ export class FieldImplementation<T, Model>
 
   onChange = (value: T): void => {
     this.value = value;
+
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
         this.#resetArray();
@@ -211,6 +212,8 @@ export class FieldImplementation<T, Model>
   }
 
   private get subfields(): Array<FieldImplementation<unknown, Model>> {
+    if (this.value === null) return [];
+
     return this.elements.concat(Object.values(this.#fields)) as Array<
       FieldImplementation<unknown, Model>
     >;
