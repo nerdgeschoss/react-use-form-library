@@ -5,7 +5,14 @@ import pkg from './package.json';
 export default {
   input: './src/index.ts',
   external: ['react'],
+  runtimeHelpers: true,
   plugins: [
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        regenerator: true,
+      },
+    ],
     cleaner({
       targets: ['./dist/'],
     }),
