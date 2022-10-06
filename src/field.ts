@@ -232,7 +232,7 @@ export class FieldImplementation<T, Model>
     const value = this.value;
     if (Array.isArray(value)) {
       this.elements = value.map((e, index) => {
-        if (this.#originalValue === undefined) {
+        if (this.#originalValue === undefined || this.#originalValue === null) {
           return this.createFieldSetField(e, e);
         }
         return this.createFieldSetField(e, this.#originalValue[index]);

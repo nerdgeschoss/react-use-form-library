@@ -50,7 +50,11 @@ function runValidationString<T>(
 ): string | undefined {
   switch (type) {
     case 'required':
-      if (typeof value === 'string' && !value) {
+      if (
+        value === null ||
+        value === undefined ||
+        (typeof value === 'string' && !value)
+      ) {
         return 'required-field';
       }
       break;

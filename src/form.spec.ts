@@ -24,7 +24,7 @@ class UpdateTracker {
 const tracker = new UpdateTracker();
 
 interface Model {
-  name: string;
+  name: string | null;
   age: number;
   description?: string;
   nullableValue: string | { id: string } | null;
@@ -197,6 +197,17 @@ describe(Form, () => {
       form.fields.name.onChange('Freddy');
       expect(form.fields.name.valid).toBeTruthy();
       expect(form.valid).toBeTruthy();
+    });
+
+    it('should have errors if field is required and value nullish', () => {
+      const form = createForm({
+        value: {
+          name: null,
+        },
+        validations: { name: 'required' },
+      });
+      expect(form.fields.name.errors).toHaveLength(1);
+      expect(form.fields.name.errors[0]).toEqual('required-field');
     });
 
     it('uses an array of validations', () => {
