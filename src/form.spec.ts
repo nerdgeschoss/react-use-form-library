@@ -37,6 +37,7 @@ interface Model {
     name?: string;
   };
   hobbies: Array<{ name: string }>;
+  json?: unknown;
 }
 
 const defaultValue: Model = {
@@ -293,11 +294,34 @@ describe(Form, () => {
     });
     it('validates a json field', () => {
       const form = createForm({
-        validations: { name: 'json' },
+        validations: { json: 'json' },
       });
-      form.fields.name.onChange('test');
-      expect(form.valid).toBeFalsy();
-      form.fields.name.onChange('{ "foo": "baz"}');
+      // Fails on string
+      form.fields.json.onChange('test');
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on number
+      form.fields.json.onChange(5);
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on string number
+      form.fields.json.onChange('5');
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on boolean
+      form.fields.json.onChange(true);
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on string boolean
+      form.fields.json.onChange('true');
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on null
+      form.fields.json.onChange(null);
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on string null
+      form.fields.json.onChange('null');
+      expect(form.fields.json.errors).toContain('invalid-json');
+      // Fails on array
+      form.fields.json.onChange('[]');
+      expect(form.fields.json.errors).toContain('invalid-json');
+
+      form.fields.json.onChange('{ "foo": "baz"}');
       expect(form.valid).toBeTruthy();
     });
     it('validates a website field', () => {

@@ -66,12 +66,20 @@ function runValidationString<T>(
       }
       break;
     case 'json':
-      if (value && typeof value === 'string') {
-        try {
-          JSON.parse(value);
-        } catch (error) {
-          return 'invalid-json';
+      try {
+        const parsed = JSON.parse(value as unknown as string);
+
+        if (
+          !(
+            typeof parsed === 'object' &&
+            !Array.isArray(parsed) &&
+            parsed !== null
+          )
+        ) {
+          throw new Error();
         }
+      } catch (error) {
+        return 'invalid-json';
       }
       break;
     case 'website':
