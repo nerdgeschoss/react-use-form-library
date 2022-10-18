@@ -296,9 +296,14 @@ describe(Form, () => {
       const form = createForm({
         validations: { json: 'json' },
       });
+
+      // Allow empty value
+      form.fields.json.onChange('');
+      expect(form.fields.json.errors).toHaveLength(0);
+      form.fields.json.onChange(undefined);
+      expect(form.fields.json.errors).toHaveLength(0);
+
       // Fails on string
-      form.fields.json.onChange('test');
-      expect(form.fields.json.errors).toContain('invalid-json');
       // Fails on number
       form.fields.json.onChange(5);
       expect(form.fields.json.errors).toContain('invalid-json');

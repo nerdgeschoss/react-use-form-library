@@ -67,6 +67,9 @@ function runValidationString<T>(
       break;
     case 'json':
       try {
+        if ((typeof value === 'string' && value === '') || value === undefined)
+          return;
+
         const parsed = JSON.parse(value as unknown as string);
 
         if (
