@@ -1,9 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useForceUpdate(): () => void {
+  const mounted = useRef(false);
   const [, updateState] = useState(0);
+
+  function handleUpdate(): void {
+    if (mounted.current) {
+      updateState((state) => state + 1);
+    }
+  }
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   return () => {
-    updateState((state) => state + 1);
+    handleUpdate();
   };
 }
 
