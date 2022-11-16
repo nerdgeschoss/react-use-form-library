@@ -662,6 +662,24 @@ describe(Form, () => {
         expect(emails.dirty).toBeTruthy();
         expect(form.dirty).toBeTruthy();
       });
+      it('handles nested validation', () => {
+        const form = createForm({
+          value: {
+            address: {
+              streetName: '',
+            },
+          },
+          validations: {
+            address: {
+              streetName: 'required',
+            },
+          },
+        });
+        expect(form.fields.address.fields.streetName.errors).toHaveLength(1);
+        expect(form.fields.address.fields.streetName.errors[0]).toBe(
+          'required-field'
+        );
+      });
     });
   });
 

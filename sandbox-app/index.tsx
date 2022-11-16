@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from '../src/index';
 import { NestedField } from './nested-field';
+import { NestedValidation } from './nested-validation';
 import { NullableField } from './nullable-field';
 import { ObjectsArray } from './objects-array';
 import { SimpleArray } from './simple-array';
@@ -39,6 +40,7 @@ function App(): JSX.Element {
         <NestedField />
         <NullableField />
         <SimpleObject />
+        <NestedValidation />
       </div>
     </>
   );

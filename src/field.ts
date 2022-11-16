@@ -103,7 +103,7 @@ export class FieldImplementation<T, Model>
   get fields(): MappedFields<T> {
     if (!this.value) {
       this.value = {} as T;
-      this.#onUpdate();
+      this.#onUpdate?.();
     }
     const handler = {
       get: (target: MappedFields<T>, key: string) => {
