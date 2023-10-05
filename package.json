@@ -29,7 +29,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "react-dom": "^17.0.1"
+    "react-dom": ">17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
