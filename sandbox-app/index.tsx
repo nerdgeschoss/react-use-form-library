@@ -1,16 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { useForm } from '../src/index';
 import { NestedField } from './nested-field';
 import { NestedValidation } from './nested-validation';
 import { NullableField } from './nullable-field';
 import { ObjectsArray } from './objects-array';
 import { SimpleArray } from './simple-array';
+import { SimpleDelayedFields } from './simple-delayed-fields';
 import { SimpleFields } from './simple-fields';
 import { SimpleObject } from './simple-object';
 
 const examples = [
   'simple-fields',
+  'simple-delayed-fields',
   'simple-array',
   'objects-array',
   'nested-field',
@@ -35,6 +36,7 @@ function App(): JSX.Element {
       </ul>
       <div>
         <SimpleFields />
+        <SimpleDelayedFields />
         <SimpleArray />
         <ObjectsArray />
         <NestedField />

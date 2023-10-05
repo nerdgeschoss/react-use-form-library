@@ -179,6 +179,25 @@ export class FieldImplementation<T, Model>
     this.#onUpdate();
   };
 
+  updateOriginalValue(value: Partial<T>): void {
+    if (typeof value === 'object') {
+      this.#originalValue = { ...this.#originalValue, ...value };
+      Object.keys(value).forEach((key) => {
+        const field = this.fields[key];
+        if (!field.dirty) {
+          field.value = value[key];
+          this.value[key] = value[key];
+        }
+        field.updateOriginalValue(value[key]);
+      });
+    } else {
+      if (!this.dirty) {
+        this.value = value;
+      }
+      this.#originalValue = value;
+    }
+  }
+
   onFocus: () => void = () => {
     this.focused = true;
     this.#onUpdate();
