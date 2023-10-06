@@ -28,16 +28,14 @@
     "Jens Ravens"
   ],
   "license": "MIT",
-  "dependencies": {
-    "react-dom": "^17.0.1"
-  },
   "devDependencies": {
+    "react-dom": "^17.0.1",
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
-    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/plugin-transform-runtime": "^7.22.15",
     "@babel/preset-env": "^7.16.11",
-    "@babel/preset-flow": "^7.16.7",
-    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-flow": "^7.22.15",
+    "@babel/preset-react": "^7.22.15",
     "@types/jest": "^27.0.3",
     "@types/react": "^17.0.37",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
@@ -70,7 +68,7 @@
     "node-forge": "0.10.0"
   },
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": ">16.13.1"
   },
   "repository": {
     "type": "git",

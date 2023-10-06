@@ -521,6 +521,29 @@ describe(Form, () => {
       form.fields.name.onChange('test');
       expect(form.submissionStatus).toEqual('idle');
     });
+
+    it('allows updating the underlying model', async () => {
+      const form = createForm({ value: { name: undefined } });
+      expect(form.model.name).toBeUndefined();
+      expect(form.fields.name.value).toBeUndefined();
+      expect(form.dirty).toEqual(false);
+      form.updateOriginalModel({ name: 'Jorge' });
+      expect(form.model.name).toEqual('Jorge');
+      expect(form.dirty).toEqual(false);
+      expect(form.fields.name.dirty).toEqual(false);
+      expect(form.fields.name.touched).toEqual(false);
+      expect(form.fields.name.value).toEqual('Jorge');
+    });
+
+    it('does not change the dirty status when changing the underlying model', async () => {
+      const form = createForm({ value: { name: 'Klaus' } });
+      form.fields.name.onChange('Claudia');
+      expect(form.fields.name.dirty).toEqual(true);
+      form.updateOriginalModel({ name: 'Jorge' });
+      expect(form.fields.name.dirty).toEqual(true);
+      expect(form.fields.name.value).toEqual('Claudia');
+      expect(form.model.name).toEqual('Claudia');
+    });
   });
 
   describe('fields array', () => {

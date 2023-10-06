@@ -125,6 +125,10 @@ export class Form<T> {
     return this.#field.value;
   }
 
+  updateOriginalModel(value: Partial<T>): void {
+    this.#field.updateOriginalValue(value);
+  }
+
   get dirty(): boolean {
     return this.#field.dirty;
   }

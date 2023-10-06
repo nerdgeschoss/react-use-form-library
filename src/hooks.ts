@@ -1,4 +1,4 @@
-import { useForceUpdate } from './util';
+import { isEqual, useForceUpdate } from './util';
 import { useRef } from 'react';
 import { Form, SubmissionStatus } from './form';
 import { MappedValidation } from './validation';
@@ -48,8 +48,12 @@ export function useForm<T>({
       onInit,
     })
   );
-
   const form = formRef.current;
+
+  if (!isEqual(form.model, model)) {
+    form.updateOriginalModel(model);
+  }
+
   form.onSubmit = onSubmit;
   form.onSubmitError = onSubmitError;
 
