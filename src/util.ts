@@ -23,7 +23,7 @@ export function useForceUpdate(): () => void {
 }
 
 export function isEqual<T>(a: T, b: T): boolean {
-  if (a == b) return true; // faster in case there's actual equality
+  if (a === b) return true; // faster in case there's actual equality
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
