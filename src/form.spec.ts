@@ -535,6 +535,12 @@ describe(Form, () => {
       expect(form.fields.name.value).toEqual('Jorge');
     });
 
+    it('allows updating the underlying model even with null values', async () => {
+      const form = createForm({ value: { name: undefined } });
+      form.updateOriginalModel({ name: null }); // null counts as an object, check that it doesn't break
+      expect(form.model.name).toBeNull();
+    });
+
     it('does not change the dirty status when changing the underlying model', async () => {
       const form = createForm({ value: { name: 'Klaus' } });
       form.fields.name.onChange('Claudia');

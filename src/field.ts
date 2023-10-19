@@ -180,7 +180,7 @@ export class FieldImplementation<T, Model>
   };
 
   updateOriginalValue(value: Partial<T>): void {
-    if (typeof value === 'object') {
+    if (value && typeof value === 'object') {
       this.#originalValue = { ...this.#originalValue, ...value };
       Object.keys(value).forEach((key) => {
         const field = this.fields[key];
