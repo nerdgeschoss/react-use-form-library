@@ -38,8 +38,12 @@ export function compact<T>(array: Array<T | undefined | false | null>): T[] {
 export function copy<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.slice() as unknown as T;
-  } else if (value && typeof value === 'object') {
+  } else if (value && isObject(value)) {
     return { ...value };
   }
   return value;
+}
+
+export function isObject(value: unknown): boolean {
+  return !!value && typeof value === 'object' && value.constructor === Object;
 }
