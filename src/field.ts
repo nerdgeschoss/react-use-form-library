@@ -1,4 +1,4 @@
-import { copy, isEqual, uniq } from './util';
+import { copy, isEqual, isObject, uniq } from './util';
 import { MappedValidation, validateValue } from './validation';
 
 /* This type is used to take a model, parse it an return a different type
@@ -165,22 +165,20 @@ export class FieldImplementation<T, Model>
   onChange = (value: T | null): void => {
     this.value = value as T;
 
-    if (value && typeof value === 'object') {
-      if (Array.isArray(value)) {
-        this.#resetArray();
-      } else {
-        uniq([...Object.keys(this.#fields), ...Object.keys(value)]).forEach(
-          (key) => {
-            this.fields[key].onChange(value[key]);
-          }
-        );
-      }
+    if (Array.isArray(value)) {
+      this.#resetArray();
+    } else if (value && isObject(value)) {
+      uniq([...Object.keys(this.#fields), ...Object.keys(value)]).forEach(
+        (key) => {
+          this.fields[key].onChange(value[key]);
+        }
+      );
     }
     this.#onUpdate();
   };
 
   updateOriginalValue(value: Partial<T>): void {
-    if (value && typeof value === 'object') {
+    if (value && isObject(value)) {
       this.#originalValue = { ...this.#originalValue, ...value };
       Object.keys(value).forEach((key) => {
         const field = this.fields[key];
@@ -192,9 +190,9 @@ export class FieldImplementation<T, Model>
       });
     } else {
       if (!this.dirty) {
-        this.value = value;
+        this.value = value as T;
       }
-      this.#originalValue = value;
+      this.#originalValue = value as T;
     }
   }
 
@@ -261,7 +259,7 @@ export class FieldImplementation<T, Model>
       if (this.isNestedValidation) {
         Object.keys(this.#validations).forEach((e) => this.fields[e]);
       }
-      if (value && typeof value === 'object') {
+      if (value && isObject(value)) {
         Object.keys(value).forEach((e) => this.fields[e]);
       }
     }

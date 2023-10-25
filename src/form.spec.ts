@@ -38,6 +38,7 @@ interface Model {
   };
   hobbies: Array<{ name: string }>;
   json?: unknown;
+  dateValue?: Date;
 }
 
 const defaultValue: Model = {
@@ -539,6 +540,21 @@ describe(Form, () => {
       const form = createForm({ value: { name: undefined } });
       form.updateOriginalModel({ name: null }); // null counts as an object, check that it doesn't break
       expect(form.model.name).toBeNull();
+    });
+
+    it('allows updating the underlying model with object types', async () => {
+      const dateValue = new Date();
+      const newDateValue = new Date('1969-07-20T20:17:40Z');
+      const form = createForm({ value: { dateValue } });
+      expect(form.fields.dateValue.value).toEqual(dateValue);
+      expect(form.fields.dateValue.dirty).toBeFalsy();
+      form.updateOriginalModel({ dateValue: newDateValue });
+      expect(form.dirty).toEqual(false);
+      expect(form.model.dateValue).toEqual(newDateValue);
+      form.fields.dateValue.onChange(dateValue);
+      expect(form.fields.dateValue.dirty).toBeTruthy();
+      expect(form.dirty).toBeTruthy();
+      expect(form.changes['dateValue']).toEqual(dateValue);
     });
 
     it('does not change the dirty status when changing the underlying model', async () => {
