@@ -7,6 +7,7 @@ import { MappedFields } from './field';
 export interface UseFormProps<T> {
   model: T;
   validations?: Partial<MappedValidation<T>>;
+  _unstableUpdateModelOnChange?: boolean;
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<T>) => void;
@@ -35,6 +36,7 @@ export function useForm<T>({
   onSubmitError,
   validations,
   onInit,
+  _unstableUpdateModelOnChange,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
@@ -50,7 +52,7 @@ export function useForm<T>({
   );
   const form = formRef.current;
 
-  if (!isEqual(form.model, model)) {
+  if (_unstableUpdateModelOnChange && !isEqual(form.model, model)) {
     form.updateOriginalModel(model);
   }
 

@@ -23,6 +23,7 @@ export function SimpleDelayedFields(): JSX.Element {
     reset,
   } = useForm({
     model: { name },
+    _unstableUpdateModelOnChange: true,
     onSubmit: async ({ model }) => {
       // eslint-disable-next-line no-console
       console.log(model);
