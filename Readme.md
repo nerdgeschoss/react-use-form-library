@@ -721,9 +721,10 @@ return (
 | Property      | Details                                                                                                          |
 | ------------- | ---------------------------------------------------------------------------------------------------------------- |
 | model         | Your form model, it should be an object (can be empty). Every property will be mapped into a field.              |
+| validations   | A validations object.                                                                                            |
 | onSubmit      | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
 | onSubmitError | A useful handler to deal with errors.                                                                            |
-| validations   | A validations object.                                                                                            |
+| onChange      | A handler for changes in all form fields.                                                                        |
 
 <p>&nbsp</p>
 
@@ -818,7 +819,7 @@ Releases are done via GitHub Releases. Create a new release there, this will aut
 
 ### Sandbox App
 
-There is a also a sandbox basic application to play around with the library. Use `yarn dev` to start up the parcel server, and you can find the files inside the `/sandbox-app` folder.
+There is a also a sandbox basic application to play around with the library. Use `yarn start` to start up the parcel server, and you can find the files inside the `/sandbox-app` folder.
 
 #### Troubleshoot
 
