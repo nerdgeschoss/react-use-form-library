@@ -26,7 +26,7 @@ export function SimpleObject(): JSX.Element {
       // eslint-disable-next-line no-console
       console.log(model);
     },
-    onChange: (model) => {
+    onChange: ({ model }) => {
       // eslint-disable-next-line no-console
       console.log(model);
     },

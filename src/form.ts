@@ -9,9 +9,9 @@ export class Form<T> {
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError: ((error: Error) => void) | undefined;
   #validations: MappedValidation<T>;
-  #onUpdate?: () => void;
   #field: FieldImplementation<T, T>;
-  #onChange?: (model: T) => void;
+  #onChange?: (form: Form<T>) => void;
+  #onUpdate?: () => void;
 
   constructor({
     model,
@@ -28,7 +28,7 @@ export class Form<T> {
     onSubmit?: (form: Form<T>) => void | Promise<void>;
     onSubmitError?: (error: Error) => void;
     onInit?: (form: Form<T>) => void;
-    onChange?: (model: T) => void;
+    onChange?: (form: Form<T>) => void;
   }) {
     this.#validations = validations ?? {};
     this.#field = new FieldImplementation<T, T>({
@@ -153,7 +153,7 @@ export class Form<T> {
     ) {
       this.submissionStatus = 'idle';
     }
-    this.#onChange?.(this.model);
+    this.#onChange?.(this);
     this.#onUpdate?.();
   }
 }
