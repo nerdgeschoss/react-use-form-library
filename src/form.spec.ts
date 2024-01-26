@@ -54,20 +54,23 @@ function createForm({
   onSubmit,
   onSubmitError,
   onInit,
+  onChange,
 }: {
   value?: Partial<Model>;
   validations?: Partial<MappedValidation<Model>>;
   onSubmit?: (form: Form<Model>) => Promise<void> | void;
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<Model>) => void;
+  onChange?: (form: Form<Model>) => void;
 } = {}): Form<Model> {
   return new Form<Model>({
     model: { ...defaultValue, ...(value || {}) },
+    validations,
     onUpdate: tracker.onUpdate,
     onSubmit: onSubmit ?? tracker.onSubmit,
     onSubmitError,
     onInit,
-    validations,
+    onChange,
   });
 }
 
@@ -824,6 +827,30 @@ describe(Form, () => {
       expect(form.fields.address.fields?.streetName.dirty).toBeTruthy();
       expect(form.fields.address.fields?.streetNumber.dirty).toBeFalsy();
       expect(form.fields.address.dirty).toBeTruthy();
+    });
+  });
+
+  describe('change handler', () => {
+    it('invokes the onChange callback when a field changes value', () => {
+      const initializeAppSpy = jest.fn();
+      const form = createForm({
+        onChange: initializeAppSpy,
+      });
+      form.fields.name.onChange('Freddy');
+      form.fields.age.onChange(27);
+      expect(initializeAppSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('passes the form values on the onChange method', () => {
+      let storedFormValues = null;
+      const form = createForm({
+        onChange: (form) => {
+          storedFormValues = form;
+        },
+      });
+      form.fields.name.onChange('George');
+      form.fields.age.onChange(30);
+      expect(storedFormValues).toEqual(form);
     });
   });
 });
