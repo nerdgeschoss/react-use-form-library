@@ -9,8 +9,9 @@ export class Form<T> {
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError: ((error: Error) => void) | undefined;
   #validations: MappedValidation<T>;
-  #onUpdate?: () => void;
   #field: FieldImplementation<T, T>;
+  #onChange?: (form: Form<T>) => void;
+  #onUpdate?: () => void;
 
   constructor({
     model,
@@ -19,6 +20,7 @@ export class Form<T> {
     onSubmit,
     onSubmitError,
     onInit,
+    onChange,
   }: {
     model: T;
     validations?: MappedValidation<T>;
@@ -26,6 +28,7 @@ export class Form<T> {
     onSubmit?: (form: Form<T>) => void | Promise<void>;
     onSubmitError?: (error: Error) => void;
     onInit?: (form: Form<T>) => void;
+    onChange?: (form: Form<T>) => void;
   }) {
     this.#validations = validations ?? {};
     this.#field = new FieldImplementation<T, T>({
@@ -40,6 +43,7 @@ export class Form<T> {
     this.#onUpdate = onUpdate;
     this.onSubmit = onSubmit;
     this.onSubmitError = onSubmitError;
+    this.#onChange = onChange;
   }
 
   // This method will touch every field, for the purpose of displaying the errors in the view
@@ -149,6 +153,7 @@ export class Form<T> {
     ) {
       this.submissionStatus = 'idle';
     }
+    this.#onChange?.(this);
     this.#onUpdate?.();
   }
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useForm } from '../src';
-import { Input } from './components/Input';
 
 interface Model {
   simpleObject?: {
@@ -24,6 +23,10 @@ export function SimpleObject(): JSX.Element {
   } = useForm({
     model: initialValue,
     onSubmit: async ({ model }) => {
+      // eslint-disable-next-line no-console
+      console.log(model);
+    },
+    onChange: ({ model }) => {
       // eslint-disable-next-line no-console
       console.log(model);
     },

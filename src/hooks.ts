@@ -11,6 +11,7 @@ export interface UseFormProps<T> {
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<T>) => void;
+  onChange?: (form: Form<T>) => void;
 }
 
 // This interface is what you get back from the useForm hook
@@ -36,6 +37,7 @@ export function useForm<T>({
   onSubmitError,
   validations,
   onInit,
+  onChange,
   _unstableUpdateModelOnChange,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
@@ -43,11 +45,12 @@ export function useForm<T>({
   const formRef = useRef<Form<T>>(
     new Form({
       model,
-      onUpdate,
       validations,
+      onUpdate,
       onSubmit,
       onSubmitError,
       onInit,
+      onChange,
     })
   );
   const form = formRef.current;
