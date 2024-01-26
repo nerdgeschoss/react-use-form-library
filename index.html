@@ -384,6 +384,10 @@ be further applied to any new field created.</p>
 <td>Your form model, it should be an object (can be empty). Every property will be mapped into a field.</td>
 </tr>
 <tr>
+<td>validations</td>
+<td>A validations object.</td>
+</tr>
+<tr>
 <td>onSubmit</td>
 <td>Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly.</td>
 </tr>
@@ -392,8 +396,8 @@ be further applied to any new field created.</p>
 <td>A useful handler to deal with errors.</td>
 </tr>
 <tr>
-<td>validations</td>
-<td>A validations object.</td>
+<td>onChange</td>
+<td>A handler for changes in all form fields.</td>
 </tr>
 </tbody></table>
 <p>&nbsp</p>
@@ -644,7 +648,7 @@ be further applied to any new field created.</p>
 <a href="#sandbox-app" id="sandbox-app" style="color: inherit; text-decoration: none;">
   <h3>Sandbox App</h3>
 </a>
-<p>There is a also a sandbox basic application to play around with the library. Use <code>yarn dev</code> to start up the parcel server, and you can find the files inside the <code>/sandbox-app</code> folder.</p>
+<p>There is a also a sandbox basic application to play around with the library. Use <code>yarn start</code> to start up the parcel server, and you can find the files inside the <code>/sandbox-app</code> folder.</p>
 
 <a href="#troubleshoot" id="troubleshoot" style="color: inherit; text-decoration: none;">
   <h4>Troubleshoot</h4>
