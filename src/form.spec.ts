@@ -535,7 +535,8 @@ describe(Form, () => {
       expect(form.model.name).toEqual('Jorge');
       expect(form.dirty).toEqual(false);
       expect(form.fields.name.dirty).toEqual(false);
-      expect(form.fields.name.touched).toEqual(false);
+      expect(form.fields.name.touched).toEqual(true);
+      expect(form.fields.name.valid).toBeTruthy();
       expect(form.fields.name.value).toEqual('Jorge');
     });
 
