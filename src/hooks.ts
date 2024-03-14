@@ -51,8 +51,8 @@ export function useForm<T>({
       onSubmitError,
       onInit,
       onChange: () => {
-        formRef.current.updateOriginalModel();
         onChange?.(formRef.current);
+        formRef.current.updateOriginalModel();
       },
     })
   );
