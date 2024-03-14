@@ -37,7 +37,7 @@ export function useForm<T>({
   onSubmit,
   onSubmitError,
   validations,
-  updateModelOnChange,
+  updateModelOnChange = true,
   onInit,
   onChange,
 }: UseFormProps<T>): FormModel<T> {

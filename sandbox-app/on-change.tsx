@@ -13,7 +13,6 @@ export function OnChange(): JSX.Element {
     onSubmit: async ({ model }) => {
       data.current = model;
     },
-    updateModelOnChange: true,
     onChange: async ({ changes }) => {
       updatedChanges.current = changes;
       data.current = {
