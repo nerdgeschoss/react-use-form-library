@@ -94,4 +94,18 @@ describe(Form, () => {
       expect(storedFormValues).toEqual(form);
     });
   });
+
+  it('updates the model after calling on the change method', () => {
+    const form = createForm({
+      value: { confirmed: false },
+    });
+
+    form.fields.confirmed.onChange(true);
+    expect(form.changes.confirmed).toEqual(true);
+
+    form.updateOriginalModel();
+
+    form.fields.confirmed.onChange(false);
+    expect(form.changes.confirmed).toEqual(false);
+  });
 });

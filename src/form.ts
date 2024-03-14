@@ -1,5 +1,6 @@
-import { MappedValidation } from './validation';
 import { Field, FieldImplementation, MappedFields } from './field';
+
+import { MappedValidation } from './validation';
 
 export type SubmissionStatus = 'submitting' | 'error' | 'submitted' | 'idle';
 
@@ -129,8 +130,8 @@ export class Form<T> {
     return this.#field.value;
   }
 
-  updateOriginalModel(value: Partial<T>): void {
-    this.#field.updateOriginalValue(value);
+  updateOriginalModel(value?: Partial<T>): void {
+    this.#field.updateOriginalValue(value || this.model);
   }
 
   get dirty(): boolean {

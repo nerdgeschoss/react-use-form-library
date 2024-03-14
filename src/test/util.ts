@@ -17,6 +17,7 @@ export interface Model {
   hobbies: Array<{ name: string }>;
   json?: unknown;
   dateValue?: Date;
+  confirmed?: boolean;
 }
 
 class UpdateTracker {
