@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { useForm } from '../src';
+
 import { Input } from './components/Input';
+import { useForm } from '../src';
 
 function useMyApiValue(): string {
   const [value, setValue] = React.useState('');
@@ -23,7 +24,6 @@ export function SimpleDelayedFields(): JSX.Element {
     reset,
   } = useForm({
     model: { name },
-    _unstableUpdateModelOnChange: true,
     onSubmit: async ({ model }) => {
       // eslint-disable-next-line no-console
       console.log(model);

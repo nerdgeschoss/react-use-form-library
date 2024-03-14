@@ -1,9 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import { NestedField } from './nested-field';
 import { NestedValidation } from './nested-validation';
 import { NullableField } from './nullable-field';
 import { ObjectsArray } from './objects-array';
+import { OnChange } from './on-change';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { SimpleArray } from './simple-array';
 import { SimpleDelayedFields } from './simple-delayed-fields';
 import { SimpleFields } from './simple-fields';
@@ -17,6 +18,7 @@ const examples = [
   'nested-field',
   'nullable-field',
   'simple-object',
+  'on-change',
 ];
 
 function App(): JSX.Element {
@@ -43,6 +45,7 @@ function App(): JSX.Element {
         <NullableField />
         <SimpleObject />
         <NestedValidation />
+        <OnChange />
       </div>
     </>
   );
