@@ -131,7 +131,7 @@ export class Form<T> {
   }
 
   updateOriginalModel(value?: Partial<T>): void {
-    this.#field.updateOriginalValue(value || this.model);
+    this.#field.updateOriginalValue(value ?? this.model);
   }
 
   get dirty(): boolean {
