@@ -8,6 +8,7 @@ import { useRef } from 'react';
 export interface UseFormProps<T> {
   model: T;
   validations?: Partial<MappedValidation<T>>;
+  updateModelOnChange?: boolean;
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<T>) => void;
@@ -36,6 +37,7 @@ export function useForm<T>({
   onSubmit,
   onSubmitError,
   validations,
+  updateModelOnChange,
   onInit,
   onChange,
 }: UseFormProps<T>): FormModel<T> {
@@ -51,8 +53,8 @@ export function useForm<T>({
       onSubmitError,
       onInit,
       onChange: () => {
-        if (onChange) {
-          onChange(formRef.current);
+        onChange?.(formRef.current);
+        if (updateModelOnChange) {
           formRef.current.updateOriginalModel();
         }
       },
