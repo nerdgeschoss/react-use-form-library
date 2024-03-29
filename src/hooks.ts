@@ -20,6 +20,7 @@ export interface FormModel<T> {
   model: T;
   fields: MappedFields<T>;
   changes: Partial<T>;
+  touched: Partial<T>;
   dirty: boolean;
   valid: boolean;
   submissionStatus: SubmissionStatus;
@@ -68,6 +69,7 @@ export function useForm<T>({
     model: form.model,
     fields: form.fields,
     changes: form.changes,
+    touched: form.touched,
     dirty: form.dirty,
     valid: form.valid,
     error: form.error,

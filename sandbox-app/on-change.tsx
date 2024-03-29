@@ -2,22 +2,21 @@ import React from 'react';
 import { useForm } from '../src';
 
 export function OnChange(): JSX.Element {
-  const data = React.useRef({});
-  const updatedChanges = React.useRef({});
+  const data = React.useRef({
+    name: 'John Doe',
+    confirm: false,
+  });
 
-  const { fields, model, onSubmit, reset } = useForm({
-    model: {
-      name: 'John Doe',
-      confirm: false,
-    },
+  const { fields, changes, touched, onSubmit, reset } = useForm({
+    model: data.current,
     onSubmit: async ({ model }) => {
       data.current = model;
     },
-    onChange: async ({ changes }) => {
-      updatedChanges.current = changes;
+    onChange: async ({ changes, touched }) => {
       data.current = {
         ...data.current,
         ...changes,
+        ...touched,
       };
     },
   });
@@ -25,6 +24,12 @@ export function OnChange(): JSX.Element {
   return (
     <>
       <h2 id="on-change">On Change</h2>
+      <p>
+        Changes does not reflect a double toggled boolean state because the
+        value will be the same as the initial value. We can now use the touched
+        object to get an updated model with the changes.
+      </p>
+
       <form onSubmit={onSubmit}>
         <label>
           <span>Confirm</span>
@@ -32,6 +37,7 @@ export function OnChange(): JSX.Element {
             type="checkbox"
             checked={fields.confirm.value}
             onChange={(event) => {
+              fields.confirm.touch();
               fields.confirm.onChange(event.target.checked);
             }}
           />
@@ -45,11 +51,7 @@ export function OnChange(): JSX.Element {
       </form>
       <h4>Data</h4>
       <pre>
-        {JSON.stringify(
-          { data: data.current, model, changes: updatedChanges.current },
-          null,
-          2
-        )}
+        {JSON.stringify({ data: data.current, changes, touched }, null, 2)}
       </pre>
       <a href="#">Back</a>
     </>

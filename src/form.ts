@@ -125,6 +125,21 @@ export class Form<T> {
     return changes;
   }
 
+  // Return an object with the fields that have been touched
+  get touched(): Partial<T> {
+    const touched: Partial<T> = {};
+
+    for (const key in this.fields) {
+      const field = this.fields[key];
+      if (field.touched) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        touched[key] = field.value as any;
+      }
+    }
+
+    return touched;
+  }
+
   // The exposed updated model contains both the original model and the changes object on top
   get model(): T {
     return this.#field.value;

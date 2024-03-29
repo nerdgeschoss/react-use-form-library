@@ -95,7 +95,7 @@ describe(Form, () => {
     });
   });
 
-  it('updates the model after calling on the change method', () => {
+  it('touched object contains the changed field', () => {
     const form = createForm({
       value: { confirmed: false },
     });
@@ -103,9 +103,9 @@ describe(Form, () => {
     form.fields.confirmed.onChange(true);
     expect(form.changes.confirmed).toEqual(true);
 
-    form.updateOriginalModel();
-
     form.fields.confirmed.onChange(false);
-    expect(form.changes.confirmed).toEqual(false);
+    form.fields.confirmed.onBlur();
+    expect(form.changes.confirmed).toEqual(undefined);
+    expect(form.touched.confirmed).toEqual(false);
   });
 });
