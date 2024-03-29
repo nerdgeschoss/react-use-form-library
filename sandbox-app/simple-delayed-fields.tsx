@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
+import { useForm } from '../src';
 
 import { Input } from './components/Input';
-import { useForm } from '../src';
 
 function useMyApiValue(): string {
   const [value, setValue] = React.useState('');
