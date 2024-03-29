@@ -130,8 +130,8 @@ export class Form<T> {
     return this.#field.value;
   }
 
-  updateOriginalModel(value?: Partial<T>): void {
-    this.#field.updateOriginalValue(value ?? this.model);
+  updateOriginalModel(value: Partial<T>): void {
+    this.#field.updateOriginalValue(value);
   }
 
   get dirty(): boolean {

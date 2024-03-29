@@ -1,14 +1,14 @@
 import { Form, SubmissionStatus } from './form';
+import { isEqual, useForceUpdate } from './util';
 
 import { MappedFields } from './field';
 import { MappedValidation } from './validation';
-import { useForceUpdate } from './util';
 import { useRef } from 'react';
 
 export interface UseFormProps<T> {
   model: T;
   validations?: Partial<MappedValidation<T>>;
-  updateModelOnChange?: boolean;
+  _unstableUpdateModelOnChange?: boolean;
   onSubmit?: (form: Form<T>) => void | Promise<void>;
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<T>) => void;
@@ -37,9 +37,9 @@ export function useForm<T>({
   onSubmit,
   onSubmitError,
   validations,
-  updateModelOnChange = true,
   onInit,
   onChange,
+  _unstableUpdateModelOnChange,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
@@ -52,15 +52,14 @@ export function useForm<T>({
       onSubmit,
       onSubmitError,
       onInit,
-      onChange: () => {
-        onChange?.(formRef.current);
-        if (updateModelOnChange) {
-          formRef.current.updateOriginalModel();
-        }
-      },
+      onChange,
     })
   );
   const form = formRef.current;
+
+  if (_unstableUpdateModelOnChange && !isEqual(form.model, model)) {
+    form.updateOriginalModel(model);
+  }
 
   form.onSubmit = onSubmit;
   form.onSubmitError = onSubmitError;
