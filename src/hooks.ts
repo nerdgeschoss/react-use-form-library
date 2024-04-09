@@ -1,8 +1,9 @@
-import { isEqual, useForceUpdate } from './util';
-import { useRef } from 'react';
 import { Form, SubmissionStatus } from './form';
-import { MappedValidation } from './validation';
+import { isEqual, useForceUpdate } from './util';
+
 import { MappedFields } from './field';
+import { MappedValidation } from './validation';
+import { useRef } from 'react';
 
 export interface UseFormProps<T> {
   model: T;
@@ -19,6 +20,7 @@ export interface FormModel<T> {
   model: T;
   fields: MappedFields<T>;
   changes: Partial<T>;
+  touchedValues: Partial<T>;
   dirty: boolean;
   valid: boolean;
   submissionStatus: SubmissionStatus;
@@ -42,6 +44,7 @@ export function useForm<T>({
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
+
   const formRef = useRef<Form<T>>(
     new Form({
       model,
@@ -66,6 +69,7 @@ export function useForm<T>({
     model: form.model,
     fields: form.fields,
     changes: form.changes,
+    touchedValues: form.touchedValues,
     dirty: form.dirty,
     valid: form.valid,
     error: form.error,
