@@ -7,16 +7,16 @@ export function OnChange(): JSX.Element {
     confirm: false,
   });
 
-  const { fields, changes, touched, onSubmit, reset } = useForm({
+  const { fields, changes, touchedValues, onSubmit, reset } = useForm({
     model: data.current,
     onSubmit: async ({ model }) => {
       data.current = model;
     },
-    onChange: async ({ changes, touched }) => {
+    onChange: async ({ changes, touchedValues }) => {
       data.current = {
         ...data.current,
         ...changes,
-        ...touched,
+        ...touchedValues,
       };
     },
   });
@@ -51,7 +51,11 @@ export function OnChange(): JSX.Element {
       </form>
       <h4>Data</h4>
       <pre>
-        {JSON.stringify({ data: data.current, changes, touched }, null, 2)}
+        {JSON.stringify(
+          { data: data.current, changes, touchedValues },
+          null,
+          2
+        )}
       </pre>
       <a href="#">Back</a>
     </>

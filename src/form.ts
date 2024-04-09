@@ -126,7 +126,7 @@ export class Form<T> {
   }
 
   // Return an object with the fields that have been touched
-  get touched(): Partial<T> {
+  get touchedValues(): Partial<T> {
     const touched: Partial<T> = {};
 
     for (const key in this.fields) {

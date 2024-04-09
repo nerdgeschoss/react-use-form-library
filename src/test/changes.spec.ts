@@ -106,6 +106,6 @@ describe(Form, () => {
     form.fields.confirmed.onChange(false);
     form.fields.confirmed.onBlur();
     expect(form.changes.confirmed).toEqual(undefined);
-    expect(form.touched.confirmed).toEqual(false);
+    expect(form.touchedValues.confirmed).toEqual(false);
   });
 });
