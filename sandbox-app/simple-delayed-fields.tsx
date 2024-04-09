@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useForm } from '../src';
-
 import { Input } from './components/Input';
 
 function useMyApiValue(): string {
