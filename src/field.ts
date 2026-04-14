@@ -144,7 +144,7 @@ export class FieldImplementation<T, Model>
   }
 
   reset(): void {
-    this.value = this.#originalValue;
+    this.value = copy(this.#originalValue);
     this.touched = false;
 
     if (Array.isArray(this.value)) {

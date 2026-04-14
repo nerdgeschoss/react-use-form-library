@@ -61,6 +61,21 @@ describe(Form, () => {
         expect(emails.elements[0].value).toEqual('google.com');
         expect(emails.elements[1].value).toEqual('facebook.com');
       });
+      it('tracks dirty state and resets even after multiple resets', () => {
+        const form = createForm({
+          value: { emails: ['google.com', 'facebook.com'] },
+        });
+        const emails = form.fields.emails;
+        emails.elements[0].onChange('linkedin.com');
+        emails.reset();
+        // After reset, changing an element should register as dirty
+        emails.elements[0].onChange('twitter.com');
+        expect(emails.dirty).toBeTruthy();
+        // Resetting again should restore the truly original values
+        emails.reset();
+        expect(emails.elements[0].value).toEqual('google.com');
+        expect(emails.dirty).toBeFalsy();
+      });
       it('touches every field', () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
