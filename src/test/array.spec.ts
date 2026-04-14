@@ -61,7 +61,7 @@ describe(Form, () => {
         expect(emails.elements[0].value).toEqual('google.com');
         expect(emails.elements[1].value).toEqual('facebook.com');
       });
-      it('tracks dirty state and resets correctly after post-reset element changes', () => {
+      it('tracks dirty state and resets even after multiple resets', () => {
         const form = createForm({
           value: { emails: ['google.com', 'facebook.com'] },
         });
