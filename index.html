@@ -349,6 +349,15 @@ be further applied to any new field created.</p>
 <p>&nbsp</p>
 
 
+<a href="#tuples-are-not-fieldsets" id="tuples-are-not-fieldsets" style="color: inherit; text-decoration: none;">
+  <h3>Tuples are not FieldSets</h3>
+</a>
+<p>A property typed as a tuple — a fixed-length array such as <code>[Date, Date]</code> — is treated as a scalar <code>FormField</code>, not a <code>FieldSet</code>. This is useful for composite values like a date range, where the value is consumed as a single tuple via <code>field.value</code> rather than iterated via <code>field.elements</code>.</p>
+<pre><code class="language-ts"><span class="hl-4">const</span><span class="hl-1"> { </span><span class="hl-7">fields</span><span class="hl-1"> } = </span><span class="hl-5">useForm</span><span class="hl-1">&lt;{ </span><span class="hl-2">range</span><span class="hl-1">: [</span><span class="hl-6">Date</span><span class="hl-1">, </span><span class="hl-6">Date</span><span class="hl-1">]; </span><span class="hl-2">tags</span><span class="hl-1">: </span><span class="hl-6">string</span><span class="hl-1">[] }&gt;({</span><br/><span class="hl-1">  </span><span class="hl-2">model:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-2">range:</span><span class="hl-1"> [</span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(), </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">()],</span><br/><span class="hl-1">    </span><span class="hl-2">tags:</span><span class="hl-1"> [],</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-8">// `range.value` is typed as `[Date, Date]` — use it as a single value.</span><br/><span class="hl-2">fields</span><span class="hl-1">.</span><span class="hl-2">range</span><span class="hl-1">.</span><span class="hl-5">onChange</span><span class="hl-1">([</span><span class="hl-2">newStart</span><span class="hl-1">, </span><span class="hl-2">newEnd</span><span class="hl-1">]);</span><br/><br/><span class="hl-8">// `tags` is a FieldSet — iterate via `tags.elements`, grow with `tags.add(...)`.</span><br/><span class="hl-2">fields</span><span class="hl-1">.</span><span class="hl-2">tags</span><span class="hl-1">.</span><span class="hl-5">add</span><span class="hl-1">(</span><span class="hl-3">&#39;new tag&#39;</span><span class="hl-1">);</span>
+</code></pre>
+<p>&nbsp</p>
+
+
 <a href="#advanced-fieldset" id="advanced-fieldset" style="color: inherit; text-decoration: none;">
   <h3>Advanced FieldSet</h3>
 </a>
