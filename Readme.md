@@ -660,6 +660,27 @@ useForm({
 
 <p>&nbsp</p>
 
+### Tuples are not FieldSets
+
+A property typed as a tuple — a fixed-length array such as `[Date, Date]` — is treated as a scalar `FormField`, not a `FieldSet`. This is useful for composite values like a date range, where the value is consumed as a single tuple via `field.value` rather than iterated via `field.elements`.
+
+```ts
+const { fields } = useForm<{ range: [Date, Date]; tags: string[] }>({
+  model: {
+    range: [new Date(), new Date()],
+    tags: [],
+  },
+});
+
+// `range.value` is typed as `[Date, Date]` — use it as a single value.
+fields.range.onChange([newStart, newEnd]);
+
+// `tags` is a FieldSet — iterate via `tags.elements`, grow with `tags.add(...)`.
+fields.tags.add('new tag');
+```
+
+<p>&nbsp</p>
+
 ### Advanced FieldSet
 
 A common escenario would be to have an array of objects in your model.
