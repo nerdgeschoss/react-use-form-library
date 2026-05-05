@@ -3,10 +3,14 @@ import { MappedValidation, validateValue } from './validation';
 
 /* This type is used to take a model, parse it an return a different type
 for each field. In this case, for each field of T, string | number you
-get back a FormField type */
+get back a FormField type. Tuples (e.g. `[Date, Date]`) are detected via
+their literal `length` and treated as scalar fields, since they represent
+a single composite value rather than a variable-length collection. */
 export type MappedFields<T> = {
-  [P in keyof Required<T>]: T[P] extends unknown[] | undefined
-    ? FieldSet<NonNullable<T[P]>[0]>
+  [P in keyof Required<T>]: NonNullable<T[P]> extends readonly unknown[]
+    ? number extends NonNullable<T[P]>['length']
+      ? FieldSet<NonNullable<T[P]>[0]>
+      : Field<T[P]>
     : T[P] extends Record<string, unknown> | undefined | null
     ? NestedField<NonNullable<T[P]>>
     : Field<T[P]>;
