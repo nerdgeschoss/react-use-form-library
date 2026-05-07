@@ -111,20 +111,28 @@ export class FieldImplementation<T, Model>
     }
     const handler = {
       get: (target: MappedFields<T>, key: string) => {
-        if (!target[key]) {
+        const t = target as unknown as Record<
+          string,
+          FieldImplementation<unknown, Model>
+        >;
+        const validations = this.#validations as Record<string, unknown>;
+        if (!t[key]) {
           const field = new FieldImplementation({
-            value: this.value[key],
-            originalValue: this.value[key],
+            value: (this.value as unknown as Record<string, unknown>)[key],
+            originalValue: (this.value as unknown as Record<string, unknown>)[
+              key
+            ],
             onUpdate: () => {
-              this.value[key] = field.value;
+              (this.value as unknown as Record<string, unknown>)[key] =
+                field.value;
               this.#onUpdate();
             },
-            validations: this.#validations[key] || {},
+            validations: (validations[key] || {}) as MappedValidation<unknown>,
             getModel: this.#getModel,
           });
-          target[key] = field;
+          t[key] = field;
         }
-        return target[key];
+        return t[key];
       },
     };
     return new Proxy(this.#fields as MappedFields<T>, handler);
@@ -172,9 +180,11 @@ export class FieldImplementation<T, Model>
     if (Array.isArray(value)) {
       this.#resetArray();
     } else if (value && isObject(value)) {
+      const fields = this.fields as Record<string, Field<unknown>>;
+      const v = value as Record<string, unknown>;
       uniq([...Object.keys(this.#fields), ...Object.keys(value)]).forEach(
         (key) => {
-          this.fields[key].onChange(value[key]);
+          fields[key].onChange(v[key]);
         }
       );
     }
@@ -184,13 +194,19 @@ export class FieldImplementation<T, Model>
   updateOriginalValue(value: Partial<T>): void {
     if (value && isObject(value)) {
       this.#originalValue = { ...this.#originalValue, ...value };
+      const fields = this.fields as unknown as Record<
+        string,
+        FieldImplementation<unknown, Model>
+      >;
+      const v = value as Record<string, unknown>;
+      const self = this.value as unknown as Record<string, unknown>;
       Object.keys(value).forEach((key) => {
-        const field = this.fields[key];
+        const field = fields[key];
         if (!field.dirty) {
-          field.value = value[key];
-          this.value[key] = value[key];
+          field.value = v[key];
+          self[key] = v[key];
         }
-        field.updateOriginalValue(value[key]);
+        field.updateOriginalValue(v[key] as Partial<unknown>);
       });
     } else {
       if (!this.dirty) {
@@ -214,8 +230,12 @@ export class FieldImplementation<T, Model>
   validate(): void {
     const validations = this.#validations;
     if (this.isNestedValidation) {
+      const fields = this.fields as unknown as Record<
+        string,
+        FieldImplementation<unknown, Model>
+      >;
       Object.keys(validations).forEach((key) => {
-        this.fields[key].validate();
+        fields[key].validate();
       });
     } else {
       this.errors = validateValue(
@@ -252,19 +272,24 @@ export class FieldImplementation<T, Model>
   #createSubfields(): void {
     const value = this.value;
     if (Array.isArray(value)) {
+      const originalArray = this.#originalValue as unknown as T[];
       this.elements = value.map((e, index) => {
         if (this.#originalValue === undefined || this.#originalValue === null) {
           return this.createFieldSetField(e, e);
         }
-        return this.createFieldSetField(e, this.#originalValue[index]);
+        return this.createFieldSetField(e, originalArray[index]);
       });
     } else {
+      const fields = this.fields as unknown as Record<
+        string,
+        FieldImplementation<unknown, Model>
+      >;
       // make sure as many fields as possible are initialized
       if (this.isNestedValidation) {
-        Object.keys(this.#validations).forEach((e) => this.fields[e]);
+        Object.keys(this.#validations).forEach((e) => fields[e]);
       }
       if (value && isObject(value)) {
-        Object.keys(value).forEach((e) => this.fields[e]);
+        Object.keys(value).forEach((e) => fields[e]);
       }
     }
   }
@@ -278,7 +303,7 @@ export class FieldImplementation<T, Model>
       originalValue,
       onUpdate: () => {
         const index = this.elements.indexOf(field);
-        this.value[index] = field.value;
+        (this.value as unknown as T[])[index] = field.value;
         this.#onUpdate();
       },
       validations: this.#validations,

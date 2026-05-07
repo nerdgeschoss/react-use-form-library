@@ -18,11 +18,9 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "target": "es6",
     "isolatedModules": true,
-    "declaration": true,
-    "jsx": "react"
+    "declaration": true
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.spec.ts"],

@@ -99,9 +99,11 @@ export class Form<T> {
 
   // Mass update method.
   updateFields(model: Partial<T>): void {
+    const fields = this.fields as unknown as Record<string, Field<unknown>>;
+    const m = model as Record<string, unknown>;
     Object.keys(model).forEach((key) => {
-      const field: Field<unknown> = this.fields[key];
-      field.onChange(model[key]);
+      const field = fields[key];
+      field.onChange(m[key]);
     });
     this.onUpdate();
   }
