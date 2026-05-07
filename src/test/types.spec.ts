@@ -50,4 +50,10 @@ describe('MappedFields', () => {
 
     expect([_value, _hasFieldSetShape]).toEqual([true, true]);
   });
+
+  it('preserves null on nested object fields', () => {
+    type TestField = MappedFields<{ test: { foo: string } | null }>['test'];
+    const _mustAcceptNull: TestField['value'] = null;
+    void _mustAcceptNull;
+  });
 });
