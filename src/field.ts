@@ -11,7 +11,7 @@ export type MappedFields<T> = {
     ? number extends NonNullable<T[P]>['length']
       ? FieldSet<NonNullable<T[P]>[0]>
       : Field<T[P]>
-    : T[P] extends Record<string, unknown> | undefined | null
+    : T[P] extends Record<string, unknown>
     ? NestedField<NonNullable<T[P]>>
     : Field<T[P]>;
 };
