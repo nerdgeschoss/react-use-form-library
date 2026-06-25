@@ -73,7 +73,7 @@ describe(Form, () => {
 
   describe('change handler', () => {
     it('invokes the onChange callback when a field changes value', () => {
-      const initializeAppSpy = jest.fn();
+      const initializeAppSpy = vi.fn();
       const form = createForm({
         onChange: initializeAppSpy,
       });

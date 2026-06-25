@@ -17,8 +17,8 @@
     "lint": "yarn lint:types && yarn lint:style",
     "lint:types": "tsc --noEmit",
     "lint:style": "eslint src/**/*.ts --max-warnings 0",
-    "test:ci": "jest --coverage",
-    "test": "jest --watchAll",
+    "test:ci": "vitest run --coverage",
+    "test": "vitest",
     "watch": "rimraf dist && tsc -w",
     "start": "parcel sandbox-app/index.html",
     "document": "yarn build:docs"
@@ -29,16 +29,18 @@
     "Geraldine Atayan"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
   "devDependencies": {
-    "react-dom": "^17.0.1",
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.22.15",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-flow": "^7.22.15",
     "@babel/preset-react": "^7.22.15",
-    "@types/jest": "^27.0.3",
     "@types/react": "^17.0.37",
+    "@types/react-dom": "^17",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "babel-core": "^6.26.3",
@@ -47,23 +49,25 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "@vitest/coverage-v8": "^3.2.4",
     "esbuild": "^0.14.2",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "jest": "^27.4.3",
+    "jsdom": "^25.0.1",
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.5.1",
     "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.61.0",
     "rollup-plugin-cleaner": "^1.0.0",
     "rollup-plugin-esbuild": "^4.7.2",
-    "ts-jest": "^27.1.1",
     "typedoc": "^0.22.10",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "vitest": "^3.2.4"
   },
   "resolutions": {
     "node-forge": "0.10.0"

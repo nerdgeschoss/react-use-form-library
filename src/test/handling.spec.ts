@@ -7,7 +7,7 @@ describe(Form, () => {
 
   describe('submitting', () => {
     it('prevents the event default', () => {
-      const mock = jest.fn();
+      const mock = vi.fn();
       const submitEvent = {
         preventDefault: mock,
       } as unknown as Event;
