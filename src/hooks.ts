@@ -58,9 +58,16 @@ export function useForm<T>({
   );
   const form = formRef.current;
 
-  if (_unstableUpdateModelOnChange && !isEqual(form.model, model)) {
+  // Reconcile against the *previously seen external model*, not the live
+  // edited model. Comparing against `form.model` fired on every render once
+  // the user edited anything (and continuously for File/Date models), which
+  // silently discarded in-flight edits. Tracking the external model in a ref
+  // makes "the source data changed" distinguishable from "the user is editing".
+  const previousModel = useRef(model);
+  if (_unstableUpdateModelOnChange && !isEqual(previousModel.current, model)) {
     form.updateOriginalModel(model);
   }
+  previousModel.current = model;
 
   form.onSubmit = onSubmit;
   form.onSubmitError = onSubmitError;

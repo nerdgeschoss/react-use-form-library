@@ -24,7 +24,35 @@ export function useForceUpdate(): () => void {
 
 export function isEqual<T>(a: T, b: T): boolean {
   if (a === b) return true; // faster in case there's actual equality
-  return JSON.stringify(a) === JSON.stringify(b);
+  if (a == null || b == null) return a === b;
+
+  // Dates: compare by time.
+  if (a instanceof Date || b instanceof Date) {
+    return (
+      a instanceof Date && b instanceof Date && a.getTime() === b.getTime()
+    );
+  }
+
+  const aPlain = Array.isArray(a) || isObject(a);
+  const bPlain = Array.isArray(b) || isObject(b);
+  if (!aPlain || !bPlain) return false;
+
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
+      return false;
+    }
+    return a.every((value, index) => isEqual(value, b[index]));
+  }
+
+  // Both plain objects: key-order-independent, and treats a missing key and
+  // an explicit `undefined` as equal.
+  const ao = a as Record<string, unknown>;
+  const bo = b as Record<string, unknown>;
+  const keys = new Set([...Object.keys(ao), ...Object.keys(bo)]);
+  for (const key of keys) {
+    if (!isEqual(ao[key], bo[key])) return false;
+  }
+  return true;
 }
 
 export function uniq(value: string[]): string[] {
