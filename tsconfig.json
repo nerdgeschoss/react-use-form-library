@@ -20,6 +20,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "es6",
+    "types": ["vitest/globals"],
     "isolatedModules": true,
     "declaration": true,
     "jsx": "react"
