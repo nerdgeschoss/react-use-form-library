@@ -3,7 +3,8 @@ import { isEqual, useForceUpdate } from './util';
 
 import { MappedFields } from './field';
 import { MappedValidation } from './validation';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { FormViews } from './views';
 
 export interface UseFormProps<T> {
   model: T;
@@ -45,6 +46,8 @@ export function useForm<T>({
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
 
+  const [views] = useState(() => new FormViews<T>());
+
   const formRef = useRef<Form<T>>(
     new Form({
       model,
@@ -65,18 +68,18 @@ export function useForm<T>({
   form.onSubmit = onSubmit;
   form.onSubmitError = onSubmitError;
 
+  // Views give fields and model a new identity whenever their content changes.
+  const { model: modelView, fields, changes, touchedValues } = views.read(form);
+
   return {
-    model: form.model,
-    fields: form.fields,
-    changes: form.changes,
-    touchedValues: form.touchedValues,
+    model: modelView,
+    fields,
+    changes,
+    touchedValues,
     dirty: form.dirty,
     valid: form.valid,
     error: form.error,
     submissionStatus: form.submissionStatus,
-    updateFields: form.updateFields.bind(form),
-    onSubmit: form.submit.bind(form),
-    reset: form.reset.bind(form),
-    resetError: form.resetError.bind(form),
+    ...views.methods(form),
   };
 }

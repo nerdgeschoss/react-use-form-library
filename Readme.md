@@ -24,8 +24,9 @@ Contrary to other solutions that provide you with react components and/or wrappe
 6. [Advanced Example](#advanced-example)
 7. [Nested Objects](#nested-objects)
 8. [Array values (FieldSet)](#fieldset)
-9. [API](#api)
-10. [Development](#development)
+9. [React Compiler and memoization](#react-compiler-and-memoization)
+10. [API](#api)
+11. [Development](#development)
 
 ## Installation
 
@@ -730,6 +731,25 @@ return (
 <p>&nbsp</p>
 
 ---
+
+## React Compiler and memoization
+
+The form updates its fields in place. To let memoizing code (the
+[React Compiler](https://react.dev/learn/react-compiler), `React.memo`,
+`useMemo`) see those updates, `useForm` returns:
+
+- `fields` and every field as views: they get a new identity whenever their
+  content changes and keep it otherwise, so a memoized component that only
+  receives an unchanged field does not re-render. Reads go to the live form, so
+  `fields.name.value` right after `fields.name.onChange(...)` returns the new
+  value.
+- `model` as a plain object, copied when a value changes. Unchanged nested
+  objects keep their identity. `model` holds the values of the current render:
+  reading `model.name` right after `fields.name.onChange(...)` still returns
+  the old value. Use `model` for reading only and update values with
+  `onChange` or `updateFields`.
+- `updateFields`, `onSubmit`, `reset`, `resetError` and the field functions
+  (`onChange`, `onBlur`, `touch`, ...) with the same identity across renders.
 
 <p>&nbsp</p>
 
