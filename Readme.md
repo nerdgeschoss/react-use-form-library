@@ -24,8 +24,9 @@ Contrary to other solutions that provide you with react components and/or wrappe
 6. [Advanced Example](#advanced-example)
 7. [Nested Objects](#nested-objects)
 8. [Array values (FieldSet)](#fieldset)
-9. [API](#api)
-10. [Development](#development)
+9. [React Compiler and memoization](#react-compiler-and-memoization)
+10. [API](#api)
+11. [Development](#development)
 
 ## Installation
 
@@ -730,6 +731,28 @@ return (
 <p>&nbsp</p>
 
 ---
+
+## React Compiler and memoization
+
+The form updates its fields and model in place. To let memoizing code (the
+[React Compiler](https://react.dev/learn/react-compiler), `React.memo`,
+`useMemo`) see those updates, `useForm` returns views:
+
+- `fields`, every field and `model` get a new identity whenever their content
+  changes, and keep their identity otherwise. A field that did not change keeps
+  its identity, so a memoized component that only receives it does not
+  re-render.
+- Reads and writes go to the live form. Reading `fields.name.value` or
+  `model.name` right after `fields.name.onChange(...)` returns the new value,
+  as before.
+- `updateFields`, `onSubmit`, `reset`, `resetError` and the field functions
+  (`onChange`, `onBlur`, `touch`, ...) keep the same identity across renders.
+
+The views are `Proxy` objects, nested objects included. APIs that use the
+structured clone algorithm (`structuredClone`, `postMessage`, IndexedDB,
+`history.pushState`) reject proxies. Pass them a plain copy such as
+`JSON.parse(JSON.stringify(model))`, or `form.model` from the `onSubmit` and
+`onChange` callbacks, which is the live object and not a proxy.
 
 <p>&nbsp</p>
 
