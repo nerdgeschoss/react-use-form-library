@@ -1,3 +1,5 @@
+import { types } from 'util';
+
 import { Model, createForm, tracker } from './util';
 
 import { Form } from '../form';
@@ -117,6 +119,92 @@ describe(FormViews, () => {
     });
   });
 
+  describe('reads and writes in the same handler', () => {
+    function rendered(value: Partial<Model>): ReturnType<typeof setup> & {
+      snapshot: FormSnapshot<Model>;
+    } {
+      const result = setup(value);
+      const snapshot = result.read();
+      void snapshot.model.address?.streetName;
+      void snapshot.fields.address.value;
+      void snapshot.fields.hobbies.value;
+      void snapshot.fields.hobbies.elements;
+      return { ...result, snapshot };
+    }
+
+    it('reads a nested value replaced by onChange', () => {
+      const { snapshot } = rendered({ address: { streetName: 'Main' } });
+      const { fields, model } = snapshot;
+      fields.address.onChange({ streetName: 'Side' });
+      expect(fields.address.value?.streetName).toBe('Side');
+      expect(model.address?.streetName).toBe('Side');
+    });
+
+    it('reads elements and value after add', () => {
+      const { snapshot } = rendered({ hobbies: [{ name: 'chess' }] });
+      const { fields, model } = snapshot;
+      fields.hobbies.add({ name: 'go' });
+      expect(fields.hobbies.elements.length).toBe(2);
+      expect(fields.hobbies.value.length).toBe(2);
+      expect(model.hobbies.length).toBe(2);
+    });
+
+    it('reads an array replaced by onChange', () => {
+      const { snapshot } = rendered({ hobbies: [{ name: 'chess' }] });
+      const { fields } = snapshot;
+      fields.hobbies.onChange([{ name: 'a' }, { name: 'b' }]);
+      expect(fields.hobbies.value.map((hobby) => hobby.name)).toEqual([
+        'a',
+        'b',
+      ]);
+    });
+
+    it('changes the added element, not another one', () => {
+      const { form, snapshot } = rendered({ hobbies: [{ name: 'chess' }] });
+      const { fields } = snapshot;
+      fields.hobbies.add({ name: 'go' });
+      const elements = fields.hobbies.elements;
+      elements[elements.length - 1].onChange({ name: 'changed' });
+      expect(form.model.hobbies.map((hobby) => hobby.name)).toEqual([
+        'chess',
+        'changed',
+      ]);
+      expect(Object.keys(form.model.hobbies)).toEqual(['0', '1']);
+    });
+  });
+
+  describe('wrappers passed back to the form', () => {
+    it('stores the real object on onChange', () => {
+      const { form, read } = setup({ address: { streetName: 'Main' } });
+      const { fields } = read();
+      fields.json.onChange(fields.address.value);
+      expect(types.isProxy(form.model.json)).toBe(false);
+      expect(form.model.json).toEqual({ streetName: 'Main' });
+    });
+
+    it('stores the real object when nested in a plain object', () => {
+      const { form, read } = setup({ address: { streetName: 'Main' } });
+      const { fields } = read();
+      fields.json.onChange({ inner: fields.address.value });
+      const json = form.model.json as { inner: unknown };
+      expect(types.isProxy(json.inner)).toBe(false);
+    });
+
+    it('stores the real object on updateFields', () => {
+      const { form, views, read } = setup({ address: { streetName: 'Main' } });
+      const { fields } = read();
+      views.methods(form).updateFields({ json: fields.address.value });
+      expect(types.isProxy(form.model.json)).toBe(false);
+    });
+
+    it('stores the real object when assigned through the model', () => {
+      const { form, read } = setup({ address: { streetName: 'Main' } });
+      const { fields, model } = read();
+      model.json = fields.address.value;
+      expect(types.isProxy(form.model.json)).toBe(false);
+    });
+  });
+
   describe('nested values', () => {
     it('gives the parent and model a new identity when a nested field changes', () => {
       const { read } = setup({ address: { streetName: 'Main' } });
@@ -151,6 +239,114 @@ describe(FormViews, () => {
       const address = Object.freeze({ streetName: 'Main' });
       const { read } = setup({ address });
       expect(read().model.address?.streetName).toBe('Main');
+    });
+  });
+
+  describe('review findings', () => {
+    it('returns inherited keys of fields without wrapping them', () => {
+      const { read } = setup();
+      const { fields } = read();
+      expect(() => fields.constructor).not.toThrow();
+      expect(Object.prototype.hasOwnProperty.call(fields, 'name')).toBe(true);
+      expect(fields.hasOwnProperty('name')).toBe(true);
+    });
+
+    it('reads sparse arrays', () => {
+      const { read } = setup({ emails: new Array(2) });
+      expect(() => read()).not.toThrow();
+    });
+
+    it('reads validations that return something other than an array', () => {
+      const form = createForm({
+        value: { name: 'x' },
+        validations: {
+          name: (({ value }: { value: string }) =>
+            value === 'x' && ['bad']) as never,
+        },
+      });
+      const views = new FormViews<Model>();
+      expect(() => views.read(form)).not.toThrow();
+      views.read(form).fields.name.onChange('y');
+      expect(() => views.read(form)).not.toThrow();
+    });
+
+    it('changes identity when an error entry changes, not only the joined text', () => {
+      const form = createForm({
+        value: { name: 'a' },
+        validations: {
+          name: ({ model }) => (model.name === 'a' ? ['x\u0000y'] : ['x', 'y']),
+        },
+      });
+      const views = new FormViews<Model>();
+      const before = views.read(form).fields.name;
+      before.onChange('b');
+      expect(views.read(form).fields.name).not.toBe(before);
+    });
+
+    it('keeps elements live after add and remove in the same handler', () => {
+      const { form, read } = setup({
+        hobbies: [{ name: 'a' }, { name: 'b' }, { name: 'c' }],
+      });
+      const elements = read().fields.hobbies.elements;
+      read().fields.hobbies.add({ name: 'd' });
+      expect(elements.length).toBe(4);
+      [...elements].forEach((element) => element.remove());
+      expect(form.model.hobbies).toEqual([]);
+    });
+
+    it('unwraps wrappers of another form', () => {
+      const a = setup({ address: { streetName: 'Main' } });
+      const b = setup();
+      b.read().fields.json.onChange(a.read().fields.address.value);
+      expect(types.isProxy(b.form.model.json)).toBe(false);
+    });
+
+    it('unwraps writes into nested objects that no field holds yet', () => {
+      const { form, read } = setup({
+        hobbies: [{ name: 'a' }],
+        address: { streetName: 'Main' },
+      });
+      const { model, fields } = read();
+      model.hobbies.push(fields.address.value as { name: string });
+      expect(types.isProxy(form.model.hobbies[1])).toBe(false);
+    });
+
+    it('writes through Object.create to the child object, as on a plain object', () => {
+      const { form, read } = setup({ name: 'a' });
+      const child = Object.create(read().model);
+      child.name = 'b';
+      expect(form.model.name).toBe('a');
+      expect(child.name).toBe('b');
+    });
+
+    it('gives changes and touchedValues new identities when a nested value changes', () => {
+      const { read } = setup({ address: { streetName: 'A' } });
+      read().fields.address.fields.streetName.onChange('B');
+      read().fields.address.touch();
+      const before = read();
+      read().fields.address.fields.streetName.onChange('C');
+      const after = read();
+      expect(after.changes.address).not.toBe(before.changes.address);
+      expect(after.touchedValues.address).not.toBe(
+        before.touchedValues.address
+      );
+      expect(after.changes.address?.streetName).toBe('C');
+    });
+
+    it('keeps the model identity on focus and blur', () => {
+      const { read } = setup({ name: 'a' });
+      const before = read().model;
+      read().fields.name.onFocus();
+      read().fields.name.onBlur();
+      expect(read().model).toBe(before);
+    });
+
+    it('handles large field sets', () => {
+      const hobbies = Array.from({ length: 100000 }, (_, i) => ({
+        name: String(i),
+      }));
+      const { read } = setup({ hobbies });
+      expect(() => read()).not.toThrow();
     });
   });
 
