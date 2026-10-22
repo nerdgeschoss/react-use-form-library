@@ -734,25 +734,35 @@ return (
 
 ## React Compiler and memoization
 
-The form updates its fields and model in place. To let memoizing code (the
-[React Compiler](https://react.dev/learn/react-compiler), `React.memo`,
-`useMemo`) see those updates, `useForm` returns views:
+If your project uses the [React Compiler](https://react.dev/learn/react-compiler),
+or `React.memo` / `useMemo` with form values, pass `memoize: true`:
 
-- `fields`, every field and `model` get a new identity whenever their content
-  changes, and keep their identity otherwise. A field that did not change keeps
-  its identity, so a memoized component that only receives it does not
-  re-render.
-- Reads and writes go to the live form. Reading `fields.name.value` or
-  `model.name` right after `fields.name.onChange(...)` returns the new value,
-  as before.
-- `updateFields`, `onSubmit`, `reset`, `resetError` and the field functions
-  (`onChange`, `onBlur`, `touch`, ...) keep the same identity across renders.
+```tsx
+const { fields, model } = useForm({ model: { name: '' }, memoize: true });
+```
 
-The views are `Proxy` objects, nested objects included. APIs that use the
-structured clone algorithm (`structuredClone`, `postMessage`, IndexedDB,
-`history.pushState`) reject proxies. Pass them a plain copy such as
-`JSON.parse(JSON.stringify(model))`, or `form.model` from the `onSubmit` and
-`onChange` callbacks, which is the live object and not a proxy.
+Without it, memoized components don't update when a form value changes. With
+it, a component re-renders when the fields it receives change, and is skipped
+otherwise.
+
+With `memoize: true`, form values work like React state:
+
+- An effect that depends on a field and sets that field to a new object runs
+  again after every change it makes. Guard it with a condition:
+
+  ```tsx
+  useEffect(() => {
+    if (!fields.period.value) fields.period.onChange({ start, end });
+  }, [fields.period]);
+  ```
+
+- Compare object values by a key. `options.indexOf(fields.country.value)`
+  doesn't find the option; use
+  `options.find((option) => option.id === fields.country.value?.id)`.
+- `model` and object values can't be passed to `structuredClone`,
+  `postMessage`, IndexedDB or `history.pushState`. Use `form.model` from the
+  `onSubmit` callback, or a copy: `JSON.parse(JSON.stringify(model))`.
+- Don't modify `changes` or `touchedValues`.
 
 <p>&nbsp</p>
 
@@ -769,6 +779,7 @@ structured clone algorithm (`structuredClone`, `postMessage`, IndexedDB,
 | onSubmit      | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
 | onSubmitError | A useful handler to deal with errors.                                                                            |
 | onChange      | A handler for changes in all form fields.                                                                        |
+| memoize       | Set to `true` when form values are used in memoized components (React Compiler, `React.memo`, `useMemo`). See [React Compiler and memoization](#react-compiler-and-memoization). |
 
 <p>&nbsp</p>
 

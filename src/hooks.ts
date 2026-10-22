@@ -15,9 +15,8 @@ export interface UseFormProps<T> {
   onInit?: (form: Form<T>) => void;
   onChange?: (form: Form<T>) => void;
   /**
-   * Returns `fields`, `model` and their nested values as views that get a new
-   * identity whenever their content changes, for the React Compiler,
-   * `React.memo` and `useMemo`. See "React Compiler and memoization" in the Readme.
+   * Set to `true` when form values are used in memoized components (React
+   * Compiler, `React.memo`, `useMemo`). See "React Compiler and memoization" in the Readme.
    */
   memoize?: boolean;
 }
