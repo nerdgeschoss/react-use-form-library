@@ -141,6 +141,7 @@ export class FormViews<T> {
   }
 
   // The same keys as `form.changes` and `form.touchedValues`, with the values as views.
+  // Frozen, because they are shared by all renders until something changes.
   private buildFormValues(
     form: AnyForm
   ): Pick<FormSnapshot<T>, 'changes' | 'touchedValues'> {
@@ -152,10 +153,10 @@ export class FormViews<T> {
       if (field.dirty) changes[key] = this.valueView(field);
       if (field.touched) touchedValues[key] = this.valueView(field);
     }
-    return { changes, touchedValues } as Pick<
-      FormSnapshot<T>,
-      'changes' | 'touchedValues'
-    >;
+    return {
+      changes: Object.freeze(changes),
+      touchedValues: Object.freeze(touchedValues),
+    } as Pick<FormSnapshot<T>, 'changes' | 'touchedValues'>;
   }
 
   private visit(node: Node): NodeState {

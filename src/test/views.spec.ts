@@ -333,6 +333,20 @@ describe(FormViews, () => {
       expect(after.changes.address?.streetName).toBe('C');
     });
 
+    it('throws when changes or touchedValues are modified', () => {
+      const { read } = setup({ name: 'a' });
+      read().fields.name.onChange('b');
+      read().fields.name.touch();
+      const { changes, touchedValues } = read();
+      expect(() => {
+        (changes as Record<string, unknown>).extra = 1;
+      }).toThrow(TypeError);
+      expect(() => {
+        (touchedValues as Record<string, unknown>).extra = 1;
+      }).toThrow(TypeError);
+      expect(read().changes).toEqual({ name: 'b' });
+    });
+
     it('keeps the model identity on focus and blur', () => {
       const { read } = setup({ name: 'a' });
       const before = read().model;

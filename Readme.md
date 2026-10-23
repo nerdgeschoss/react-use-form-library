@@ -759,10 +759,12 @@ With `memoize: true`, form values work like React state:
 - Compare object values by a key. `options.indexOf(fields.country.value)`
   doesn't find the option; use
   `options.find((option) => option.id === fields.country.value?.id)`.
-- `model` and object values can't be passed to `structuredClone`,
-  `postMessage`, IndexedDB or `history.pushState`. Use `form.model` from the
-  `onSubmit` callback, or a copy: `JSON.parse(JSON.stringify(model))`.
-- Don't modify `changes` or `touchedValues`.
+- `model` and object values are `Proxy` objects. Reading and writing them works
+  as usual, but `structuredClone`, `postMessage`, IndexedDB and
+  `history.pushState` reject proxies. Use `form.model` from the `onSubmit`
+  callback, or a copy: `JSON.parse(JSON.stringify(model))`.
+- `changes` and `touchedValues` are read-only. Modifying them throws a
+  `TypeError`; copy them first (`{ ...changes }`).
 
 <p>&nbsp</p>
 
