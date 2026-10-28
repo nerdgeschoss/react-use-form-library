@@ -28,6 +28,7 @@
 <li><a href="#advanced-example">Advanced Example</a></li>
 <li><a href="#nested-objects">Nested Objects</a></li>
 <li><a href="#fieldset">Array values (FieldSet)</a></li>
+<li><a href="#react-compiler-and-memoization">React Compiler and memoization</a></li>
 <li><a href="#api">API</a></li>
 <li><a href="#development">Development</a></li>
 </ol>
@@ -367,6 +368,43 @@ be further applied to any new field created.</p>
 <p>&nbsp</p>
 
 <hr>
+
+<a href="#react-compiler-and-memoization" id="react-compiler-and-memoization" style="color: inherit; text-decoration: none;">
+  <h2>React Compiler and memoization</h2>
+</a>
+<p>If your project uses the <a href="https://react.dev/learn/react-compiler">React Compiler</a>,
+or passes <code>fields</code>, a field or <code>model</code> to <code>React.memo</code> components or as
+<code>useMemo</code> / <code>useEffect</code> dependencies, pass <code>memoize: true</code>:</p>
+<pre><code class="language-tsx"><span class="hl-4">const</span><span class="hl-1"> { </span><span class="hl-7">fields</span><span class="hl-1">, </span><span class="hl-7">model</span><span class="hl-1"> } = </span><span class="hl-5">useForm</span><span class="hl-1">({ </span><span class="hl-2">model:</span><span class="hl-1"> { </span><span class="hl-2">name:</span><span class="hl-1"> </span><span class="hl-3">&#39;&#39;</span><span class="hl-1"> }, </span><span class="hl-2">memoize:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1"> });</span>
+</code></pre>
+<p>Without it, memoized components don&#39;t update when a form value changes. With
+it, a component re-renders when the fields it receives change, and is skipped
+otherwise. You don&#39;t need it if you build your own dependencies from the
+values, e.g. <code>[JSON.stringify(fields.name.value)]</code>.</p>
+<p>With <code>memoize: true</code>, form values work like React state:</p>
+<ul>
+<li><p>An effect that depends on a field and sets that field to a new object runs
+again after every change it makes. Guard it with a condition:</p>
+<pre><code class="language-tsx"><span class="hl-5">useEffect</span><span class="hl-1">(() </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">if</span><span class="hl-1"> (!</span><span class="hl-2">fields</span><span class="hl-1">.</span><span class="hl-2">period</span><span class="hl-1">.</span><span class="hl-2">value</span><span class="hl-1">) </span><span class="hl-2">fields</span><span class="hl-1">.</span><span class="hl-2">period</span><span class="hl-1">.</span><span class="hl-5">onChange</span><span class="hl-1">({ </span><span class="hl-2">start</span><span class="hl-1">, </span><span class="hl-2">end</span><span class="hl-1"> });</span><br/><span class="hl-1">}, [</span><span class="hl-2">fields</span><span class="hl-1">.</span><span class="hl-2">period</span><span class="hl-1">]);</span>
+</code></pre>
+</li>
+<li><p>Compare object values by a key. <code>options.indexOf(fields.country.value)</code>
+doesn&#39;t find the option; use
+<code>options.find((option) =&gt; option.id === fields.country.value?.id)</code>.</p>
+</li>
+<li><p>Change values only with <code>onChange</code> and <code>updateFields</code>. Changes written
+directly into <code>model</code> or its nested objects (<code>model.tags.push(...)</code>) are not
+detected.</p>
+</li>
+<li><p><code>model</code> and object values are <code>Proxy</code> objects. Reading them works as usual,
+but <code>structuredClone</code>, <code>postMessage</code>, IndexedDB and <code>history.pushState</code>
+reject proxies. Use <code>form.model</code> from the <code>onSubmit</code> callback, or a copy:
+<code>JSON.parse(JSON.stringify(model))</code>.</p>
+</li>
+<li><p><code>changes</code> and <code>touchedValues</code> are read-only. Modifying them throws a
+<code>TypeError</code>; copy them first (<code>{ ...changes }</code>).</p>
+</li>
+</ul>
 <p>&nbsp</p>
 
 
@@ -407,6 +445,10 @@ be further applied to any new field created.</p>
 <tr>
 <td>onChange</td>
 <td>A handler for changes in all form fields.</td>
+</tr>
+<tr>
+<td>memoize</td>
+<td>Set to <code>true</code> when the React Compiler is used, or when fields or the model are passed to <code>React.memo</code> components or used as <code>useMemo</code> / <code>useEffect</code> dependencies. See <a href="#react-compiler-and-memoization">React Compiler and memoization</a>.</td>
 </tr>
 </tbody></table>
 <p>&nbsp</p>
