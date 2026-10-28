@@ -15,8 +15,9 @@ export interface UseFormProps<T> {
   onInit?: (form: Form<T>) => void;
   onChange?: (form: Form<T>) => void;
   /**
-   * Set to `true` when form values are used in memoized components (React
-   * Compiler, `React.memo`, `useMemo`). See "React Compiler and memoization" in the Readme.
+   * Set to `true` when the React Compiler is used, or when fields or the model
+   * are passed to `React.memo` components or used as `useMemo` / `useEffect`
+   * dependencies. See "React Compiler and memoization" in the Readme.
    */
   memoize?: boolean;
 }

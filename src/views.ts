@@ -78,10 +78,19 @@ function isFrozenProperty(target: object, key: PropertyKey): boolean {
   return !!descriptor && !descriptor.configurable && !descriptor.writable;
 }
 
-function unwrapDescriptor(descriptor: PropertyDescriptor): PropertyDescriptor {
-  return 'value' in descriptor
-    ? { ...descriptor, value: unwrap(descriptor.value) }
-    : descriptor;
+// A property that ends up non-configurable and non-writable must hold the requested value, so only other definitions are unwrapped.
+function unwrapDescriptor(
+  target: object,
+  key: PropertyKey,
+  descriptor: PropertyDescriptor
+): PropertyDescriptor {
+  if (!('value' in descriptor)) return descriptor;
+  const existing = Object.getOwnPropertyDescriptor(target, key);
+  const configurable =
+    descriptor.configurable ?? existing?.configurable ?? false;
+  const writable = descriptor.writable ?? existing?.writable ?? false;
+  if (!configurable && !writable) return descriptor;
+  return { ...descriptor, value: unwrap(descriptor.value) };
 }
 
 /**
@@ -96,6 +105,10 @@ export class FormViews<T> {
   private fieldsViews = new WeakMap<Node, Cached<AnyRecord>>();
   private elementsViews = new WeakMap<Node, Cached<AnyField[]>>();
   private valueViews = new WeakMap<Node, Cached<unknown>>();
+  private errorViews = new WeakMap<
+    AnyField,
+    { entries: unknown[]; source: unknown; view: unknown }
+  >();
   // Nested objects that no field holds yet; they only change through direct writes.
   private rawViews = new WeakMap<object, object>();
   private functions = new WeakMap<
@@ -176,6 +189,8 @@ export class FormViews<T> {
     // The value's own entries, so a slot written by any path is noticed, plus the children's value versions.
     const value = this.liveValue(node);
     const valueSignature: unknown[] = [value];
+    // `length` is not an own enumerable key, so `value.length = n` is only noticed through it.
+    if (Array.isArray(value)) valueSignature.push(value.length);
     if (Array.isArray(value) || isObject(value)) {
       for (const key of Object.keys(value as object)) {
         valueSignature.push(key, (value as AnyRecord)[key]);
@@ -317,6 +332,7 @@ export class FormViews<T> {
               );
             }
             if (key === 'elements') return this.elementsView(target);
+            if (key === 'errors') return this.errorsView(target);
             // Getters run on the real field: its private fields don't work with a proxy as `this`.
             const value = Reflect.get(target, key, target);
             return typeof value === 'function' && key !== 'constructor'
@@ -328,12 +344,28 @@ export class FormViews<T> {
               ? Reflect.set(target, key, unwrap(value), target)
               : Reflect.set(target, key, value, receiver),
           defineProperty: (target, key, descriptor) =>
-            Reflect.defineProperty(target, key, unwrapDescriptor(descriptor)),
+            Reflect.defineProperty(
+              target,
+              key,
+              unwrapDescriptor(target, key, descriptor)
+            ),
         });
         targets.set(view, field);
         return view;
       }
     );
+  }
+
+  // Validation creates a new `errors` array on every change; this keeps one while the entries stay the same,
+  // and gives a new one when they change, also when a validation reuses and changes its array.
+  private errorsView(field: AnyField): unknown {
+    const errors: unknown = field.errors;
+    if (!Array.isArray(errors)) return errors;
+    const entry = this.errorViews.get(field);
+    if (entry && sameSignature(entry.entries, errors)) return entry.view;
+    const view = entry?.source === errors ? [...errors] : errors;
+    this.errorViews.set(field, { entries: [...errors], source: errors, view });
+    return view;
   }
 
   private fieldsView(node: Node, live: AnyRecord): AnyRecord {
@@ -425,7 +457,11 @@ export class FormViews<T> {
           ? Reflect.set(target, key, unwrap(newValue))
           : Reflect.set(target, key, newValue, receiver),
       defineProperty: (target, key, descriptor) =>
-        Reflect.defineProperty(target, key, unwrapDescriptor(descriptor)),
+        Reflect.defineProperty(
+          target,
+          key,
+          unwrapDescriptor(target, key, descriptor)
+        ),
     });
     targets.set(view, value);
     return view;

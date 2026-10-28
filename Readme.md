@@ -735,7 +735,8 @@ return (
 ## React Compiler and memoization
 
 If your project uses the [React Compiler](https://react.dev/learn/react-compiler),
-or `React.memo` / `useMemo` with form values, pass `memoize: true`:
+or passes `fields`, a field or `model` to `React.memo` components or as
+`useMemo` / `useEffect` dependencies, pass `memoize: true`:
 
 ```tsx
 const { fields, model } = useForm({ model: { name: '' }, memoize: true });
@@ -743,7 +744,8 @@ const { fields, model } = useForm({ model: { name: '' }, memoize: true });
 
 Without it, memoized components don't update when a form value changes. With
 it, a component re-renders when the fields it receives change, and is skipped
-otherwise.
+otherwise. You don't need it if you build your own dependencies from the
+values, e.g. `[JSON.stringify(fields.name.value)]`.
 
 With `memoize: true`, form values work like React state:
 
@@ -759,10 +761,13 @@ With `memoize: true`, form values work like React state:
 - Compare object values by a key. `options.indexOf(fields.country.value)`
   doesn't find the option; use
   `options.find((option) => option.id === fields.country.value?.id)`.
-- `model` and object values are `Proxy` objects. Reading and writing them works
-  as usual, but `structuredClone`, `postMessage`, IndexedDB and
-  `history.pushState` reject proxies. Use `form.model` from the `onSubmit`
-  callback, or a copy: `JSON.parse(JSON.stringify(model))`.
+- Change values only with `onChange` and `updateFields`. Changes written
+  directly into `model` or its nested objects (`model.tags.push(...)`) are not
+  detected.
+- `model` and object values are `Proxy` objects. Reading them works as usual,
+  but `structuredClone`, `postMessage`, IndexedDB and `history.pushState`
+  reject proxies. Use `form.model` from the `onSubmit` callback, or a copy:
+  `JSON.parse(JSON.stringify(model))`.
 - `changes` and `touchedValues` are read-only. Modifying them throws a
   `TypeError`; copy them first (`{ ...changes }`).
 
@@ -781,7 +786,7 @@ With `memoize: true`, form values work like React state:
 | onSubmit      | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
 | onSubmitError | A useful handler to deal with errors.                                                                            |
 | onChange      | A handler for changes in all form fields.                                                                        |
-| memoize       | Set to `true` when form values are used in memoized components (React Compiler, `React.memo`, `useMemo`). See [React Compiler and memoization](#react-compiler-and-memoization). |
+| memoize       | Set to `true` when the React Compiler is used, or when fields or the model are passed to `React.memo` components or used as `useMemo` / `useEffect` dependencies. See [React Compiler and memoization](#react-compiler-and-memoization). |
 
 <p>&nbsp</p>
 

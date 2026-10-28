@@ -364,6 +364,71 @@ describe(FormViews, () => {
     });
   });
 
+  describe('pull request review', () => {
+    it('defines a non-configurable, non-writable property with the requested value', () => {
+      const { read } = setup({ address: { streetName: 'Main' } });
+      const { model, fields } = read();
+      const address = fields.address.value;
+      expect(() =>
+        Object.defineProperty(model, 'json', { value: address })
+      ).not.toThrow();
+      expect(model.json).toBe(address);
+    });
+
+    it('stores the real object when a property is defined as writable', () => {
+      const { form, read } = setup({ address: { streetName: 'Main' } });
+      const { model, fields } = read();
+      Object.defineProperty(model, 'json', {
+        value: fields.address.value,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+      expect(types.isProxy(form.model.json)).toBe(false);
+    });
+
+    it('changes the identity of an array value when only its length changes', () => {
+      const { read } = setup({ emails: ['a'] });
+      const before = read().fields.emails.value;
+      (read().fields.emails.value as string[]).length = 3;
+      read().fields.name.onChange('x');
+      expect(read().fields.emails.value).not.toBe(before);
+    });
+
+    describe('errors', () => {
+      it('keeps the errors array while its entries stay the same', () => {
+        const { read } = setup({ name: '' });
+        const before = read().fields.name.errors;
+        read().fields.age.onChange(30);
+        expect(read().fields.name.errors).toBe(before);
+      });
+
+      it('returns new errors right after a write and a new array', () => {
+        const { read } = setup({ name: 'Ada' });
+        const { fields } = read();
+        const before = fields.name.errors;
+        fields.name.onChange('');
+        expect(fields.name.errors).toEqual(['required-field']);
+        expect(fields.name.errors).not.toBe(before);
+      });
+
+      it('gives a new array when a validation changes and returns the same array', () => {
+        const shared = ['a'];
+        const form = createForm({
+          value: { name: 'x' },
+          validations: { name: () => shared },
+        });
+        const views = new FormViews<Model>();
+        const before = views.read(form).fields.name.errors;
+        shared[0] = 'b';
+        views.read(form).fields.age.onChange(21);
+        const after = views.read(form).fields.name.errors;
+        expect(after).not.toBe(before);
+        expect(after).toEqual(['b']);
+      });
+    });
+  });
+
   describe('methods', () => {
     it('returns the same functions on every read', () => {
       const { form, views } = setup();
