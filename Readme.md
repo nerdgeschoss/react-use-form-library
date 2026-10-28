@@ -24,8 +24,9 @@ Contrary to other solutions that provide you with react components and/or wrappe
 6. [Advanced Example](#advanced-example)
 7. [Nested Objects](#nested-objects)
 8. [Array values (FieldSet)](#fieldset)
-9. [API](#api)
-10. [Development](#development)
+9. [React Compiler and memoization](#react-compiler-and-memoization)
+10. [API](#api)
+11. [Development](#development)
 
 ## Installation
 
@@ -731,6 +732,45 @@ return (
 
 ---
 
+## React Compiler and memoization
+
+If your project uses the [React Compiler](https://react.dev/learn/react-compiler),
+or passes `fields`, a field or `model` to `React.memo` components or as
+`useMemo` / `useEffect` dependencies, pass `memoize: true`:
+
+```tsx
+const { fields, model } = useForm({ model: { name: '' }, memoize: true });
+```
+
+Without it, memoized components don't update when a form value changes. With
+it, a component re-renders when the fields it receives change, and is skipped
+otherwise. You don't need it if you build your own dependencies from the
+values, e.g. `[JSON.stringify(fields.name.value)]`.
+
+With `memoize: true`, form values work like React state:
+
+- An effect that depends on a field and sets that field to a new object runs
+  again after every change it makes. Guard it with a condition:
+
+  ```tsx
+  useEffect(() => {
+    if (!fields.period.value) fields.period.onChange({ start, end });
+  }, [fields.period]);
+  ```
+
+- Compare object values by a key. `options.indexOf(fields.country.value)`
+  doesn't find the option; use
+  `options.find((option) => option.id === fields.country.value?.id)`.
+- Change values only with `onChange` and `updateFields`. Changes written
+  directly into `model` or its nested objects (`model.tags.push(...)`) are not
+  detected.
+- `model` and object values are `Proxy` objects. Reading them works as usual,
+  but `structuredClone`, `postMessage`, IndexedDB and `history.pushState`
+  reject proxies. Use `form.model` from the `onSubmit` callback, or a copy:
+  `JSON.parse(JSON.stringify(model))`.
+- `changes` and `touchedValues` are read-only. Modifying them throws a
+  `TypeError`; copy them first (`{ ...changes }`).
+
 <p>&nbsp</p>
 
 ## API
@@ -746,6 +786,7 @@ return (
 | onSubmit      | Your custom submit function. It will be parsed internally and provide a onSubmit handler to call programaticaly. |
 | onSubmitError | A useful handler to deal with errors.                                                                            |
 | onChange      | A handler for changes in all form fields.                                                                        |
+| memoize       | Set to `true` when the React Compiler is used, or when fields or the model are passed to `React.memo` components or used as `useMemo` / `useEffect` dependencies. See [React Compiler and memoization](#react-compiler-and-memoization). |
 
 <p>&nbsp</p>
 

@@ -3,7 +3,8 @@ import { isEqual, useForceUpdate } from './util';
 
 import { MappedFields } from './field';
 import { MappedValidation } from './validation';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { FormViews, unwrap } from './views';
 
 export interface UseFormProps<T> {
   model: T;
@@ -13,6 +14,12 @@ export interface UseFormProps<T> {
   onSubmitError?: (error: Error) => void;
   onInit?: (form: Form<T>) => void;
   onChange?: (form: Form<T>) => void;
+  /**
+   * Set to `true` when the React Compiler is used, or when fields or the model
+   * are passed to `React.memo` components or used as `useMemo` / `useEffect`
+   * dependencies. See "React Compiler and memoization" in the Readme.
+   */
+  memoize?: boolean;
 }
 
 // This interface is what you get back from the useForm hook
@@ -41,13 +48,16 @@ export function useForm<T>({
   onInit,
   onChange,
   _unstableUpdateModelOnChange,
+  memoize,
 }: UseFormProps<T>): FormModel<T> {
   // Using a custom hook to call a rerender on every change
   const onUpdate = useForceUpdate();
 
+  const [views] = useState(() => new FormViews<T>());
+
   const formRef = useRef<Form<T>>(
     new Form({
-      model,
+      model: memoize ? (unwrap(model) as T) : model,
       validations,
       onUpdate,
       onSubmit,
@@ -59,24 +69,40 @@ export function useForm<T>({
   const form = formRef.current;
 
   if (_unstableUpdateModelOnChange && !isEqual(form.model, model)) {
-    form.updateOriginalModel(model);
+    form.updateOriginalModel(memoize ? (unwrap(model) as T) : model);
   }
 
   form.onSubmit = onSubmit;
   form.onSubmitError = onSubmitError;
 
+  if (!memoize) {
+    return {
+      model: form.model,
+      fields: form.fields,
+      changes: form.changes,
+      touchedValues: form.touchedValues,
+      dirty: form.dirty,
+      valid: form.valid,
+      error: form.error,
+      submissionStatus: form.submissionStatus,
+      updateFields: form.updateFields.bind(form),
+      onSubmit: form.submit.bind(form),
+      reset: form.reset.bind(form),
+      resetError: form.resetError.bind(form),
+    };
+  }
+
+  const { model: modelView, fields, changes, touchedValues } = views.read(form);
+
   return {
-    model: form.model,
-    fields: form.fields,
-    changes: form.changes,
-    touchedValues: form.touchedValues,
+    model: modelView,
+    fields,
+    changes,
+    touchedValues,
     dirty: form.dirty,
     valid: form.valid,
     error: form.error,
     submissionStatus: form.submissionStatus,
-    updateFields: form.updateFields.bind(form),
-    onSubmit: form.submit.bind(form),
-    reset: form.reset.bind(form),
-    resetError: form.resetError.bind(form),
+    ...views.methods(form),
   };
 }
